@@ -35,5 +35,10 @@ build/
 ### VS Code ###
 .vscode/
 
+### Local secrets ###
+.env
+.env.local
+mariadb.env
+
 ### Mac OS ###
 .DS_Store

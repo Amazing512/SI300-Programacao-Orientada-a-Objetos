@@ -1,14 +1,12 @@
 package org.unicamp.poo.view;
 
-import org.unicamp.poo.util.ConsoleScanner;
-
 import java.util.List;
 import java.util.Scanner;
 
-public final class MenuView {
+public final class Menu {
     private final Scanner scanner;
 
-    public MenuView(Scanner scanner) {
+    public Menu(Scanner scanner) {
         this.scanner = scanner;
     }
 
