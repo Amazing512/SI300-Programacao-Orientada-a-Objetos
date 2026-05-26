@@ -9,7 +9,7 @@ public class Wallet implements Serializable {
     private String holder;
     private String broker;
 
-    public Wallet(String holder, String broker) {
+    public Wallet(int id, String holder, String broker) {
         super();
         this.id = null; // Recebido na persistência
         this.holder = holder;
