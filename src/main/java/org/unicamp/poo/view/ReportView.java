@@ -6,6 +6,9 @@ import org.unicamp.poo.util.ConsoleScanner;
 import java.util.List;
 import java.util.Scanner;
 
+/*  View class responsible for interacting with the user and formatting console
+    layouts for financial and ranking reports. */
+
 public class ReportView {
 
     // ANSI Escape codes for coloring console output texts
@@ -22,6 +25,8 @@ public class ReportView {
 
         return id;
     }
+
+    // Renders a financial panel block showing metrics and net values.
 
     public void showFinancialReport(int walletId, double totalCashIn, double totalCashOut, double result) {
 
@@ -44,6 +49,8 @@ public class ReportView {
 
     }
 
+    // Formats and prints a multi-column aligned dashboard showcasing the wallets ranking.
+
     public void showSortedWalletsReport(List<Wallet> wallets, double[] sortedBalances) {
         System.out.println("\n---------------------------------");
         System.out.println("       CARTEIRAS POR SALDO        ");
@@ -52,6 +59,7 @@ public class ReportView {
         System.out.printf("%-10s | %-25s | %-15s%n", "ID", "PROPRIETÁRIO", "SALDO ATUAL");
         System.out.println("---------------------------------");
 
+        // Iterates and flushes formatted rows to the console
         for(int i = 0; i < wallets.size(); i++){
             Wallet w = wallets.get(i);
             double balance = sortedBalances[i];
