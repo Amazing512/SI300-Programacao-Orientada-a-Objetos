@@ -2,7 +2,7 @@ package org.unicamp.poo.dao.impl.mariadb;
 
 import org.unicamp.poo.dao.TransactionDAO;
 import org.unicamp.poo.model.Transaction;
-
+import java.sql.Statement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

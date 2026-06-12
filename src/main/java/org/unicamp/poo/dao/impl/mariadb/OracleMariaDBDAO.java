@@ -45,10 +45,10 @@ public class OracleMariaDBDAO implements OracleDAO {
             
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    Oracle o = new Oracle();
-                    o.setDate(rs.getDate("quote_date"));
-                    o.setPrice(rs.getDouble("price"));
-                    return o;
+                    return new Oracle(
+                            rs.getDate("quote_date"),
+                            rs.getDouble("price")
+                    );
                 }
             }
         } catch (SQLException e) {
@@ -61,19 +61,22 @@ public class OracleMariaDBDAO implements OracleDAO {
     public List<Oracle> findAll() {
         List<Oracle> list = new ArrayList<>();
         String sql = "SELECT * FROM oracle_quotes ORDER BY quote_date DESC";
-        
+
         try (PreparedStatement stmt = connection.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
-            
+
             while (rs.next()) {
-                Oracle o = new Oracle();
-                o.setDate(rs.getDate("quote_date"));
-                o.setPrice(rs.getDouble("price"));
-                list.add(o); // Adiciona na lista
+                Oracle o = new Oracle(
+                        rs.getDate("quote_date"),
+                        rs.getDouble("price")
+                );
+                list.add(o);
             }
+
         } catch (SQLException e) {
             System.err.println("Erro ao executar FINDALL no MariaDB: " + e.getMessage());
         }
+
         return list;
     }
 

@@ -7,86 +7,13 @@ import java.util.List;
 
 public interface OracleDAO {
 
-    Oracle create(Oracle oracle){
-        String sql = "INSERT INTO oracle_quotes (quote_date, price) VALUES (?, ?)";
-        
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setDate(1, new java.util.Date(oracle.getDate().getTime()));
-            stmt.setDouble(2, oracle.getPrice());
-            
-            stmt.executeUpdate();
-            System.out.println("Cotação inserida com sucesso no MariaDB!");
-            return oracle;
-        } catch (SQLException e) {
-            System.err.println("Erro ao criar registro no OracleMariaDBDAO: " + e.getMessage());
-            return null;
-        }
+    Oracle create(Oracle oracle);
 
-    }
+    Oracle findByDate(Date date);
 
-    Oracle findByDate(Date date){
-        String sql = "SELECT * FROM oracle_quotes WHERE quote_date = ?";
-        
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setDate(1, new java.util.Date(date.getTime()));
-            
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    Oracle o = new Oracle();
-                    o.setDate(rs.getDate("quote_date"));
-                    o.setPrice(rs.getDouble("price"));
-                    return o;
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("Erro ao buscar cotação por data: " + e.getMessage());
-        }
-        return null;
-    }
+    List<Oracle> findAll();
 
-    List<Oracle> findAll(){
-        List<Oracle> list = new ArrayList<>();
-        String sql = "SELECT * FROM oracle_quotes ORDER BY quote_date DESC";
-        
-        try (PreparedStatement stmt = connection.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-            
-            while (rs.next()) {
-                Oracle o = new Oracle();
-                o.setDate(rs.getDate("quote_date"));
-                o.setPrice(rs.getDouble("price"));
-                list.add(o);
-            }
-        } catch (SQLException e) {
-            System.err.println("Erro ao listar histórico do Oracle: " + e.getMessage());
-        }
-        return list;
-    }
+    void update(Oracle oracle);
 
-    void update(Oracle oracle){
-        String sql = "UPDATE oracle_quotes SET price = ? WHERE quote_date = ?";
-        
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setDouble(1, oracle.getPrice());
-            stmt.setDate(2, new java.util.Date(oracle.getDate().getTime()));
-            
-            stmt.executeUpdate();
-            System.out.println("Cotação atualizada com sucesso no MariaDB!");
-        } catch (SQLException e) {
-            System.err.println("Erro ao atualizar cotação: " + e.getMessage());
-        }
-    }
-
-    void delete(Date date){
-        String sql = "DELETE FROM oracle_quotes WHERE quote_date = ?";
-        
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setDate(1, new java.sql.Date(date.getTime()));
-            stmt.executeUpdate();
-            System.out.println("Registro de cotação deletado do MariaDB!");
-        } catch (SQLException e) {
-            System.err.println("Erro ao deletar cotação: " + e.getMessage());
-        }
-    }
-    }
+    void delete(Date date);
 }

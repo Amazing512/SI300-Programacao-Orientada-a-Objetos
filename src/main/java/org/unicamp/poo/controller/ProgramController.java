@@ -2,12 +2,12 @@ package org.unicamp.poo.controller;
 
 import org.unicamp.poo.dao.DatabaseConnection;
 import org.unicamp.poo.dao.TransactionDAO;
+import org.unicamp.poo.dao.impl.memory.WalletMemoryDAO;
 import org.unicamp.poo.dao.WalletDAO;
 import org.unicamp.poo.dao.impl.mariadb.MariaDBConnection;
 import org.unicamp.poo.dao.impl.mariadb.TransactionDAOImplMariaDB;
 import org.unicamp.poo.dao.impl.mariadb.WalletDAOImplMariaDB;
-import org.unicamp.poo.dao.impl.memory.TransactionDAOImplMemory;
-import org.unicamp.poo.dao.impl.memory.WalletDAOImplMemory;
+import org.unicamp.poo.dao.impl.memory.TransactionMemoryDAO ;
 import org.unicamp.poo.model.enums.DatabaseSelector;
 import org.unicamp.poo.util.ConsoleScanner;
 import org.unicamp.poo.util.MessageProvider;
@@ -38,7 +38,7 @@ public class ProgramController {
     }
 
     void actionTransaction() {
-        final TransactionController transactionController = new TransactionController(transactionDAO, new TransactionView(), messages);
+        final TransactionController transactionController = new TransactionController(transactionDAO, walletDAO, new TransactionView(), messages);
         transactionController.start();
     }
 
@@ -64,8 +64,8 @@ public class ProgramController {
             break;
             case MEMORY:
             {
-                walletDAO = new WalletDAOImplMemory();
-                transactionDAO     = new TransactionDAOImplMemory();
+                walletDAO = new WalletMemoryDAO();
+                transactionDAO = new TransactionMemoryDAO();
             }
             break;
         }
