@@ -1,7 +1,6 @@
 package org.unicamp.poo.dao.impl.mariadb;
 
 import org.unicamp.poo.dao.DatabaseConnection;
-import org.unicamp.poo.util.MessageProvider;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -63,7 +62,7 @@ public class MariaDBConnection implements DatabaseConnection {
 
             if ((user == null || user.isBlank()) || (password == null || password.isBlank()))
             {
-                throw new IllegalStateException(MessageProvider "Defina MARIADB_USER e MARIADB_PASSWORD nas variaveis de ambiente ou no arquivo local mariadb.env.");
+                throw new IllegalStateException("Defina MARIADB_USER e MARIADB_PASSWORD nas variaveis de ambiente ou no arquivo local mariadb.env.");
             }
         }
         catch (final ClassNotFoundException exceptionValue)
