@@ -1,7 +1,9 @@
 package org.unicamp.poo.dao.impl.mariadb;
-
 import org.unicamp.poo.dao.TransactionDAO;
 import org.unicamp.poo.model.Transaction;
+import org.unicamp.poo.model.enums.OperationType;
+
+
 import java.sql.Statement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -20,15 +22,14 @@ public class TransactionDAOImplMariaDB implements TransactionDAO {
 
     @Override
     public Transaction create(Transaction transaction) {
-        String sql = "INSERT INTO transactions (quantity, description, date, wallet_id) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO transactions (wallet_id, OperationDate, operation_type, quantity) VALUES (?, ?, ?, ?)";
         
         try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             
-            stmt.setDouble(1, transaction.getQuantity()); 
-            stmt.setString(2, transaction.getDescription());
-            stmt.setTimestamp(3, java.sql.Timestamp.valueOf(transaction.getDateTime()));
-            stmt.setInt(4, transaction.getWalletId()); // Supondo que exista getWalletId()
-            
+             stmt.setInt(1, transaction.getWalletId()); 
+            stmt.setTimestamp(2,new java.sql.Timestamp(transaction.getOperationDate().getTime()));
+            stmt.setString(3,transaction.getOperationType().name());
+            stmt.setDouble(4,transaction.getQuantity());
             stmt.executeUpdate();
             
             try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
@@ -46,7 +47,7 @@ public class TransactionDAOImplMariaDB implements TransactionDAO {
         }
     }
 
-    
+        
         @Override
         public Transaction findById(int id) {
         String sql = "SELECT * FROM transactions WHERE id = ?";
@@ -56,13 +57,12 @@ public class TransactionDAOImplMariaDB implements TransactionDAO {
             
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    Transaction t = new Transaction();
+                Transaction t = new Transaction(
+                    rs.getInt("wallet_id"),
+                    rs.getTimestamp("OperationDate"),
+                    OperationType.valueOf(rs.getString("operation_type")),
+                    rs.getDouble("quantity"));
                     t.setId(rs.getInt("id"));
-                    t.setQuantity(rs.getInt("quantity")); 
-                    t.setDescription(rs.getString("description"));
-                    t.setDateTime(rs.getTimestamp("date").toLocalDateTime());
-                    t.setWalletId(rs.getInt("wallet_id"));
-                    return t;
                 }
             }
         } catch (SQLException e) {
@@ -81,12 +81,12 @@ public class TransactionDAOImplMariaDB implements TransactionDAO {
              ResultSet rs = stmt.executeQuery()) {
             
             while (rs.next()) {
-                Transaction t = new Transaction();
+                Transaction t = new Transaction(
+                rs.getInt("wallet_id"),
+                rs.getTimestamp("date"),
+                OperationType.valueOf(rs.getString("operation_type")),
+                rs.getDouble("quantity"));
                 t.setId(rs.getInt("id"));
-                t.setQuantity(rs.getInt("quantity")); 
-                t.setDescription(rs.getString("description"));
-                t.setDateTime(rs.getTimestamp("date").toLocalDateTime());
-                t.setWalletId(rs.getInt("wallet_id"));
                 list.add(t);
             }
         } catch (SQLException e) {
@@ -105,13 +105,12 @@ public class TransactionDAOImplMariaDB implements TransactionDAO {
             
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    Transaction t = new Transaction();
+                   Transaction t = new Transaction(
+                    rs.getInt("wallet_id"),
+                    rs.getTimestamp("date"),
+                    OperationType.valueOf(rs.getString("operation_type")),
+                    rs.getDouble("quantity"));
                     t.setId(rs.getInt("id"));
-                    t.setQuantity(rs.getInt("quantity")); 
-                    t.setDescription(rs.getString("description"));
-                    t.setDateTime(rs.getTimestamp("date").toLocalDateTime());
-                    t.setWalletId(rs.getInt("wallet_id"));
-                    list.add(t);
                 }
             }
         } catch (SQLException e) {
@@ -122,14 +121,14 @@ public class TransactionDAOImplMariaDB implements TransactionDAO {
 
     @Override
     public void update(Transaction transaction) {
-        String sql = "UPDATE transactions SET quantity = ?, description = ?, date = ?, wallet_id = ? WHERE id = ?";
+        String sql = "UPDATE transactions SET quantity = ?, description = ?, OperationDate = ?, wallet_id = ? WHERE id = ?";
         
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, transaction.getQuantity());
-            stmt.setString(2, transaction.getDescription());
-            stmt.setTimestamp(3, java.sql.Timestamp.valueOf(transaction.getDateTime()));
-            stmt.setInt(4, transaction.getWalletId());
-            stmt.setInt(5, transaction.getId());
+            stmt.setInt(1, transaction.getWalletId());
+            stmt.setTimestamp(2,new java.sql.Timestamp(transaction.getOperationDate().getTime()));
+            stmt.setString(3,transaction.getOperationType().name());
+            stmt.setDouble(4,transaction.getQuantity());
+            stmt.setInt(5,transaction.getId());
             
             stmt.executeUpdate();
             System.out.println("Transação atualizada com sucesso!");
