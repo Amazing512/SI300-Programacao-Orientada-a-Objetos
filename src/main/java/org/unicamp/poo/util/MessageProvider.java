@@ -8,7 +8,7 @@ public class MessageProvider {
 
     public MessageProvider(String bundleFileName, String lang, String country)
     {
-        Locale.setDefault(Locale.of(lang, country));
+        Locale.setDefault(new Locale(lang, country));
         this.resourceBundle = ResourceBundle.getBundle(bundleFileName, Locale.getDefault());
     }
 
