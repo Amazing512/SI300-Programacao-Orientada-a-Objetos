@@ -13,6 +13,11 @@ import java.util.List;
 // Controller class responsible for managing operations related to Wallets.
 
 public final class WalletController {
+
+    // ANSI Escape codes for coloring console output texts
+    public static final String reset = "\u001B[0m";
+    public static final String yellow = "\u001B[33m";
+
     // Attributes encapsulating the Model (DAO), View, and internationalized messages
     private final WalletDAO model;
     private final WalletView view;
@@ -134,7 +139,7 @@ public final class WalletController {
         // Keeps interacting with the user until the exit option (0) is selected
         while (loop)
         {
-            switch (walletMenu.getChoice(messages.get("walletMenu.title"), options, messages.get("walletMenu.prompt")))
+            switch (walletMenu.getChoice(messages.get(yellow + "walletMenu.title" + reset), options, messages.get("walletMenu.prompt")))
             {
                 case 0 -> loop = false;
                 case 1 -> actionAddWallet();
