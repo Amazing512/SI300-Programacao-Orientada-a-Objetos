@@ -17,6 +17,11 @@ import java.util.List;
     sorting wallet lists based on their current balance. */
 
 public class ReportController {
+
+    // ANSI Escape codes for coloring console output texts
+    public static final String reset = "\u001B[0m";
+    public static final String yellow = "\u001B[33m";
+
     private final WalletDAO walletDAO;
     private final TransactionDAO transactionDAO;
     private final ReportView view;
@@ -124,7 +129,7 @@ public class ReportController {
         boolean loop = true;
 
         while (loop) {
-            switch (reportMenu.getChoice(messages.get("reportMenu.title"), options, messages.get("reportMenu.prompt"))) {
+            switch (reportMenu.getChoice(messages.get(yellow + "reportMenu.title" + reset), options, messages.get("reportMenu.prompt"))) {
                 case 0 -> loop = false;
                 case 1 -> showFinancialReport();
                 case 2 -> showSortedWallets();

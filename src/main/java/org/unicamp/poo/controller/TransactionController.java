@@ -15,6 +15,11 @@ import java.util.List;
 // Controller responsible for handling coin buy, sell, and transaction history operations.
 
 public class TransactionController {
+
+    // ANSI Escape codes for coloring console output texts
+    public static final String reset = "\u001B[0m";
+    public static final String yellow = "\u001B[33m";
+
     // Model dependencies for persistence and business logic
     TransactionDAO model;
     WalletDAO walletModel;
@@ -82,7 +87,7 @@ public class TransactionController {
 
         if (newTransaction != null){
             // Ensure the transaction amount is strictly positive
-            if (newTransaction.getQuantity() < 0){
+            if (newTransaction.getQuantity() <= 0){
                 view.showErrorMessage(messages.get("transaction.error.negativeValue"));
                 return;
             }
@@ -136,7 +141,6 @@ public class TransactionController {
         options.add(messages.get("transactionMenu.return"));
         options.add(messages.get("transactionMenu.buyCoin"));
         options.add(messages.get("transactionMenu.sellCoin"));
-        options.add(messages.get("transactionMenu.sellCoin"));
         return (options);
     }
 
@@ -150,7 +154,7 @@ public class TransactionController {
 
         while (loop)
         {
-            switch (transactionMenu.getChoice(messages.get("transactionMenu.title"), options, messages.get("transactionMenu.prompt")))
+            switch (transactionMenu.getChoice(messages.get(yellow + "transactionMenu.title" + reset), options, messages.get("transactionMenu.prompt")))
             {
                 case 0 -> loop = false;
                 case 1 -> actionBuyCoin();

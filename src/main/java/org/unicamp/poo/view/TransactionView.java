@@ -58,7 +58,7 @@ public class TransactionView {
                 Transaction t = transactions.get(i);
 
                 System.out.println("----------------------------------------------");
-                System.out.println("Movimentação "+ (i+1));
+                System.out.println("Movimentação " + (i+1));
                 System.out.println("Data: " + t.getOperationDate());
                 System.out.print("Tipo da transação: ");
 

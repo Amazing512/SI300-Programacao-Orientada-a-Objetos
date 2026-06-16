@@ -15,6 +15,10 @@ import java.util.List;
 
 public class OracleController {
 
+    // ANSI Escape codes for coloring console output texts
+    public static final String reset = "\u001B[0m";
+    public static final String yellow = "\u001B[33m";
+
     private final OracleDAO model;
     private final ReportView view;
     private final MessageProvider messages;
@@ -128,7 +132,7 @@ public class OracleController {
         boolean loop = true;
 
         while (loop) {
-            switch (oracleMenu.getChoice(messages.get("oracleMenu.title"), options, messages.get("oracleMenu.prompt"))) {
+            switch (oracleMenu.getChoice(messages.get(yellow + "oracleMenu.title" + reset), options, messages.get("oracleMenu.prompt"))) {
                 case 0 -> loop = false;
                 case 1 -> actionAddOracle();
                 case 2 -> actionSearchOracle();
