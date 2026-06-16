@@ -130,7 +130,8 @@ public class ProgramController {
 
         while (loop)
         {
-            switch (userMenu.getChoice(messages.get(yellow + "mainMenu.title" + reset), getMenuOptions(), messages.get("mainMenu.prompt")))
+            String yellowTitle = yellow + messages.get("mainMenu.title") + reset;
+            switch (userMenu.getChoice(yellowTitle, getMenuOptions(), messages.get("mainMenu.prompt")))
             {
                 case 0 -> loop = false;
                 case 1 -> actionWallet();

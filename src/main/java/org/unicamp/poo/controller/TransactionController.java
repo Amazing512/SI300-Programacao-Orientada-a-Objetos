@@ -152,9 +152,10 @@ public class TransactionController {
         final Menu transactionMenu = new Menu(ConsoleScanner.getInstance());
         boolean loop = true;
 
-        while (loop)
-        {
-            switch (transactionMenu.getChoice(messages.get(yellow + "transactionMenu.title" + reset), options, messages.get("transactionMenu.prompt")))
+        while (loop) {
+            String yellowTitle = yellow + messages.get("transactionMenu.title") + reset;
+
+            switch (transactionMenu.getChoice(yellowTitle, options, messages.get("transactionMenu.prompt")))
             {
                 case 0 -> loop = false;
                 case 1 -> actionBuyCoin();

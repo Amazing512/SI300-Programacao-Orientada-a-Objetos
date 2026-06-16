@@ -132,7 +132,9 @@ public class OracleController {
         boolean loop = true;
 
         while (loop) {
-            switch (oracleMenu.getChoice(messages.get(yellow + "oracleMenu.title" + reset), options, messages.get("oracleMenu.prompt"))) {
+            String yellowTitle = yellow + messages.get("oracleMenu.title") + reset;
+
+            switch (oracleMenu.getChoice(yellowTitle, options, messages.get("oracleMenu.prompt"))) {
                 case 0 -> loop = false;
                 case 1 -> actionAddOracle();
                 case 2 -> actionSearchOracle();

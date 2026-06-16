@@ -137,9 +137,10 @@ public final class WalletController {
         boolean loop = true;
 
         // Keeps interacting with the user until the exit option (0) is selected
-        while (loop)
-        {
-            switch (walletMenu.getChoice(messages.get(yellow + "walletMenu.title" + reset), options, messages.get("walletMenu.prompt")))
+        while (loop) {
+            String yellowTitle = yellow + messages.get("walletMenu.title") + reset;
+
+            switch (walletMenu.getChoice(yellowTitle, options, messages.get("walletMenu.prompt")))
             {
                 case 0 -> loop = false;
                 case 1 -> actionAddWallet();

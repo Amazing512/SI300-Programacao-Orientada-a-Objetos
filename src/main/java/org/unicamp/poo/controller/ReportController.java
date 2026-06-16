@@ -129,7 +129,9 @@ public class ReportController {
         boolean loop = true;
 
         while (loop) {
-            switch (reportMenu.getChoice(messages.get(yellow + "reportMenu.title" + reset), options, messages.get("reportMenu.prompt"))) {
+            String yellowTitle = yellow + messages.get("reportMenu.title") + reset;
+
+            switch (reportMenu.getChoice(yellowTitle, options, messages.get("reportMenu.prompt"))) {
                 case 0 -> loop = false;
                 case 1 -> showFinancialReport();
                 case 2 -> showSortedWallets();
