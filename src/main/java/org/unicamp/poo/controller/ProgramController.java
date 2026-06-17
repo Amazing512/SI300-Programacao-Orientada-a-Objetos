@@ -1,5 +1,8 @@
 package org.unicamp.poo.controller;
 
+import org.unicamp.poo.dao.OracleDAO;
+import org.unicamp.poo.dao.impl.memory.OracleMemoryDAO;
+import org.unicamp.poo.dao.impl.mariadb.OracleMariaDBDAO;
 import org.unicamp.poo.dao.DatabaseConnection;
 import org.unicamp.poo.dao.TransactionDAO;
 import org.unicamp.poo.dao.impl.memory.WalletMemoryDAO;
@@ -34,6 +37,7 @@ public class ProgramController {
 
     private WalletDAO walletDAO;
     private TransactionDAO transactionDAO;
+    private OracleDAO oracleDAO;
 
     // Initializes the central controller with the persistence strategy and messaging configuration.
 
@@ -64,6 +68,18 @@ public class ProgramController {
         reportController.start();
     }
 
+    void actionOracle()
+    {
+        OracleController oracleController =
+                new OracleController(
+                        oracleDAO,
+                        new ReportView(),
+                        messages
+                );
+
+        oracleController.start();
+    }
+
     // Renders the system help menu containing guidelines and general instructions.
 
     void actionHelp() {
@@ -84,14 +100,17 @@ public class ProgramController {
             {
                 dbConn = new MariaDBConnection(serverName);
                 dbConn.openConnection();
+
                 walletDAO = new WalletDAOImplMariaDB(dbConn.getConnection());
                 transactionDAO = new TransactionDAOImplMariaDB(dbConn.getConnection());
+                oracleDAO = new OracleMariaDBDAO(dbConn.getConnection());
             }
             break;
             case MEMORY:
             {
                 walletDAO = new WalletMemoryDAO();
                 transactionDAO = new TransactionMemoryDAO();
+                oracleDAO = new OracleMemoryDAO();
             }
             break;
         }
@@ -113,9 +132,9 @@ public class ProgramController {
         options.add(messages.get("mainMenu.wallet"));
         options.add(messages.get("mainMenu.transaction"));
         options.add(messages.get("mainMenu.reports"));
+        options.add(messages.get("mainMenu.oracle"));
         options.add(messages.get("mainMenu.help"));
-        return (options);
-
+        return options;
     }
 
     // Executes the primary processing core daemon shell runner loop.
@@ -137,7 +156,8 @@ public class ProgramController {
                 case 1 -> actionWallet();
                 case 2 -> actionTransaction();
                 case 3 -> actionReports();
-                case 4 -> actionHelp();
+                case 4 -> actionOracle();
+                case 5 -> actionHelp();
                 default -> loop = false;
             }
         }

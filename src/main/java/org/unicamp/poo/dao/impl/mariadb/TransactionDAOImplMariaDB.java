@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TransactionDAOImplMariaDB implements TransactionDAO {
-    private Connection connection = null;
+    private final Connection connection;
 
     public TransactionDAOImplMariaDB(Connection connection)
     {
@@ -22,13 +22,13 @@ public class TransactionDAOImplMariaDB implements TransactionDAO {
 
     @Override
     public Transaction create(Transaction transaction) {
-        String sql = "INSERT INTO transactions (wallet_id, OperationDate, operation_type, quantity) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO MOVIMENTACAO (IdCarteira, Data, TipoOperacao, Quantidade) VALUES (?, ?, ?, ?)";
         
         try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             
-             stmt.setInt(1, transaction.getWalletId()); 
-            stmt.setTimestamp(2,new java.sql.Timestamp(transaction.getOperationDate().getTime()));
-            stmt.setString(3,transaction.getOperationType().name());
+             stmt.setInt(1, transaction.getWalletId());
+            stmt.setDate(2,new java.sql.Date(transaction.getOperationDate().getTime()));
+            stmt.setString(3,String.valueOf(transaction.getOperationType().getCode()));
             stmt.setDouble(4,transaction.getQuantity());
             stmt.executeUpdate();
             
@@ -50,19 +50,23 @@ public class TransactionDAOImplMariaDB implements TransactionDAO {
         
         @Override
         public Transaction findById(int id) {
-        String sql = "SELECT * FROM transactions WHERE id = ?";
+        String sql = "SELECT * FROM MOVIMENTACAO WHERE IdMovimento = ?";
         
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, id);
             
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                Transaction t = new Transaction(
-                    rs.getInt("wallet_id"),
-                    rs.getTimestamp("OperationDate"),
-                    OperationType.valueOf(rs.getString("operation_type")),
-                    rs.getDouble("quantity"));
-                    t.setId(rs.getInt("id"));
+                    Transaction t = new Transaction(
+                            rs.getInt("IdCarteira"),
+                            rs.getDate("Data"),
+                            OperationType.fromCode(
+                                    rs.getString("TipoOperacao").charAt(0)
+                            ),
+                            rs.getDouble("Quantidade")
+                    );
+
+                    return t;
                 }
             }
         } catch (SQLException e) {
@@ -75,18 +79,18 @@ public class TransactionDAOImplMariaDB implements TransactionDAO {
     @Override
     public List<Transaction> findAll() {
         List<Transaction> list = new ArrayList<>();
-        String sql = "SELECT * FROM transactions";
+        String sql = "SELECT * FROM MOVIMENTACAO";
         
         try (PreparedStatement stmt = connection.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
             
             while (rs.next()) {
                 Transaction t = new Transaction(
-                rs.getInt("wallet_id"),
-                rs.getTimestamp("date"),
-                OperationType.valueOf(rs.getString("operation_type")),
-                rs.getDouble("quantity"));
-                t.setId(rs.getInt("id"));
+                        rs.getInt("IdCarteira"),
+                        rs.getDate("Data"),
+                        OperationType.fromCode(rs.getString("TipoOperacao").charAt(0)),
+                        rs.getDouble("Quantidade"));
+                        t.setId(rs.getInt("IdMovimento"));
                 list.add(t);
             }
         } catch (SQLException e) {
@@ -97,41 +101,80 @@ public class TransactionDAOImplMariaDB implements TransactionDAO {
 
     @Override
     public List<Transaction> findByWalletId(int walletId) {
+
         List<Transaction> list = new ArrayList<>();
-        String sql = "SELECT * FROM transactions WHERE wallet_id = ?";
-        
+
+        String sql = "SELECT * FROM MOVIMENTACAO WHERE IdCarteira = ?";
+
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+
             stmt.setInt(1, walletId);
-            
+
             try (ResultSet rs = stmt.executeQuery()) {
+
                 while (rs.next()) {
-                   Transaction t = new Transaction(
-                    rs.getInt("wallet_id"),
-                    rs.getTimestamp("date"),
-                    OperationType.valueOf(rs.getString("operation_type")),
-                    rs.getDouble("quantity"));
-                    t.setId(rs.getInt("id"));
+
+                    Transaction t = new Transaction(
+                            rs.getInt("IdCarteira"),
+                            rs.getDate("Data"),
+                            OperationType.fromCode(rs.getString("TipoOperacao").charAt(0)),
+                            rs.getDouble("Quantidade")
+                    );
+
+                    t.setId(rs.getInt("IdMovimento"));
+
+                    list.add(t);
                 }
             }
+
         } catch (SQLException e) {
             System.err.println("Erro ao listar transações por Wallet ID: " + e.getMessage());
         }
+
         return list;
     }
 
     @Override
     public void update(Transaction transaction) {
-        String sql = "UPDATE transactions SET quantity = ?, description = ?, OperationDate = ?, wallet_id = ? WHERE id = ?";
-        
+
+        String sql =
+                "UPDATE MOVIMENTACAO " +
+                        "SET IdCarteira = ?, " +
+                        "Data = ?, " +
+                        "TipoOperacao = ?, " +
+                        "Quantidade = ? " +
+                        "WHERE IdMovimento = ?";
+
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+
             stmt.setInt(1, transaction.getWalletId());
-            stmt.setTimestamp(2,new java.sql.Timestamp(transaction.getOperationDate().getTime()));
-            stmt.setString(3,transaction.getOperationType().name());
-            stmt.setDouble(4,transaction.getQuantity());
-            stmt.setInt(5,transaction.getId());
-            
+
+            stmt.setDate(
+                    2,
+                    new java.sql.Date(
+                            transaction.getOperationDate().getTime()
+                    )
+            );
+
+            stmt.setString(
+                    3,
+                    transaction.getOperationType().name()
+            );
+
+            stmt.setDouble(
+                    4,
+                    transaction.getQuantity()
+            );
+
+            stmt.setInt(
+                    5,
+                    transaction.getId()
+            );
+
             stmt.executeUpdate();
+
             System.out.println("Transação atualizada com sucesso!");
+
         } catch (SQLException e) {
             System.err.println("Erro ao atualizar transação: " + e.getMessage());
         }
@@ -139,7 +182,7 @@ public class TransactionDAOImplMariaDB implements TransactionDAO {
 
     @Override
     public void delete(int id) {
-        String sql = "DELETE FROM transactions WHERE id = ?";
+        String sql = "DELETE FROM MOVIMENTACAO WHERE IdMovimento = ?";
         
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, id);

@@ -9,7 +9,7 @@ public final class Main {
     private final static String          country  = "US";
     private final static MessageProvider messageProvider = new MessageProvider("messages", "pt", "BR");
 
-    static void main() {
+    public static void main() {
         try {
             final String serverName = "WindServer";
 

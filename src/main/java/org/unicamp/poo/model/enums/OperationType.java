@@ -13,4 +13,14 @@ public enum OperationType {
     public char getCode() {
         return code;
     }
+
+    public static OperationType fromCode(char code) {
+        for (OperationType type : values()) {
+            if (type.code == code) {
+                return type;
+            }
+        }
+
+        throw new IllegalArgumentException("Código inválido: " + code);
+    }
 }

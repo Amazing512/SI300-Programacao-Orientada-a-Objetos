@@ -11,10 +11,10 @@ public class WalletDAOImplMariaDB implements WalletDAO {
 
     private final Connection connection;
 
-    private static final String TABLE_NAME = "carteira";
-    private static final String ID_COLUMN = "identificador";
-    private static final String HOLDER_COLUMN = "nome_titular";
-    private static final String BROKER_COLUMN = "corretora";
+    private static final String TABLE_NAME = "CARTEIRA";
+    private static final String ID_COLUMN = "IdCarteira";
+    private static final String HOLDER_COLUMN = "Titular";
+    private static final String BROKER_COLUMN = "Corretora";
 
     public WalletDAOImplMariaDB(Connection connection) {
         this.connection = connection;

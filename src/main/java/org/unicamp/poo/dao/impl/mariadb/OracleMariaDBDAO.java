@@ -21,7 +21,7 @@ public class OracleMariaDBDAO implements OracleDAO {
 
     @Override
     public Oracle create(Oracle oracle) {
-        String sql = "INSERT INTO oracle_quotes (quote_date, price) VALUES (?, ?)";
+        String sql = "INSERT INTO ORACULO (Data, Cotacao) VALUES (?, ?)";
         
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setDate(1, new java.sql.Date(oracle.getDate().getTime()));
@@ -38,7 +38,7 @@ public class OracleMariaDBDAO implements OracleDAO {
 
     @Override
     public Oracle findByDate(Date date) {
-        String sql = "SELECT * FROM oracle_quotes WHERE quote_date = ?";
+        String sql = "SELECT * FROM ORACULO WHERE Data = ?";
         
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setDate(1, new java.sql.Date(date.getTime()));
@@ -46,8 +46,8 @@ public class OracleMariaDBDAO implements OracleDAO {
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     return new Oracle(
-                            rs.getDate("quote_date"),
-                            rs.getDouble("price")
+                            rs.getDate("Data"),
+                            rs.getDouble("Cotacao")
                     );
                 }
             }
@@ -60,15 +60,15 @@ public class OracleMariaDBDAO implements OracleDAO {
     @Override
     public List<Oracle> findAll() {
         List<Oracle> list = new ArrayList<>();
-        String sql = "SELECT * FROM oracle_quotes ORDER BY quote_date DESC";
+        String sql = "SELECT * FROM ORACULO ORDER BY Data DESC";
 
         try (PreparedStatement stmt = connection.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
                 Oracle o = new Oracle(
-                        rs.getDate("quote_date"),
-                        rs.getDouble("price")
+                        rs.getDate("Data"),
+                        rs.getDouble("Cotacao")
                 );
                 list.add(o);
             }
@@ -82,7 +82,7 @@ public class OracleMariaDBDAO implements OracleDAO {
 
     @Override
     public void update(Oracle oracle) {
-        String sql = "UPDATE oracle_quotes SET price = ? WHERE quote_date = ?";
+        String sql = "UPDATE ORACULO SET Cotacao = ? WHERE Data = ?";
         
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setDouble(1, oracle.getPrice());
@@ -97,7 +97,7 @@ public class OracleMariaDBDAO implements OracleDAO {
 
     @Override
     public void delete(Date date) {
-        String sql = "DELETE FROM oracle_quotes WHERE quote_date = ?";
+        String sql = "DELETE FROM ORACULO WHERE Data = ?";
         
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setDate(1, new java.sql.Date(date.getTime()));
