@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.unicamp.poo</groupId>
-    <artifactId>cli</artifactId>
+    <artifactId>l</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>

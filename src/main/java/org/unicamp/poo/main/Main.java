@@ -5,15 +5,15 @@ import org.unicamp.poo.model.enums.DatabaseSelector;
 import org.unicamp.poo.util.MessageProvider;
 
 public final class Main {
-    private final static String          lang     = "en";
-    private final static String          country  = "US";
-    private final static MessageProvider messageProvider = new MessageProvider("messages", "pt", "BR");
+    private final static String          lang     = "pt";
+    private final static String          country  = "BR";
+    private final static MessageProvider messageProvider = new MessageProvider("messages", lang, country);
 
     public static void main() {
         try {
             final String serverName = "WindServer";
 
-            (new ProgramController(DatabaseSelector.MARIADB, messageProvider)).start(serverName);
+            (new ProgramController(DatabaseSelector.MEMORY, messageProvider)).start(serverName);
 
 
         } catch(Exception ex) {

@@ -55,12 +55,9 @@ public class ProgramController {
     }
 
     // Boots up the Transaction Sub-module and hands over the control flow.
-    // The Oracle is injected here as an internal dependency only — it has no
-    // direct menu of its own and is consulted automatically before buy/sell.
 
     void actionTransaction() {
-        final OracleController oracleController = new OracleController(oracleDAO);
-        final TransactionController transactionController = new TransactionController(transactionDAO, walletDAO, oracleController, new TransactionView(), messages);
+        final TransactionController transactionController = new TransactionController(transactionDAO, walletDAO, new TransactionView(), messages);
         transactionController.start();
     }
 
@@ -69,6 +66,18 @@ public class ProgramController {
     void actionReports() {
         final ReportController reportController = new ReportController(walletDAO, transactionDAO, new ReportView(), messages);
         reportController.start();
+    }
+
+    void actionOracle()
+    {
+        OracleController oracleController =
+                new OracleController(
+                        oracleDAO,
+                        new ReportView(),
+                        messages
+                );
+
+        oracleController.start();
     }
 
     // Renders the system help menu containing guidelines and general instructions.
@@ -123,6 +132,7 @@ public class ProgramController {
         options.add(messages.get("mainMenu.wallet"));
         options.add(messages.get("mainMenu.transaction"));
         options.add(messages.get("mainMenu.reports"));
+        options.add(messages.get("mainMenu.oracle"));
         options.add(messages.get("mainMenu.help"));
         return options;
     }
@@ -146,7 +156,8 @@ public class ProgramController {
                 case 1 -> actionWallet();
                 case 2 -> actionTransaction();
                 case 3 -> actionReports();
-                case 4 -> actionHelp();
+                case 4 -> actionOracle();
+                case 5 -> actionHelp();
                 default -> loop = false;
             }
         }

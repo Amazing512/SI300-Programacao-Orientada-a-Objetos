@@ -1,11 +1,9 @@
 package org.unicamp.poo.view;
 
-import org.unicamp.poo.model.Oracle;
 import org.unicamp.poo.model.Transaction;
 import org.unicamp.poo.model.enums.OperationType;
 import org.unicamp.poo.util.ConsoleScanner;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
@@ -18,18 +16,6 @@ public class TransactionView {
     public static final String reset = "\u001B[0m";
     public static final String green = "\u001B[32m";
     public static final String red = "\u001B[31m";
-
-    // Date format used to display the daily Oracle quote
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
-
-    // Shows the current day's quote consulted from the Oracle before a buy or sell
-    // operation, so the user can make an informed decision.
-    public void displayDailyQuote(Oracle dailyQuote) {
-        System.out.println("\n----- Cotação do Dia -----");
-        System.out.println("Data:  " + DATE_FORMAT.format(dailyQuote.getDate()));
-        System.out.printf("Preço: %.2f%n", dailyQuote.getPrice());
-        System.out.println("---------------------------");
-    }
 
     public Transaction readTransactionData(OperationType operationType) {
         Scanner read = ConsoleScanner.getInstance();

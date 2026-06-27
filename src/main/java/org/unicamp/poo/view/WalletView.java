@@ -1,6 +1,8 @@
 package org.unicamp.poo.view;
+
 import org.unicamp.poo.model.Wallet;
 import org.unicamp.poo.util.ConsoleScanner;
+import org.unicamp.poo.util.MessageProvider;
 
 import java.util.Scanner;
 
@@ -15,19 +17,26 @@ public class WalletView {
     public static final String green = "\u001B[32m";
     public static final String red = "\u001B[31m";
 
+    private final MessageProvider messages;
+
+    // Constructor providing Dependency Injection for internationalized messages
+    public WalletView(MessageProvider messages) {
+        this.messages = messages;
+    }
+
     //Reads all fields required to instantiate and register a new Wallet
     public Wallet readWalletData() {
         // Uses the centralized shared Scanner instance from the project utilities
         Scanner read = ConsoleScanner.getInstance();
 
-        System.out.print("Digite o ID da carteira: ");
+        System.out.print(messages.get("wallet.view.prompt.id"));
         int id = read.nextInt();
         read.nextLine(); // Consumes the leftover newline character to prevent skipping inputs
 
-        System.out.print("Digite o nome do titular: ");
+        System.out.print(messages.get("wallet.view.prompt.holder"));
         String holder = read.nextLine();
 
-        System.out.print("Digite a corretora: ");
+        System.out.print(messages.get("wallet.view.prompt.broker"));
         String broker = read.nextLine();
 
         return new Wallet(id, holder, broker);
@@ -49,7 +58,7 @@ public class WalletView {
     public int readWalletId() {
         Scanner read = ConsoleScanner.getInstance();
 
-        System.out.print("Digite o ID da carteira: ");
+        System.out.print(messages.get("wallet.view.prompt.id"));
         int id = read.nextInt();
         read.nextLine();
 
@@ -59,20 +68,20 @@ public class WalletView {
     // Displays the current details of a given Wallet instance formatted on the console screen
     public void displayWallet(Wallet wallet) {
 
-        System.out.println("----- Dados da carteira -----");
-        System.out.println("ID: " + wallet.getId());
-        System.out.println("Títular: " + wallet.getHolder());
-        System.out.println("Corretora: " + wallet.getBroker());
+        System.out.println(messages.get("wallet.view.header"));
+        System.out.println(messages.get("wallet.view.id") + wallet.getId());
+        System.out.println(messages.get("wallet.view.holder") + wallet.getHolder());
+        System.out.println(messages.get("wallet.view.broker") + wallet.getBroker());
     }
 
     //Prompts the user for updated holder and broker details, maintaining the original entity ID
     public Wallet readWalletUpdates(Wallet editableWallet) {
         Scanner read = ConsoleScanner.getInstance();
 
-        System.out.print("Digite o novo nome do titular: ");
+        System.out.print(messages.get("wallet.view.prompt.newHolder"));
         String holder = read.nextLine();
 
-        System.out.print("Digite o novo nome da corretora: ");
+        System.out.print(messages.get("wallet.view.prompt.newBroker"));
         String broker = read.nextLine();
 
         // Creates a new instance using the same ID from the target editable wallet
@@ -86,9 +95,9 @@ public class WalletView {
 
         // Loops until a valid decision option (1 or 2) is supplied by the user
         while (true) {
-            System.out.print("Deseja excluir a carteira? (Essa ação não é reversível): ");
-            System.out.println("1- Sim");
-            System.out.println("2- Não");
+            System.out.println(messages.get("wallet.view.prompt.confirmDelete"));
+            System.out.println(messages.get("oracle.view.confirm.yes"));
+            System.out.println(messages.get("oracle.view.confirm.no"));
 
             int option = read.nextInt();
             read.nextLine();
@@ -98,7 +107,7 @@ public class WalletView {
             } else if (option == 2) {
                 return false;
             } else {
-                System.out.println("Opção inválida");
+                System.out.println(messages.get("report.view.invalidOption"));
             }
         }
     }

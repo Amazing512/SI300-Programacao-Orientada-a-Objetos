@@ -17,14 +17,11 @@ public final class Menu {
 
         while (waiting)
         {
-            System.out.println("------------------------------------------------------------");
             System.out.println(title);
-            System.out.println("------------------------------------------------------------");
             for (int count = 0; count < options.size(); count++)
             {
                 System.out.println(count + " - " + options.get(count));
             }
-            System.out.println("------------------------------------------------------------");
             System.out.println(prompt);
             choice = this.scanner.nextInt();
             this.scanner.nextLine();

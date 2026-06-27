@@ -95,6 +95,10 @@ public final class WalletController {
                 view.showErrorMessage(messages.get("wallet.edit.error.cancelled"));
             }
         }
+        else{
+            // Shows an error message if the wallet does not exist in the repository
+            view.showErrorMessage(messages.get("wallet.search.error.notfound"));
+        }
     }
 
     // Action to delete a wallet.
@@ -114,6 +118,10 @@ public final class WalletController {
                 // Error feedback or fallback if deletion is rejected/not found
                 view.showErrorMessage(messages.get("wallet.remove.error.cancelled"));
             }
+        }
+        else {
+            // Error handling if the target wallet does not exist in the database
+            view.showErrorMessage(messages.get("wallet.search.error.notfound"));
         }
     }
 
