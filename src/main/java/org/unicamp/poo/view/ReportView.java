@@ -3,6 +3,7 @@ package org.unicamp.poo.view;
 import org.unicamp.poo.model.Oracle;
 import org.unicamp.poo.model.Wallet;
 import org.unicamp.poo.util.ConsoleScanner;
+import org.unicamp.poo.util.MessageProvider;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -10,7 +11,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
-/*  View class responsible for interacting with the user and formatting console
+/* View class responsible for interacting with the user and formatting console
     layouts for financial and ranking reports. */
 
 public class ReportView {
@@ -23,10 +24,17 @@ public class ReportView {
     // Date format used for Oracle input and output
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
 
+    private final MessageProvider messages;
+
+    // Constructor providing Dependency Injection for internationalized messages
+    public ReportView(MessageProvider messages) {
+        this.messages = messages;
+    }
+
     public int readWalletIdReport(){
         Scanner read = ConsoleScanner.getInstance();
 
-        System.out.print("Digite o ID da carteira para gerar o relatório financeiro: ");
+        System.out.print(messages.get("report.view.prompt.financialId"));
         int id = read.nextInt();
         read.nextLine();
 
@@ -37,14 +45,12 @@ public class ReportView {
 
     public void showFinancialReport(int walletId, double totalCashIn, double totalCashOut, double result) {
 
-        System.out.println("\n----------------------------------");
-        System.out.println("       RELATÓRIO FINANCEIRO       ");
+        System.out.println(messages.get("report.view.financial.header"));
+        System.out.println(messages.get("report.view.financial.id") + walletId);
+        System.out.printf(messages.get("report.view.financial.cashIn"), totalCashIn);
+        System.out.printf(messages.get("report.view.financial.cashOut"), totalCashOut);
         System.out.println("----------------------------------");
-        System.out.println("ID da carteira: " + walletId);
-        System.out.printf("Total de entrada de moedas: %.2f%n", totalCashIn);
-        System.out.printf("Total de saídas de moedas: %.2f%n", totalCashOut);
-        System.out.println("----------------------------------");
-        System.out.print("Resultado Líquido: ");
+        System.out.print(messages.get("report.view.financial.resultLabel"));
 
         if (result < 0){
             System.out.println(red + String.format("%.2f", result) + reset);
@@ -59,11 +65,8 @@ public class ReportView {
     // Formats and prints a multi-column aligned dashboard showcasing the wallets ranking.
 
     public void showSortedWalletsReport(List<Wallet> wallets, double[] sortedBalances) {
-        System.out.println("\n---------------------------------");
-        System.out.println("       CARTEIRAS POR SALDO        ");
-        System.out.println("---------------------------------");
-
-        System.out.printf("%-10s | %-25s | %-15s%n", "ID", "PROPRIETÁRIO", "SALDO ATUAL");
+        System.out.println(messages.get("report.view.sorted.header"));
+        System.out.println(messages.get("report.view.sorted.columns"));
         System.out.println("---------------------------------");
 
         // Iterates and flushes formatted rows to the console
@@ -92,14 +95,14 @@ public class ReportView {
 
         // Loops until the user enters a valid date in the expected format
         while (true) {
-            System.out.print("Digite a data da cotação (dd/MM/yyyy): ");
+            System.out.print(messages.get("oracle.view.prompt.date"));
             String input = read.nextLine();
 
             try {
                 DATE_FORMAT.setLenient(false); // Rejects invalid dates like 32/13/2024
                 return DATE_FORMAT.parse(input);
             } catch (ParseException e) {
-                System.out.println(red + "Data inválida. Use o formato dd/MM/yyyy." + reset);
+                System.out.println(red + messages.get("oracle.view.prompt.invalidDate") + reset);
             }
         }
     }
@@ -110,12 +113,12 @@ public class ReportView {
 
         Date date = readOracleDate();
 
-        System.out.print("Digite o preço da moeda: ");
+        System.out.print(messages.get("oracle.view.prompt.price"));
         double price = read.nextDouble();
         read.nextLine();
 
         while (price <= 0) {
-            System.out.print("O preço deve ser positivo. Digite novamente: ");
+            System.out.print(messages.get("oracle.view.prompt.positivePrice"));
             price = read.nextDouble();
             read.nextLine();
         }
@@ -125,21 +128,20 @@ public class ReportView {
 
     // Displays the details of a single Oracle quote on the console.
     public void displayOracle(Oracle oracle) {
-        System.out.println("\n----- Cotação do Dia -----");
-        System.out.println("Data:  " + DATE_FORMAT.format(oracle.getDate()));
-        System.out.printf("Preço: %.2f%n", oracle.getPrice());
+        System.out.println(messages.get("oracle.view.single.header"));
+        System.out.println(messages.get("transaction.view.history.date") + DATE_FORMAT.format(oracle.getDate()));
+        System.out.printf(messages.get("oracle.view.single.price"), oracle.getPrice());
         System.out.println("--------------------------");
     }
 
     // Iterates through a list of Oracle quotes and prints them formatted to the console.
     public void displayOracleList(List<Oracle> oracles) {
-        System.out.println("\n----- Lista de Cotações -----");
+        System.out.println(messages.get("oracle.view.list.header"));
         for (int i = 0; i < oracles.size(); i++) {
             Oracle o = oracles.get(i);
-            System.out.println("----------------------------------------------");
-            System.out.println("Cotação " + (i + 1));
-            System.out.println("Data:  " + DATE_FORMAT.format(o.getDate()));
-            System.out.printf("Preço: %.2f%n", o.getPrice());
+            System.out.println(messages.get("oracle.view.list.item") + (i + 1));
+            System.out.println(messages.get("transaction.view.history.date") + DATE_FORMAT.format(o.getDate()));
+            System.out.printf(messages.get("oracle.view.single.price"), o.getPrice());
         }
         System.out.println("----------------------------------------------");
     }
@@ -148,15 +150,15 @@ public class ReportView {
     public Oracle readOracleUpdates(Oracle editableOracle) {
         Scanner read = ConsoleScanner.getInstance();
 
-        System.out.println("Data atual: " + DATE_FORMAT.format(editableOracle.getDate()));
-        System.out.printf("Preço atual: %.2f%n", editableOracle.getPrice());
+        System.out.println(messages.get("oracle.view.current.date") + DATE_FORMAT.format(editableOracle.getDate()));
+        System.out.printf(messages.get("oracle.view.current.price"), editableOracle.getPrice());
 
-        System.out.print("Digite o novo preço da moeda: ");
+        System.out.print(messages.get("oracle.view.prompt.price"));
         double price = read.nextDouble();
         read.nextLine();
 
         while (price <= 0) {
-            System.out.print("O preço deve ser positivo. Digite novamente: ");
+            System.out.print(messages.get("oracle.view.prompt.positivePrice"));
             price = read.nextDouble();
             read.nextLine();
         }
@@ -170,9 +172,9 @@ public class ReportView {
         Scanner read = ConsoleScanner.getInstance();
 
         while (true) {
-            System.out.println("Deseja excluir a cotação do dia " + DATE_FORMAT.format(removableOracle.getDate()) + "? (Essa ação não é reversível)");
-            System.out.println("1- Sim");
-            System.out.println("2- Não");
+            System.out.printf(messages.get("oracle.view.prompt.confirmDelete") + "%n", DATE_FORMAT.format(removableOracle.getDate()));
+            System.out.println(messages.get("oracle.view.confirm.yes"));
+            System.out.println(messages.get("oracle.view.confirm.no"));
 
             int option = read.nextInt();
             read.nextLine();
@@ -182,7 +184,7 @@ public class ReportView {
             } else if (option == 2) {
                 return false;
             } else {
-                System.out.println("Opção inválida.");
+                System.out.println(messages.get("report.view.invalidOption"));
             }
         }
     }

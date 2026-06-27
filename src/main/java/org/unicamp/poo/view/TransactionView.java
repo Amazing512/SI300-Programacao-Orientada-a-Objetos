@@ -1,8 +1,10 @@
 package org.unicamp.poo.view;
 
+import org.unicamp.poo.model.Oracle;
 import org.unicamp.poo.model.Transaction;
 import org.unicamp.poo.model.enums.OperationType;
 import org.unicamp.poo.util.ConsoleScanner;
+import org.unicamp.poo.util.MessageProvider;
 
 import java.util.Date;
 import java.util.List;
@@ -17,19 +19,26 @@ public class TransactionView {
     public static final String green = "\u001B[32m";
     public static final String red = "\u001B[31m";
 
+    private final MessageProvider messages;
+
+    // Constructor providing Dependency Injection for internationalized messages
+    public TransactionView(MessageProvider messages) {
+        this.messages = messages;
+    }
+
     public Transaction readTransactionData(OperationType operationType) {
         Scanner read = ConsoleScanner.getInstance();
 
-        System.out.print("Digite o ID da carteira: ");
+        System.out.print(messages.get("wallet.view.prompt.id"));
         int id = read.nextInt();
         read.nextLine();
 
-        System.out.print("Digite a quantidade de moedas: ");
+        System.out.print(messages.get("transaction.view.prompt.quantity"));
         double quantity = read.nextDouble();
 
         // Forces user to enter a positive non-zero value
         while (quantity <= 0){
-            System.out.println("Digite a quantidade de moedas (Deve ser um valor positivo): ");
+            System.out.print(messages.get("transaction.view.prompt.positiveQuantity"));
             quantity = read.nextDouble();
         }
         return new Transaction(id, new Date(), operationType, quantity);
@@ -38,7 +47,7 @@ public class TransactionView {
     public int readWalletForHistory(){
         Scanner read = ConsoleScanner.getInstance();
 
-        System.out.println("Digite o ID da carteira para consultar o histórico: ");
+        System.out.println(messages.get("transaction.view.prompt.historyId"));
         int id = read.nextInt();
         read.nextLine();
 
@@ -46,32 +55,8 @@ public class TransactionView {
     }
 
     // Iterates through a list of transactions and prints them formatted to the console.
-    public void showHistory(List<Transaction> transactions){
+    public void showHistory(List<Transaction> transactions) {
 
-        // Check if there are no records to display
-        if (transactions == null || transactions.isEmpty()){
-            System.out.println("Nenhuma transação encontrada.");
-        }
-        else{
-            System.out.println("\n----- Histórico de Movimentações -----");
-            for (int i = 0; i < transactions.size(); i++){
-                Transaction t = transactions.get(i);
-
-                System.out.println("----------------------------------------------");
-                System.out.println("Movimentação " + (i+1));
-                System.out.println("Data: " + t.getOperationDate());
-                System.out.print("Tipo da transação: ");
-
-                if (t.getOperationType() == OperationType.CASH_IN){
-                    System.out.println(green + "Compra" + reset);
-                }
-                else if (t.getOperationType() == OperationType.CASH_OUT){
-                    System.out.println(red + "Venda" + reset);
-                }
-                System.out.println("Quantidade de moedas movimentadas: " + t.getQuantity());
-            }
-            System.out.println("----------------------------------------------");
-        }
     }
 
     // Prints an error message highlighted in red color
@@ -82,5 +67,8 @@ public class TransactionView {
     // Prints a success message highlighted in green color
     public void showSuccessMessage(String s) {
         System.out.println(green + s + reset);
+    }
+
+    public void displayDailyQuote(Oracle dailyQuote) {
     }
 }

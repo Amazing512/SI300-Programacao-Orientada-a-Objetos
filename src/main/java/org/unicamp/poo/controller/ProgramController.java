@@ -50,44 +50,51 @@ public class ProgramController {
     // Boots up the Wallet Sub-module and hands over the control flow.
 
     void actionWallet() {
-        final WalletController walletController = new WalletController(walletDAO, new WalletView(), messages);
+        final WalletController walletController = new WalletController(walletDAO, new WalletView(messages), messages);
         walletController.start();
     }
 
     // Boots up the Transaction Sub-module and hands over the control flow.
 
     void actionTransaction() {
-        final TransactionController transactionController = new TransactionController(transactionDAO, walletDAO, new TransactionView(), messages);
+        final TransactionController transactionController = new TransactionController(transactionDAO, walletDAO, new TransactionView(messages), messages);
         transactionController.start();
     }
 
     // Boots up the Financial Reports Sub-module and hands over the control flow.
 
     void actionReports() {
-        final ReportController reportController = new ReportController(walletDAO, transactionDAO, new ReportView(), messages);
+        final ReportController reportController = new ReportController(walletDAO, transactionDAO, new ReportView(messages), messages);
         reportController.start();
     }
 
-    void actionOracle()
-    {
-        OracleController oracleController =
-                new OracleController(
-                        oracleDAO,
-                        new ReportView(),
-                        messages
-                );
-
-        oracleController.start();
-    }
-
-    // Renders the system help menu containing guidelines and general instructions.
-
+    // Boots up the Help Sub-module with long instructions and full credits list.
     void actionHelp() {
-        System.out.println("\n------------------------------");
-        System.out.println("       AJUDA DO SISTEMA       ");
-        System.out.println("------------------------------");
-        System.out.println(messages.get("help.instructions"));
-        System.out.println("------------------------------");
+        final Menu helpMenu = new Menu(ConsoleScanner.getInstance());
+        boolean loop = true;
+
+        // Prepare the help sub-menu options using internationalized messages
+        final List<String> options = new ArrayList<>();
+        options.add(messages.get("helpMenu.return"));
+        options.add(messages.get("helpMenu.viewInstructions"));
+        options.add(messages.get("helpMenu.viewCredits"));
+
+        while (loop) {
+            String yellowTitle = yellow + messages.get("helpMenu.title") + reset;
+
+            switch (helpMenu.getChoice(yellowTitle, options, messages.get("helpMenu.prompt"))) {
+                case 0 -> loop = false;
+                case 1 -> {
+                    System.out.println(yellow + messages.get("help.instructions.header") + reset);
+                    System.out.println(messages.get("help.instructions"));
+                }
+                case 2 -> {
+                    System.out.println(yellow + messages.get("help.credits.header") + reset);
+                    System.out.println(messages.get("help.credits"));
+                }
+                default -> loop = false;
+            }
+        }
     }
 
     // Initializes state components and data connection layers based on strategy selector.
@@ -132,7 +139,6 @@ public class ProgramController {
         options.add(messages.get("mainMenu.wallet"));
         options.add(messages.get("mainMenu.transaction"));
         options.add(messages.get("mainMenu.reports"));
-        options.add(messages.get("mainMenu.oracle"));
         options.add(messages.get("mainMenu.help"));
         return options;
     }
@@ -156,8 +162,7 @@ public class ProgramController {
                 case 1 -> actionWallet();
                 case 2 -> actionTransaction();
                 case 3 -> actionReports();
-                case 4 -> actionOracle();
-                case 5 -> actionHelp();
+                case 4 -> actionHelp();
                 default -> loop = false;
             }
         }

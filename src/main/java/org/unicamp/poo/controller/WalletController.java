@@ -125,7 +125,6 @@ public final class WalletController {
         }
     }
 
-    //Populates and retrieves the list of menu options from the MessageProvider
     private List<String> getMenuOptions()
     {
         final List<String> options = new ArrayList<String>();

@@ -32,7 +32,7 @@ public class TransactionController {
     // Initializes the controller with necessary DAOs, views, the internal Oracle quote
     // provider, and internationalization tools.
 
-    public TransactionController(TransactionDAO model, WalletDAO walletModel, OracleController oracleController, TransactionView view, MessageProvider messages) {
+    public TransactionController(TransactionDAO model, WalletDAO walletModel, TransactionView view, MessageProvider messages) {
         super();
         this.model = model;
         this.walletModel = walletModel;

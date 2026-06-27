@@ -53,7 +53,6 @@ public class WalletView {
     }
 
     //Prompts the user for a single Wallet ID
-    // Used for searches, edits, and deletions
 
     public int readWalletId() {
         Scanner read = ConsoleScanner.getInstance();
