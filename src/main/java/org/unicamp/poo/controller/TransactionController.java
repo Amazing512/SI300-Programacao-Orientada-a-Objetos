@@ -2,6 +2,7 @@ package org.unicamp.poo.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Date;
 
 import org.unicamp.poo.dao.TransactionDAO;
 import org.unicamp.poo.dao.WalletDAO;
@@ -120,52 +121,55 @@ public class TransactionController {
         }
         view.displayDailyQuote(dailyQuote);
 
-        Transaction newTransaction = view.readTransactionData(OperationType.CASH_OUT);
+        int walletId = view.readWalletId();
 
-        if (newTransaction != null){
-            // Ensure the transaction amount is strictly positive
-            if (newTransaction.getQuantity() <= 0){
-                view.showErrorMessage(messages.get("transaction.error.negativeValue"));
-                return;
-            }
+        // Check if the targeted wallet actually exists
+        var wallet = walletModel.findById(walletId);
+        if (wallet == null){
+            view.showErrorMessage(messages.get("transaction.wallet.notFound"));
+            return;
+        }
 
-            // Check if the targeted wallet actually exists
-            var wallet = walletModel.findById(newTransaction.getWalletId());
-            if (wallet == null){
-                view.showErrorMessage(messages.get("transaction.wallet.notFound"));
-                return;
-            }
+        // Display current balance
+        double currentBalance = calculateWalletBalance(walletId);
+        view.displayWalletBalance(currentBalance);
 
-            // Ensure the wallet has enough funds for the operation
-            double currentBalance = calculateWalletBalance(newTransaction.getWalletId());
-            if (newTransaction.getQuantity() > currentBalance) {
-                view.showErrorMessage(messages.get("transaction.sell.insufficientBalance"));
-                return;
-            }
-
-            // Confirmation step
-            double totalValue = newTransaction.getQuantity() * dailyQuote.getPrice();
-            String confirmMsg = messages.get("transaction.confirm.sell.part1") + " "
-                              + String.format("%.4f", newTransaction.getQuantity()) + " "
-                              + messages.get("transaction.confirm.sell.part2") + " "
-                              + String.format("%.2f", totalValue)
-                              + "?";
-
-            if (!view.confirmTransaction(confirmMsg)) {
-                view.showErrorMessage(messages.get("transaction.cancelled"));
-                return;
-            }
-
-            // Persist the sell transaction
-            Transaction savedTransaction = model.create(newTransaction);
-            if (savedTransaction != null) {
-                view.showSuccessMessage(messages.get("transaction.sell.success"));
-            }
-            else {
-                view.showErrorMessage(messages.get("transaction.sell.error"));
-            }
-        } else {
+        // Read Quantity
+        Double quantity = view.readQuantity();
+        if (quantity == null) {
             view.showErrorMessage(messages.get("transaction.cancelled"));
+            return;
+        }
+
+        // Ensure the wallet has enough funds for the operation
+        if (quantity > currentBalance) {
+            view.showErrorMessage(messages.get("transaction.sell.insufficientBalance"));
+            return;
+        }
+
+        // Create transaction object
+        Transaction newTransaction = new Transaction(walletId, new Date(), OperationType.CASH_OUT, quantity);
+
+        // Confirmation step
+        double totalValue = newTransaction.getQuantity() * dailyQuote.getPrice();
+        String confirmMsg = messages.get("transaction.confirm.sell.part1") + " "
+                          + String.format("%.4f", newTransaction.getQuantity()) + " "
+                          + messages.get("transaction.confirm.sell.part2") + " "
+                          + String.format("%.2f", totalValue)
+                          + "?";
+
+        if (!view.confirmTransaction(confirmMsg)) {
+            view.showErrorMessage(messages.get("transaction.cancelled"));
+            return;
+        }
+
+        // Persist the sell transaction
+        Transaction savedTransaction = model.create(newTransaction);
+        if (savedTransaction != null) {
+            view.showSuccessMessage(messages.get("transaction.sell.success"));
+        }
+        else {
+            view.showErrorMessage(messages.get("transaction.sell.error"));
         }
     }
 

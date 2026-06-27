@@ -59,6 +59,25 @@ public class TransactionView {
         System.out.println("---------------------------");
     }
 
+    public int readWalletId() {
+        return ConsoleScanner.readInt(messages.get("wallet.view.prompt.id"), messages.get("generic.confirmInvalid"));
+    }
+
+    public void displayWalletBalance(double balance) {
+        System.out.printf(messages.get("transaction.view.walletBalance") + " %.4f%n", balance);
+    }
+
+    public Double readQuantity() {
+        double quantity = ConsoleScanner.readDouble(messages.get("transaction.view.prompt.quantity"), messages.get("generic.confirmInvalid"));
+        while (quantity <= 0) {
+            if (quantity == 0) {
+                return null;
+            }
+            quantity = ConsoleScanner.readDouble(messages.get("transaction.view.prompt.positiveQuantity"), messages.get("generic.confirmInvalid"));
+        }
+        return quantity;
+    }
+
     public boolean confirmTransaction(String confirmMessage) {
         while (true) {
             System.out.println("\n" + confirmMessage);

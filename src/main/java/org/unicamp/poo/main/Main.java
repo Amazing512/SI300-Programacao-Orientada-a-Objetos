@@ -2,6 +2,7 @@ package org.unicamp.poo.main;
 
 import org.unicamp.poo.controller.ProgramController;
 import org.unicamp.poo.model.enums.DatabaseSelector;
+import org.unicamp.poo.util.Info;
 import org.unicamp.poo.util.MessageProvider;
 
 public final class Main {
@@ -12,6 +13,8 @@ public final class Main {
     public static void main(String[] args) {
         try {
             final String serverName = "WindServer";
+
+            System.out.println(Info.getStamp());
 
             (new ProgramController(DatabaseSelector.MEMORY, messageProvider)).start(serverName);
 
