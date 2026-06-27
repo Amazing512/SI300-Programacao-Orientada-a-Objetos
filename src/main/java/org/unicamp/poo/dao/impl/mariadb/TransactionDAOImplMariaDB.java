@@ -1,16 +1,15 @@
 package org.unicamp.poo.dao.impl.mariadb;
-import org.unicamp.poo.dao.TransactionDAO;
-import org.unicamp.poo.model.Transaction;
-import org.unicamp.poo.model.enums.OperationType;
-
-
-import java.sql.Statement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.unicamp.poo.dao.TransactionDAO;
+import org.unicamp.poo.model.Transaction;
+import org.unicamp.poo.model.enums.OperationType;
 
 public class TransactionDAOImplMariaDB implements TransactionDAO {
     private final Connection connection;
@@ -57,18 +56,23 @@ public class TransactionDAOImplMariaDB implements TransactionDAO {
             
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
+                    try {
                     Transaction t = new Transaction(
-                            rs.getInt("IdCarteira"),
-                            rs.getDate("Data"),
-                            OperationType.fromCode(
-                                    rs.getString("TipoOperacao").charAt(0)
-                            ),
-                            rs.getDouble("Quantidade")
+                        rs.getInt("IdCarteira"),
+                        rs.getDate("Data"),
+                        OperationType.fromCode(
+                            rs.getString("TipoOperacao").charAt(0)
+                        ),
+                        rs.getDouble("Quantidade")
                     );
 
                     t.setId(rs.getInt("IdMovimento"));
 
                     return t;
+                    } catch (IllegalArgumentException exception) {
+                    System.err.println("Erro ao mapear transação: " + exception.getMessage());
+                    return null;
+                    }
                 }
             }
         } catch (SQLException e) {
@@ -87,13 +91,17 @@ public class TransactionDAOImplMariaDB implements TransactionDAO {
              ResultSet rs = stmt.executeQuery()) {
             
             while (rs.next()) {
-                Transaction t = new Transaction(
-                        rs.getInt("IdCarteira"),
-                        rs.getDate("Data"),
-                        OperationType.fromCode(rs.getString("TipoOperacao").charAt(0)),
-                        rs.getDouble("Quantidade"));
-                        t.setId(rs.getInt("IdMovimento"));
-                list.add(t);
+                try {
+                    Transaction t = new Transaction(
+                            rs.getInt("IdCarteira"),
+                            rs.getDate("Data"),
+                            OperationType.fromCode(rs.getString("TipoOperacao").charAt(0)),
+                            rs.getDouble("Quantidade"));
+                    t.setId(rs.getInt("IdMovimento"));
+                    list.add(t);
+                } catch (IllegalArgumentException exception) {
+                    System.err.println("Erro ao mapear transação: " + exception.getMessage());
+                }
             }
         } catch (SQLException e) {
             System.err.println("Erro ao listar todas as transações: " + e.getMessage());
@@ -115,17 +123,20 @@ public class TransactionDAOImplMariaDB implements TransactionDAO {
             try (ResultSet rs = stmt.executeQuery()) {
 
                 while (rs.next()) {
+                    try {
+                        Transaction t = new Transaction(
+                                rs.getInt("IdCarteira"),
+                                rs.getDate("Data"),
+                                OperationType.fromCode(rs.getString("TipoOperacao").charAt(0)),
+                                rs.getDouble("Quantidade")
+                        );
 
-                    Transaction t = new Transaction(
-                            rs.getInt("IdCarteira"),
-                            rs.getDate("Data"),
-                            OperationType.fromCode(rs.getString("TipoOperacao").charAt(0)),
-                            rs.getDouble("Quantidade")
-                    );
+                        t.setId(rs.getInt("IdMovimento"));
 
-                    t.setId(rs.getInt("IdMovimento"));
-
-                    list.add(t);
+                        list.add(t);
+                    } catch (IllegalArgumentException exception) {
+                        System.err.println("Erro ao mapear transação: " + exception.getMessage());
+                    }
                 }
             }
 

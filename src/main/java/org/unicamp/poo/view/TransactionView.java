@@ -2,7 +2,6 @@ package org.unicamp.poo.view;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Scanner;
 
 import org.unicamp.poo.model.Oracle;
 import org.unicamp.poo.model.Transaction;
@@ -25,19 +24,17 @@ public class TransactionView {
     }
 
     public Transaction readTransactionData(OperationType operationType) {
-        Scanner read = ConsoleScanner.getInstance();
+        int id = ConsoleScanner.readInt(messages.get("wallet.view.prompt.id"), messages.get("generic.confirmInvalid"));
 
-        System.out.print(messages.get("wallet.view.prompt.id"));
-        int id = read.nextInt();
-        read.nextLine();
-
-        System.out.print(messages.get("transaction.view.prompt.quantity"));
-        double quantity = read.nextDouble();
+        double quantity = ConsoleScanner.readDouble(messages.get("transaction.view.prompt.quantity"), messages.get("generic.confirmInvalid"));
 
         // Forces user to enter a positive non-zero value
         while (quantity <= 0){
-            System.out.print(messages.get("transaction.view.prompt.positiveQuantity"));
-            quantity = read.nextDouble();
+            if(quantity == 0) {
+                // Void the operation
+                return null;
+            }
+            quantity = ConsoleScanner.readDouble(messages.get("transaction.view.prompt.positiveQuantity"), messages.get("generic.confirmInvalid"));
         }
         return new Transaction(id, new Date(), operationType, quantity);
     }

@@ -91,6 +91,8 @@ public class TransactionController {
             else {
                 view.showErrorMessage(messages.get("transaction.buy.error"));
             }
+        } else {
+            view.showErrorMessage(messages.get("transaction.cancelled"));
         }
     }
 
@@ -136,6 +138,8 @@ public class TransactionController {
             else {
                 view.showErrorMessage(messages.get("transaction.sell.error"));
             }
+        } else {
+            view.showErrorMessage(messages.get("transaction.cancelled"));
         }
     }
 

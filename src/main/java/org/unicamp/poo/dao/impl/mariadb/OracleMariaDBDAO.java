@@ -1,15 +1,15 @@
 package org.unicamp.poo.dao.impl.mariadb;
 
-import org.unicamp.poo.dao.OracleDAO;
-import org.unicamp.poo.model.Oracle;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+
+import org.unicamp.poo.dao.OracleDAO;
+import org.unicamp.poo.model.Oracle;
 
 public class OracleMariaDBDAO implements OracleDAO {
     
@@ -45,10 +45,15 @@ public class OracleMariaDBDAO implements OracleDAO {
             
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    return new Oracle(
-                            rs.getDate("Data"),
-                            rs.getDouble("Cotacao")
-                    );
+                    try {
+                        return new Oracle(
+                                rs.getDate("Data"),
+                                rs.getDouble("Cotacao")
+                        );
+                    } catch (RuntimeException exception) {
+                        System.err.println("Erro ao mapear cotação: " + exception.getMessage());
+                        return null;
+                    }
                 }
             }
         } catch (SQLException e) {
@@ -66,11 +71,15 @@ public class OracleMariaDBDAO implements OracleDAO {
              ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
-                Oracle o = new Oracle(
-                        rs.getDate("Data"),
-                        rs.getDouble("Cotacao")
-                );
-                list.add(o);
+                try {
+                    Oracle o = new Oracle(
+                            rs.getDate("Data"),
+                            rs.getDouble("Cotacao")
+                    );
+                    list.add(o);
+                } catch (RuntimeException exception) {
+                    System.err.println("Erro ao mapear cotação: " + exception.getMessage());
+                }
             }
 
         } catch (SQLException e) {

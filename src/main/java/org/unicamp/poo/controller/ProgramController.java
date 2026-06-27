@@ -96,27 +96,26 @@ public class ProgramController {
     {
         OracleDAO oracleDAO;
 
-        switch (databaseSelector)
-        {
-            case MARIADB:
-            {
+        switch (databaseSelector) {
+            case MARIADB -> {
                 dbConn = new MariaDBConnection(serverName);
                 dbConn.openConnection();
+
+                if (dbConn.getConnection() == null) {
+                    throw new IllegalStateException("Falha ao abrir a conexão MariaDB.");
+                }
 
                 walletDAO = new WalletDAOImplMariaDB(dbConn.getConnection());
                 transactionDAO = new TransactionDAOImplMariaDB(dbConn.getConnection());
                 oracleDAO = new OracleMariaDBDAO(dbConn.getConnection());
                 oracleController = new OracleController(oracleDAO);
             }
-            break;
-            case MEMORY:
-            {
+            case MEMORY -> {
                 walletDAO = new WalletMemoryDAO();
                 transactionDAO = new TransactionMemoryDAO();
                 oracleDAO = new OracleMemoryDAO();
                 oracleController = new OracleController(oracleDAO);
             }
-            break;
         }
     }
 

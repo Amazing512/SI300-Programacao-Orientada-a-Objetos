@@ -37,13 +37,7 @@ public class ReportView {
     }
 
     public int readWalletIdReport(String prompt){
-        Scanner read = ConsoleScanner.getInstance();
-
-        System.out.print(prompt);
-        int id = read.nextInt();
-        read.nextLine();
-
-        return id;
+        return ConsoleScanner.readInt(prompt, messages.get("generic.confirmInvalid"));
     }
 
     // Renders a financial panel block showing metrics and net values.
@@ -186,20 +180,13 @@ public class ReportView {
         }
     }
 
-    // Reads all fields required to register a new Oracle quote.
     public Oracle readOracleData() {
-        Scanner read = ConsoleScanner.getInstance();
-
         Date date = readOracleDate();
 
-        System.out.print(messages.get("report.oracle.price.prompt"));
-        double price = read.nextDouble();
-        read.nextLine();
+        double price = ConsoleScanner.readDouble(messages.get("report.oracle.price.prompt"), messages.get("generic.confirmInvalid"));
 
         while (price <= 0) {
-            System.out.print(messages.get("report.oracle.price.invalid"));
-            price = read.nextDouble();
-            read.nextLine();
+            price = ConsoleScanner.readDouble(messages.get("report.oracle.price.invalid"), messages.get("generic.confirmInvalid"));
         }
 
         return new Oracle(date, price);
@@ -228,19 +215,13 @@ public class ReportView {
 
     // Prompts the user for an updated price, maintaining the original date.
     public Oracle readOracleUpdates(Oracle editableOracle) {
-        Scanner read = ConsoleScanner.getInstance();
-
         System.out.println(messages.get("report.oracle.update.dateCurrent") + " " + DATE_FORMAT.format(editableOracle.getDate()));
         System.out.printf(messages.get("report.oracle.update.priceCurrent") + " " + "%.2f%n", editableOracle.getPrice());
 
-        System.out.print(messages.get("report.oracle.update.pricePrompt"));
-        double price = read.nextDouble();
-        read.nextLine();
+        double price = ConsoleScanner.readDouble(messages.get("report.oracle.update.pricePrompt"), messages.get("generic.confirmInvalid"));
 
         while (price <= 0) {
-            System.out.print(messages.get("report.oracle.price.invalid"));
-            price = read.nextDouble();
-            read.nextLine();
+            price = ConsoleScanner.readDouble(messages.get("report.oracle.price.invalid"), messages.get("generic.confirmInvalid"));
         }
 
         // Keeps the same date — the key of an Oracle is its date and cannot be changed
@@ -249,24 +230,25 @@ public class ReportView {
 
     // Prompts a confirmation choice to safely execute irreversible deletion actions.
     public boolean confirmDeletion(Oracle removableOracle) {
-        Scanner read = ConsoleScanner.getInstance();
-
         while (true) {
             System.out.println(messages.get("report.oracle.confirmDelete") + DATE_FORMAT.format(removableOracle.getDate()) + messages.get("report.oracle.confirmDelete.suffix"));
             System.out.println("1 - " + messages.get("generic.confirmYes"));
             System.out.println("2 - " + messages.get("generic.confirmNo"));
 
-            int option = read.nextInt();
-            read.nextLine();
+            Integer option = ConsoleScanner.readIntOrNull();
+            if (option == null) {
+                System.out.println(messages.get("generic.confirmInvalid"));
+                continue;
+            }
 
             switch (option) {
-                case 1:
+                case 1 -> {
                     return true;
-                case 2:
+                }
+                case 2 -> {
                     return false;
-                default:
-                    System.out.println(messages.get("generic.confirmInvalid"));
-                    break;
+                }
+                default -> System.out.println(messages.get("generic.confirmInvalid"));
             }
         }
     }

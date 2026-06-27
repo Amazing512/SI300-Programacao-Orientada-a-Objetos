@@ -27,9 +27,7 @@ public class WalletView {
         // Uses the centralized shared Scanner instance from the project utilities
         Scanner read = ConsoleScanner.getInstance();
 
-        System.out.print(messages.get("wallet.view.prompt.id"));
-        int id = read.nextInt();
-        read.nextLine(); // Consumes the leftover newline character to prevent skipping inputs
+        int id = ConsoleScanner.readInt(messages.get("wallet.view.prompt.id"), messages.get("generic.confirmInvalid"));
 
         System.out.print(messages.get("wallet.view.prompt.holder"));
         String holder = read.nextLine();
@@ -52,13 +50,7 @@ public class WalletView {
 
     //Prompts the user for a single Wallet ID
     public int readWalletId() {
-        Scanner read = ConsoleScanner.getInstance();
-
-        System.out.print(messages.get("wallet.view.prompt.id"));
-        int id = read.nextInt();
-        read.nextLine();
-
-        return id;
+        return ConsoleScanner.readInt(messages.get("wallet.view.prompt.id"), messages.get("generic.confirmInvalid"));
     }
 
     // Displays the current details of a given Wallet instance formatted on the console screen
@@ -87,25 +79,26 @@ public class WalletView {
 
     // Prompts a confirmation choice to safely execute irreversible deletion actions
     public boolean confirmDeletion(Wallet removableWallet) {
-        Scanner read = ConsoleScanner.getInstance();
-
         // Loops until a valid decision option (1 or 2) is supplied by the user
         while (true) {
             System.out.println(messages.get("wallet.view.prompt.confirmDelete"));
             System.out.println("1 - " + messages.get("generic.confirmYes"));
             System.out.println("2 - " + messages.get("generic.confirmNo"));
 
-            int option = read.nextInt();
-            read.nextLine();
+            Integer option = ConsoleScanner.readIntOrNull();
+            if (option == null) {
+                System.out.println(messages.get("generic.confirmInvalid"));
+                continue;
+            }
 
             switch (option) {
-                case 1:
+                case 1 -> {
                     return true;
-                case 2:
+                }
+                case 2 -> {
                     return false;
-                default:
-                    System.out.println(messages.get("generic.confirmInvalid"));
-                    break;
+                }
+                default -> System.out.println(messages.get("generic.confirmInvalid"));
             }
         }
     }
