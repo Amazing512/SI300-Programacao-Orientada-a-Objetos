@@ -2,7 +2,6 @@ package org.unicamp.poo.view;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Scanner;
 
 import org.unicamp.poo.model.Oracle;
@@ -43,20 +42,6 @@ public class TransactionView {
         return new Transaction(id, new Date(), operationType, quantity);
     }
 
-    public int readWalletForHistory(){
-        Scanner read = ConsoleScanner.getInstance();
-
-        System.out.println(messages.get("transaction.view.prompt.historyId"));
-        int id = read.nextInt();
-        read.nextLine();
-
-        return id;
-    }
-
-    // Iterates through a list of transactions and prints them formatted to the console.
-    public void showHistory(List<Transaction> transactions) {
-
-    }
 
     // Prints an error message highlighted in red color
     public void showErrorMessage(String s) {

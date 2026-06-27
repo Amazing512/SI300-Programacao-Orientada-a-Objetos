@@ -66,6 +66,8 @@ public class TransactionDAOImplMariaDB implements TransactionDAO {
                             rs.getDouble("Quantidade")
                     );
 
+                    t.setId(rs.getInt("IdMovimento"));
+
                     return t;
                 }
             }
@@ -158,7 +160,7 @@ public class TransactionDAOImplMariaDB implements TransactionDAO {
 
             stmt.setString(
                     3,
-                    transaction.getOperationType().name()
+                    String.valueOf(transaction.getOperationType().getCode())
             );
 
             stmt.setDouble(

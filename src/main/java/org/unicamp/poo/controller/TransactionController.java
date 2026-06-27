@@ -139,21 +139,6 @@ public class TransactionController {
         }
     }
 
-    // Fetches and displays the transaction history for a specific wallet.
-    private void actionShowHistory(){
-        int walletId = view.readWalletForHistory();
-
-        // Verify if the wallet exists before requesting history
-        var wallet = walletModel.findById(walletId);
-        if (wallet == null){
-            view.showErrorMessage(messages.get("transaction.wallet.notFound"));
-            return;
-        }
-
-        // Fetch history data and pass it to the view
-        List<Transaction> history = model.findByWalletId(walletId);
-        view.showHistory(history);
-    }
 
     // Generates the translated text options for the transaction menu.
 
@@ -182,7 +167,6 @@ public class TransactionController {
                 case 0 -> loop = false;
                 case 1 -> actionBuyCoin();
                 case 2 -> actionSellCoin();
-                case 3 -> actionShowHistory();
                 default -> loop = false;
             }
         }
