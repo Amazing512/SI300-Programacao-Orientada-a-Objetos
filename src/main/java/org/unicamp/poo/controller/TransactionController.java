@@ -1,25 +1,23 @@
 package org.unicamp.poo.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.unicamp.poo.dao.TransactionDAO;
 import org.unicamp.poo.dao.WalletDAO;
 import org.unicamp.poo.model.Oracle;
 import org.unicamp.poo.model.Transaction;
 import org.unicamp.poo.model.enums.OperationType;
+import static org.unicamp.poo.util.ConsoleColors.RESET;
+import static org.unicamp.poo.util.ConsoleColors.YELLOW;
 import org.unicamp.poo.util.ConsoleScanner;
 import org.unicamp.poo.util.MessageProvider;
 import org.unicamp.poo.view.Menu;
 import org.unicamp.poo.view.TransactionView;
 
-import java.util.ArrayList;
-import java.util.List;
-
 // Controller responsible for handling coin buy, sell, and transaction history operations.
 
 public class TransactionController {
-
-    // ANSI Escape codes for coloring console output texts
-    public static final String reset = "\u001B[0m";
-    public static final String yellow = "\u001B[33m";
 
     // Model dependencies for persistence and business logic
     TransactionDAO model;
@@ -32,7 +30,7 @@ public class TransactionController {
     // Initializes the controller with necessary DAOs, views, the internal Oracle quote
     // provider, and internationalization tools.
 
-    public TransactionController(TransactionDAO model, WalletDAO walletModel, TransactionView view, MessageProvider messages) {
+    public TransactionController(TransactionDAO model, WalletDAO walletModel, OracleController oracleController, TransactionView view, MessageProvider messages) {
         super();
         this.model = model;
         this.walletModel = walletModel;
@@ -161,7 +159,7 @@ public class TransactionController {
 
     private List<String> getMenuOptions()
     {
-        final List<String> options = new ArrayList<String>();
+        final List<String> options = new ArrayList<>();
         options.add(messages.get("transactionMenu.return"));
         options.add(messages.get("transactionMenu.buyCoin"));
         options.add(messages.get("transactionMenu.sellCoin"));
@@ -173,11 +171,11 @@ public class TransactionController {
     public void start()
     {
         final List<String> options = getMenuOptions();
-        final Menu transactionMenu = new Menu(ConsoleScanner.getInstance());
+        final Menu transactionMenu = new Menu(ConsoleScanner.getInstance(), messages);
         boolean loop = true;
 
         while (loop) {
-            String yellowTitle = yellow + messages.get("transactionMenu.title") + reset;
+            String yellowTitle = YELLOW + messages.get("transactionMenu.title") + RESET;
 
             switch (transactionMenu.getChoice(yellowTitle, options, messages.get("transactionMenu.prompt")))
             {

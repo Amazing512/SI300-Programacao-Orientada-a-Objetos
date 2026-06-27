@@ -1,24 +1,23 @@
 package org.unicamp.poo.view;
 
-import org.unicamp.poo.model.Oracle;
-import org.unicamp.poo.model.Transaction;
-import org.unicamp.poo.model.enums.OperationType;
-import org.unicamp.poo.util.ConsoleScanner;
-import org.unicamp.poo.util.MessageProvider;
-
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
+import org.unicamp.poo.model.Oracle;
+import org.unicamp.poo.model.Transaction;
+import org.unicamp.poo.model.enums.OperationType;
+import static org.unicamp.poo.util.ConsoleColors.GREEN;
+import static org.unicamp.poo.util.ConsoleColors.RED;
+import static org.unicamp.poo.util.ConsoleColors.RESET;
+import org.unicamp.poo.util.ConsoleScanner;
+import org.unicamp.poo.util.MessageProvider;
+
 // View class responsible for handling console interactions regarding transactions.
 
 public class TransactionView {
-
-    // ANSI Escape codes for coloring console output texts
-    public static final String reset = "\u001B[0m";
-    public static final String green = "\u001B[32m";
-    public static final String red = "\u001B[31m";
-
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
     private final MessageProvider messages;
 
     // Constructor providing Dependency Injection for internationalized messages
@@ -61,14 +60,20 @@ public class TransactionView {
 
     // Prints an error message highlighted in red color
     public void showErrorMessage(String s) {
-        System.out.println(red + s + reset);
+        System.out.println(RED + s + RESET);
     }
 
     // Prints a success message highlighted in green color
     public void showSuccessMessage(String s) {
-        System.out.println(green + s + reset);
+        System.out.println(GREEN + s + RESET);
     }
 
+    // Shows the current day's quote consulted from the Oracle before a buy or sell
+    // operation, so the user can make an informed decision.
     public void displayDailyQuote(Oracle dailyQuote) {
+        System.out.println("\n----- Cotação do Dia -----");
+        System.out.println("Data:  " + DATE_FORMAT.format(dailyQuote.getDate()));
+        System.out.printf("Preço: %.2f%n", dailyQuote.getPrice());
+        System.out.println("---------------------------");
     }
 }

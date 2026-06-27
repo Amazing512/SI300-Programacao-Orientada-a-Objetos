@@ -9,12 +9,11 @@ public final class Main {
     private final static String          country  = "BR";
     private final static MessageProvider messageProvider = new MessageProvider("messages", lang, country);
 
-    public static void main() {
+    public static void main(String[] args) {
         try {
             final String serverName = "WindServer";
 
             (new ProgramController(DatabaseSelector.MEMORY, messageProvider)).start(serverName);
-
 
         } catch(Exception ex) {
             System.out.println("Error: " + ex.getMessage());

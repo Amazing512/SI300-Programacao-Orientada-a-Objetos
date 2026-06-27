@@ -1,22 +1,20 @@
 package org.unicamp.poo.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.unicamp.poo.dao.WalletDAO;
 import org.unicamp.poo.model.Wallet;
+import static org.unicamp.poo.util.ConsoleColors.RESET;
+import static org.unicamp.poo.util.ConsoleColors.YELLOW;
 import org.unicamp.poo.util.ConsoleScanner;
 import org.unicamp.poo.util.MessageProvider;
 import org.unicamp.poo.view.Menu;
 import org.unicamp.poo.view.WalletView;
 
-import java.util.ArrayList;
-import java.util.List;
-
 // Controller class responsible for managing operations related to Wallets.
 
 public final class WalletController {
-
-    // ANSI Escape codes for coloring console output texts
-    public static final String reset = "\u001B[0m";
-    public static final String yellow = "\u001B[33m";
 
     // Attributes encapsulating the Model (DAO), View, and internationalized messages
     private final WalletDAO model;
@@ -127,7 +125,7 @@ public final class WalletController {
 
     private List<String> getMenuOptions()
     {
-        final List<String> options = new ArrayList<String>();
+        final List<String> options = new ArrayList<>();
         options.add(messages.get("walletMenu.return"));
         options.add(messages.get("walletMenu.addWallet"));
         options.add(messages.get("walletMenu.searchWallet"));
@@ -140,12 +138,12 @@ public final class WalletController {
     public void start()
     {
         final List<String> options = getMenuOptions();
-        final Menu walletMenu = new Menu(ConsoleScanner.getInstance());
+        final Menu walletMenu = new Menu(ConsoleScanner.getInstance(), messages);
         boolean loop = true;
 
         // Keeps interacting with the user until the exit option (0) is selected
         while (loop) {
-            String yellowTitle = yellow + messages.get("walletMenu.title") + reset;
+            String yellowTitle = YELLOW + messages.get("walletMenu.title") + RESET;
 
             switch (walletMenu.getChoice(yellowTitle, options, messages.get("walletMenu.prompt")))
             {
