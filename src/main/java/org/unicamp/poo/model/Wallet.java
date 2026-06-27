@@ -9,8 +9,14 @@ public class Wallet implements Serializable {
     private String holder;
     private String broker;
 
-    public Wallet(int id, String holder, String broker) {
+    public Wallet(Integer id, String holder, String broker) {
         this.id = id;
+        this.holder = holder;
+        this.broker = broker;
+    }
+
+    public Wallet(String holder, String broker) {
+        this.id = null;
         this.holder = holder;
         this.broker = broker;
     }

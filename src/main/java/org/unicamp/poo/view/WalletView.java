@@ -27,15 +27,13 @@ public class WalletView {
         // Uses the centralized shared Scanner instance from the project utilities
         Scanner read = ConsoleScanner.getInstance();
 
-        int id = ConsoleScanner.readInt(messages.get("wallet.view.prompt.id"), messages.get("generic.confirmInvalid"));
-
         System.out.print(messages.get("wallet.view.prompt.holder"));
         String holder = read.nextLine();
 
         System.out.print(messages.get("wallet.view.prompt.broker"));
         String broker = read.nextLine();
 
-        return new Wallet(id, holder, broker);
+        return new Wallet(holder, broker);
     }
 
     // Prints an error message highlighted in RED color

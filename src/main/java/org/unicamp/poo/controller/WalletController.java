@@ -36,16 +36,10 @@ public final class WalletController {
         Wallet newWallet = view.readWalletData();
 
         if (newWallet != null){
-            // Checks if a wallet with the given ID already exists to prevent duplication
-            if(model.findById(newWallet.getId()) != null){
-                view.showErrorMessage(messages.get("wallet.add.error.duplicate"));
-                return;
-            }
-
             // Persists the new wallet through the DAO layer
             Wallet saveWallet = model.create(newWallet);
             if (saveWallet != null) {
-                view.showSuccessMessage(messages.get("wallet.add.success"));
+                view.showSuccessMessage(messages.get("wallet.add.success") + " ID: " + saveWallet.getId());
             }
             else{
                 view.showErrorMessage(messages.get("wallet.add.error"));
