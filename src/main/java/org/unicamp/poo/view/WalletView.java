@@ -10,21 +10,21 @@ import org.unicamp.poo.util.ConsoleScanner;
 import org.unicamp.poo.util.MessageProvider;
 
 /*
-View class responsible for handling terminal input and output operations
-regarding the Wallet module.
+Classe View responsável por lidar com operações de entrada e saída de terminal
+referentes ao módulo Carteira.
  */
 
 public class WalletView {
     private final MessageProvider messages;
 
-    // Constructor providing Dependency Injection for internationalized messages
+    // Construtor que fornece Injeção de Dependência para mensagens internacionalizadas
     public WalletView(MessageProvider messages) {
         this.messages = messages;
     }
 
-    //Reads all fields required to instantiate and register a new Wallet
+    // Lê todos os campos requeridos para instanciar e registrar uma nova Carteira
     public Wallet readWalletData() {
-        // Uses the centralized shared Scanner instance from the project utilities
+        // Usa a instância centralizada e compartilhada de Scanner dos utilitários do projeto
         Scanner read = ConsoleScanner.getInstance();
 
         System.out.print(messages.get("wallet.view.prompt.holder"));
@@ -36,22 +36,22 @@ public class WalletView {
         return new Wallet(holder, broker);
     }
 
-    // Prints an error message highlighted in RED color
+    // Imprime uma mensagem de erro destacada na cor VERMELHA
     public void showErrorMessage(String s) {
         System.out.println(RED + s + RESET);
     }
 
-    // Prints a success message highlighted in GREEN color
+    // Imprime uma mensagem de sucesso destacada na cor VERDE
     public void showSuccessMessage(String s) {
         System.out.println(GREEN + s + RESET);
     }
 
-    //Prompts the user for a single Wallet ID
+    // Solicita ao usuário um ID de Carteira
     public int readWalletId() {
         return ConsoleScanner.readInt(messages.get("wallet.view.prompt.id"), messages.get("generic.confirmInvalid"));
     }
 
-    // Displays the current details of a given Wallet instance formatted on the console screen
+    // Exibe os detalhes atuais de uma determinada instância de Carteira formatada no console
     public void displayWallet(Wallet wallet) {
 
         System.out.println(messages.get("wallet.view.header"));
@@ -60,7 +60,7 @@ public class WalletView {
         System.out.println(messages.get("wallet.view.broker") + " " + wallet.getBroker());
     }
 
-    //Prompts the user for updated holder and broker details, maintaining the original entity ID
+    // Solicita ao usuário detalhes atualizados de titular e corretora, mantendo o ID original da entidade
     public Wallet readWalletUpdates(Wallet editableWallet) {
         Scanner read = ConsoleScanner.getInstance();
 
@@ -70,14 +70,14 @@ public class WalletView {
         System.out.print(messages.get("wallet.view.prompt.newBroker"));
         String broker = read.nextLine();
 
-        // Creates a new instance using the same ID from the target editable wallet
+        // Cria uma nova instância usando o mesmo ID da carteira editável alvo
         Wallet wallet = new Wallet(editableWallet.getId(), holder, broker);
         return wallet;
     }
 
-    // Prompts a confirmation choice to safely execute irreversible deletion actions
+    // Solicita uma escolha de confirmação para executar ações de exclusão irreversíveis de forma segura
     public boolean confirmDeletion(Wallet removableWallet) {
-        // Loops until a valid decision option (1 or 2) is supplied by the user
+        // Loop até que uma opção de decisão válida (1 ou 2) seja fornecida pelo usuário
         while (true) {
             System.out.println(messages.get("wallet.view.prompt.confirmDelete"));
             System.out.println("1 - " + messages.get("generic.confirmYes"));

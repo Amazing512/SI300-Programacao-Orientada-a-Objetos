@@ -12,17 +12,17 @@ import org.unicamp.poo.util.MessageProvider;
 import org.unicamp.poo.view.Menu;
 import org.unicamp.poo.view.WalletView;
 
-// Controller class responsible for managing operations related to Wallets.
+// Classe Controller responsável por gerenciar operações relacionadas a Carteiras.
 
 public final class WalletController {
 
-    // Attributes encapsulating the Model (DAO), View, and internationalized messages
+    // Atributos que encapsulam o Model (DAO), View e mensagens internacionalizadas
     private final WalletDAO model;
     private final WalletView view;
 
     private final MessageProvider messages;
 
-    // Constructor using Dependency Injection to initialize the controller components.
+    // Construtor que usa Injeção de Dependência para inicializar os componentes do controller.
     public WalletController(WalletDAO model, WalletView view, MessageProvider messages) {
         super();
         this.model = model;
@@ -30,13 +30,13 @@ public final class WalletController {
         this.messages = messages;
     }
 
-    // Action to register a new wallet.
+    // Ação para registrar uma nova carteira.
     private void actionAddWallet() {
-        // Requests the view to read data from the terminal and return a temporary Wallet object
+        // Solicita à view para ler os dados do terminal e retornar um objeto Carteira temporário
         Wallet newWallet = view.readWalletData();
 
         if (newWallet != null){
-            // Persists the new wallet through the DAO layer
+            // Persiste a nova carteira através da camada DAO
             Wallet saveWallet = model.create(newWallet);
             if (saveWallet != null) {
                 view.showSuccessMessage(messages.get("wallet.add.success") + " ID: " + saveWallet.getId());
@@ -47,72 +47,72 @@ public final class WalletController {
         }
     }
 
-    // Action to look up a wallet by its ID
+    // Ação para buscar uma carteira pelo seu ID
     private void actionSearchWallet() {
-        // Gets the ID to be searched from the view
+        // Obtém da view o ID a ser buscado
         int id = view.readWalletId();
 
-        // Searches for the wallet in the DAO repository
+        // Busca a carteira no repositório DAO
         Wallet wallet = model.findById(id);
 
         if(wallet != null) {
-            // Displays the wallet details if found
+            // Exibe os detalhes da carteira se for encontrada
             view.displayWallet(wallet);
         }
         else{
-            // Shows an error message if the wallet does not exist
+            // Mostra uma mensagem de erro se a carteira não existir
             view.showErrorMessage(messages.get("wallet.search.error.notfound"));
         }
 
     }
 
-    // Action to edit an existing wallet's details
+    // Ação para editar os detalhes de uma carteira existente
     private void actionEditWallet() {
 
-        // Gets the ID of the wallet to be edited
+        // Obtém o ID da carteira a ser editada
         int id = view.readWalletId();
         Wallet editableWallet = model.findById(id);
 
         if(editableWallet != null) {
-            // Requests the view to prompt the user for the updated details
+            // Solicita à view que peça os detalhes atualizados ao usuário
             Wallet updatedWallet = view.readWalletUpdates(editableWallet);
 
             if (updatedWallet != null) {
-                // Updates the wallet information in the database/memory repository
+                // Atualiza as informações da carteira no repositório do banco/memória
                 model.update(updatedWallet);
                 view.showSuccessMessage(messages.get("wallet.edit.success"));
             }
             else{
-                // Error handling in case the update returns null
+                // Tratamento de erro caso a atualização retorne nula
                 view.showErrorMessage(messages.get("wallet.edit.error.cancelled"));
             }
         }
         else{
-            // Shows an error message if the wallet does not exist in the repository
+            // Mostra uma mensagem de erro se a carteira não existir no repositório
             view.showErrorMessage(messages.get("wallet.search.error.notfound"));
         }
     }
 
-    // Action to delete a wallet.
+    // Ação para remover uma carteira.
     private void actionRemoveWallet() {
-        // Gets the ID of the wallet to be removed
+        // Obtém o ID da carteira a ser removida
         int id = view.readWalletId();
         Wallet removableWallet = model.findById(id);
 
         if (removableWallet != null){
-            // Asks the user for a deletion confirmation through the view layer
+            // Solicita uma confirmação de exclusão do usuário através da camada view
             if (view.confirmDeletion(removableWallet)) {
-                // Removes the wallet from the DAO repository
+                // Remove a carteira do repositório DAO
                 model.delete(id);
                 view.showSuccessMessage(messages.get("wallet.remove.success"));
             }
             else {
-                // Error feedback or fallback if deletion is rejected/not found
+                // Feedback de erro se a exclusão for rejeitada
                 view.showErrorMessage(messages.get("wallet.remove.error.cancelled"));
             }
         }
         else {
-            // Error handling if the target wallet does not exist in the database
+            // Tratamento de erro se a carteira alvo não existir no banco de dados
             view.showErrorMessage(messages.get("wallet.search.error.notfound"));
         }
     }
@@ -128,14 +128,14 @@ public final class WalletController {
         return (options);
     }
 
-    // Starts the main menu loop for the Wallet Management system.
+    // Inicia o loop do menu principal para o sistema de Gerenciamento de Carteiras.
     public void start()
     {
         final List<String> options = getMenuOptions();
         final Menu walletMenu = new Menu(ConsoleScanner.getInstance(), messages);
         boolean loop = true;
 
-        // Keeps interacting with the user until the exit option (0) is selected
+        // Continua interagindo com o usuário até que a opção de saída (0) seja selecionada
         while (loop) {
             String yellowTitle = YELLOW + messages.get("walletMenu.title") + RESET;
 

@@ -17,17 +17,17 @@ import static org.unicamp.poo.util.ConsoleColors.RESET;
 import org.unicamp.poo.util.ConsoleScanner;
 import org.unicamp.poo.util.MessageProvider;
 
-/* View class responsible for interacting with the user and formatting console
-    layouts for financial and ranking reports. */
+/* Classe View responsável por interagir com o usuário e formatar layouts de console
+    para relatórios financeiros e de ranking. */
 
 public class ReportView {
 
     private final MessageProvider messages;
 
-    // Date format used for Oracle input and output
+    // Formato de data usado para entrada e saída do Oráculo
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
 
-    // Constructor providing Dependency Injection for internationalized messages
+    // Construtor que fornece Injeção de Dependência para mensagens internacionalizadas
     public ReportView(MessageProvider messages) {
         this.messages = messages;
     }
@@ -40,7 +40,7 @@ public class ReportView {
         return ConsoleScanner.readInt(prompt, messages.get("generic.confirmInvalid"));
     }
 
-    // Renders a financial panel block showing metrics and net values.
+    // Renderiza um bloco de painel financeiro mostrando métricas e valores líquidos.
     public void showFinancialReport(
         int walletId,
         double totalCoinsBought,
@@ -73,7 +73,7 @@ public class ReportView {
         System.out.println("----------------------------------");
     }
 
-    // Prints wallets sorted by identifier.
+    // Imprime carteiras ordenadas pelo identificador.
     public void showWalletsOrderedByIdReport(List<Wallet> wallets) {
         System.out.println("\n---------------------------------");
         System.out.println(messages.get("report.wallets.byId.title"));
@@ -89,7 +89,7 @@ public class ReportView {
         System.out.println("---------------------------------");
     }
 
-    // Prints wallets sorted alphabetically by holder name.
+    // Imprime carteiras ordenadas alfabeticamente pelo nome do titular.
     public void showWalletsOrderedByHolderReport(List<Wallet> wallets) {
         System.out.println("\n---------------------------------");
         System.out.println(messages.get("report.wallets.byHolder.title"));
@@ -105,7 +105,7 @@ public class ReportView {
         System.out.println("---------------------------------");
     }
 
-    // Prints the current balance of a single wallet.
+    // Imprime o saldo atual de uma única carteira.
     public void showWalletCurrentBalanceReport(Wallet wallet, double balance) {
         System.out.println("\n---------------------------------");
         System.out.println(messages.get("report.wallet.currentBalance.title"));
@@ -117,7 +117,7 @@ public class ReportView {
         System.out.println("---------------------------------");
     }
 
-    // Prints the transaction history of a single wallet.
+    // Imprime o histórico de transações de uma única carteira.
     public void showWalletHistoryReport(Wallet wallet, List<Transaction> transactions) {
         System.out.println("\n---------------------------------");
         System.out.println(messages.get("report.wallet.history.title"));
@@ -137,7 +137,7 @@ public class ReportView {
         System.out.println("---------------------------------");
     }
 
-    // Prints the gain or loss total for each wallet.
+    // Imprime o total de ganho ou perda de cada carteira.
     public void showWalletGainLossReport(List<Wallet> wallets, TransactionDAO transactionDAO) {
         System.out.println("\n---------------------------------");
         System.out.println(messages.get("report.wallet.gainLoss.title"));
@@ -164,27 +164,27 @@ public class ReportView {
         System.out.println("---------------------------------");
     }
 
-    // Prints an error message highlighted in RED color
+    // Imprime uma mensagem de erro destacada na cor VERMELHA
     public void showErrorMessage(String s) {
         System.out.println(RED + s + RESET);
     }
 
-    // Prints a success message highlighted in GREEN color
+    // Imprime uma mensagem de sucesso destacada na cor VERDE
     public void showSuccessMessage(String s) {
         System.out.println(GREEN + s + RESET);
     }
 
-    // Prompts the user for a date, used for Oracle searches, edits and deletions.
+    // Solicita ao usuário uma data, usada para buscas, edições e exclusões no Oráculo.
     public Date readOracleDate() {
         Scanner read = ConsoleScanner.getInstance();
 
-        // Loops until the user enters a valid date in the expected format
+        // Loop até que o usuário insira uma data válida no formato esperado
         while (true) {
             System.out.print(messages.get("report.oracle.date.prompt"));
             String input = read.nextLine();
 
             try {
-                DATE_FORMAT.setLenient(false); // Rejects invalid dates like 32/13/2024
+                DATE_FORMAT.setLenient(false); // Rejeita datas inválidas como 32/13/2024
                 return DATE_FORMAT.parse(input);
             } catch (ParseException e) {
                 System.out.println(RED + messages.get("report.oracle.date.invalid") + RESET);
@@ -204,7 +204,7 @@ public class ReportView {
         return new Oracle(date, price);
     }
 
-    // Displays the details of a single Oracle quote on the console.
+    // Exibe os detalhes de uma única cotação do Oráculo no console.
     public void displayOracle(Oracle oracle) {
         System.out.println("\n" + messages.get("report.oracle.display.title"));
         System.out.println(messages.get("report.oracle.display.date") + " " + DATE_FORMAT.format(oracle.getDate()));
@@ -212,7 +212,7 @@ public class ReportView {
         System.out.println(messages.get("report.oracle.display.separator"));
     }
 
-    // Iterates through a list of Oracle quotes and prints them formatted to the console.
+    // Itera por uma lista de cotações do Oráculo e as imprime formatadas no console.
     public void displayOracleList(List<Oracle> oracles) {
         System.out.println("\n" + messages.get("report.oracle.list.title"));
         for (int i = 0; i < oracles.size(); i++) {
@@ -225,7 +225,7 @@ public class ReportView {
         System.out.println(messages.get("report.oracle.list.separator"));
     }
 
-    // Prompts the user for an updated price, maintaining the original date.
+    // Solicita ao usuário um preço atualizado, mantendo a data original.
     public Oracle readOracleUpdates(Oracle editableOracle) {
         System.out.println(messages.get("report.oracle.update.dateCurrent") + " " + DATE_FORMAT.format(editableOracle.getDate()));
         System.out.printf(messages.get("report.oracle.update.priceCurrent") + " " + "%.2f%n", editableOracle.getPrice());
@@ -236,11 +236,11 @@ public class ReportView {
             price = ConsoleScanner.readDouble(messages.get("report.oracle.price.invalid"), messages.get("generic.confirmInvalid"));
         }
 
-        // Keeps the same date — the key of an Oracle is its date and cannot be changed
+        // Mantém a mesma data — a chave de um Oráculo é sua data e não pode ser alterada
         return new Oracle(editableOracle.getDate(), price);
     }
 
-    // Prompts a confirmation choice to safely execute irreversible deletion actions.
+    // Solicita uma escolha de confirmação para executar ações de exclusão irreversíveis de forma segura.
     public boolean confirmDeletion(Oracle removableOracle) {
         while (true) {
             System.out.println(messages.get("report.oracle.confirmDelete") + DATE_FORMAT.format(removableOracle.getDate()) + messages.get("report.oracle.confirmDelete.suffix"));

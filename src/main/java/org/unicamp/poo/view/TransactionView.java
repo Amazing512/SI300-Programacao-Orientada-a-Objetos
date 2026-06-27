@@ -12,13 +12,12 @@ import static org.unicamp.poo.util.ConsoleColors.RESET;
 import org.unicamp.poo.util.ConsoleScanner;
 import org.unicamp.poo.util.MessageProvider;
 
-// View class responsible for handling console interactions regarding transactions.
+// Classe View responsável por lidar com interações de console referentes a transações.
 
 public class TransactionView {
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
     private final MessageProvider messages;
 
-    // Constructor providing Dependency Injection for internationalized messages
     public TransactionView(MessageProvider messages) {
         this.messages = messages;
     }
@@ -28,10 +27,8 @@ public class TransactionView {
 
         double quantity = ConsoleScanner.readDouble(messages.get("transaction.view.prompt.quantity"), messages.get("generic.confirmInvalid"));
 
-        // Forces user to enter a positive non-zero value
         while (quantity <= 0){
             if(quantity == 0) {
-                // Void the operation
                 return null;
             }
             quantity = ConsoleScanner.readDouble(messages.get("transaction.view.prompt.positiveQuantity"), messages.get("generic.confirmInvalid"));
@@ -39,19 +36,14 @@ public class TransactionView {
         return new Transaction(id, new Date(), operationType, quantity);
     }
 
-
-    // Prints an error message highlighted in red color
     public void showErrorMessage(String s) {
         System.out.println(RED + s + RESET);
     }
 
-    // Prints a success message highlighted in green color
     public void showSuccessMessage(String s) {
         System.out.println(GREEN + s + RESET);
     }
 
-    // Shows the current day's quote consulted from the Oracle before a buy or sell
-    // operation, so the user can make an informed decision.
     public void displayDailyQuote(Oracle dailyQuote) {
         System.out.println("\n" + messages.get("report.oracle.display.title"));
         System.out.println(messages.get("report.oracle.display.date") + "  " + DATE_FORMAT.format(dailyQuote.getDate()));

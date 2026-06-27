@@ -17,8 +17,8 @@ import org.unicamp.poo.util.MessageProvider;
 import org.unicamp.poo.view.Menu;
 import org.unicamp.poo.view.ReportView;
 
-/*  Controller responsible for generating consolidated financial reports and
-    sorting wallet lists based on their current balance. */
+/*  Controller responsável por gerar relatórios financeiros consolidados e
+    ordenar listas de carteiras com base no seu saldo atual. */
 
 public class ReportController {
 
@@ -28,7 +28,7 @@ public class ReportController {
     private final ReportView view;
     private final MessageProvider messages;
 
-    // Initializes the report controller with required DAOs, view, and internationalization provider.
+    // Inicializa o controller de relatório com os DAOs, view e provedor de internacionalização necessários.
     public ReportController(WalletDAO walletDAO, TransactionDAO transactionDAO, OracleController oracleController, ReportView view, MessageProvider messages) {
         super();
         this.walletDAO = walletDAO;
@@ -38,27 +38,27 @@ public class ReportController {
         this.messages = messages;
     }
 
-    // Dynamically calculates the total current balance of a specific wallet.
+    // Calcula dinamicamente o saldo atual total de uma carteira específica.
     private double calculateWalletBalance (int walletId){
         List<Transaction> transactions = transactionDAO.findByWalletId(walletId);
         double balance = 0.0;
 
         for (Transaction t : transactions){
             if (t.getOperationType() == OperationType.CASH_IN) {
-                balance += t.getQuantity(); // Increases balance on buy
+                balance += t.getQuantity(); // Incrementa o saldo na compra
             }
             else if (t.getOperationType() == OperationType.CASH_OUT){
-                balance -= t.getQuantity(); // Decreases balance on sell
+                balance -= t.getQuantity(); // Decrementa o saldo na venda
             }
         }
         return balance;
     }
 
-    // Processes the financial report data flow for a specific wallet.
+    // Processa o fluxo de dados do relatório financeiro para uma carteira específica.
     public void showFinancialReport(){
         int walletId = view.readWalletIdReport();
 
-        // Ensure the wallet exists before fetching transactions
+        // Garante que a carteira existe antes de buscar as transações
         Wallet wallet = walletDAO.findById(walletId);
         if (wallet == null){
             view.showErrorMessage(messages.get("transaction.wallet.notFound"));
@@ -78,7 +78,7 @@ public class ReportController {
             if (quote != null) {
                 price = quote.getPrice();
             } else {
-                // fallback to today's price if no quote exists for transaction date
+                // fallback para o preço de hoje caso não exista cotação para a data da transação
                 Oracle todayQuote = oracleController.getOrGenerateDailyQuote();
                 if (todayQuote != null) {
                     price = todayQuote.getPrice();
@@ -98,7 +98,7 @@ public class ReportController {
 
         double coinBalance = totalCoinsBought - totalCoinsSold;
 
-        // Current value of the remaining coins (coinBalance * today's price)
+        // Valor atual das moedas restantes (coinBalance * preço de hoje)
         double currentPrice = 0.0;
         Oracle todayQuote = oracleController.getOrGenerateDailyQuote();
         if (todayQuote != null) {
@@ -106,10 +106,10 @@ public class ReportController {
         }
         double currentHoldingsValue = coinBalance * currentPrice;
 
-        // Financial Profit / Loss = (Current Value of Remaining Coins + Money Received from Sales) - Money Spent on Purchases
+        // Lucro / Prejuízo Financeiro = (Valor Atual das Moedas Restantes + Dinheiro Recebido de Vendas) - Dinheiro Gasto em Compras
         double totalFinancialGainLoss = (currentHoldingsValue + totalMoneyReceived) - totalMoneySpent;
 
-        // Delegates the visual presentation to the view layer
+        // Delega a apresentação visual para a camada view
         view.showFinancialReport(
             walletId,
             totalCoinsBought,
@@ -122,7 +122,7 @@ public class ReportController {
         );
     }
 
-    // Lists wallets ordered by identifier in ascending order.
+    // Lista as carteiras ordenadas pelo identificador em ordem crescente.
     private void showWalletsOrderedById() {
         List<Wallet> wallets = walletDAO.findAll();
 
@@ -135,7 +135,7 @@ public class ReportController {
         view.showWalletsOrderedByIdReport(wallets);
     }
 
-    // Lists wallets ordered alphabetically by holder name.
+    // Lista as carteiras ordenadas alfabeticamente pelo nome do titular.
     private void showWalletsOrderedByHolder() {
         List<Wallet> wallets = walletDAO.findAllOrderByHolder();
 
@@ -147,7 +147,7 @@ public class ReportController {
         view.showWalletsOrderedByHolderReport(wallets);
     }
 
-    // Shows the current balance of a single wallet.
+    // Exibe o saldo atual de uma única carteira.
     private void showWalletCurrentBalance() {
         int walletId = view.readWalletIdReport(messages.get("report.wallet.balance.prompt"));
         Wallet wallet = walletDAO.findById(walletId);
@@ -161,7 +161,7 @@ public class ReportController {
         view.showWalletCurrentBalanceReport(wallet, balance);
     }
 
-    // Shows the transaction history of a single wallet.
+    // Exibe o histórico de transações de uma única carteira.
     private void showWalletHistory() {
         int walletId = view.readWalletIdReport(messages.get("report.wallet.history.prompt"));
         Wallet wallet = walletDAO.findById(walletId);
@@ -180,7 +180,7 @@ public class ReportController {
         view.showWalletHistoryReport(wallet, transactions);
     }
 
-    // Shows the gain or loss total for each wallet.
+    // Exibe o total de ganho ou perda de cada carteira.
     private void showWalletGainOrLoss() {
         List<Wallet> wallets = walletDAO.findAll();
 
@@ -192,7 +192,7 @@ public class ReportController {
         view.showWalletGainLossReport(wallets, transactionDAO);
     }
 
-    // Generates the list of translated menu options for the reports section.
+    // Gera a lista de opções de menu traduzidas para a seção de relatórios.
     private List<String> getMenuOptions(){
         final List<String> options = new ArrayList<>();
         options.add(messages.get("reportMenu.return"));
@@ -206,7 +206,7 @@ public class ReportController {
         return options;
     }
 
-    // Starts the main sub menu loop navigation for reports.
+    // Inicia o loop de navegação do submenu principal de relatórios.
     public void start() {
         final List<String> options = getMenuOptions();
         final Menu reportMenu = new Menu(ConsoleScanner.getInstance(), messages);

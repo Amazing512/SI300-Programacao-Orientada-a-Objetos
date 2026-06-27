@@ -7,7 +7,7 @@ public class ConsoleScanner {
 
     private ConsoleScanner()
     {
-        // empty private constructor avoids instantiation
+        // Construtor privado vazio para evitar instanciação
     }
 
     public static Scanner getInstance()

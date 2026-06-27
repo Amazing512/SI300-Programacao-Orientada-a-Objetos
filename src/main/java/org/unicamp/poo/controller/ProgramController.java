@@ -24,8 +24,8 @@ import org.unicamp.poo.view.ReportView;
 import org.unicamp.poo.view.TransactionView;
 import org.unicamp.poo.view.WalletView;
 
-/* Main orchestrator controller that centralizes the application's core flow,
-   coordinating menu navigation, sub-controllers lifecycle, and database sessions. */
+/* Controller orquestrador principal que centraliza o fluxo principal da aplicação,
+   coordenando a navegação de menus, o ciclo de vida dos sub-controllers e as sessões do banco de dados. */
 
 public class ProgramController {
 
@@ -37,37 +37,37 @@ public class ProgramController {
     private TransactionDAO transactionDAO;
     private OracleController oracleController;
 
-    // Initializes the central controller with the persistence strategy and messaging configuration.
+    // Inicializa o controller central com a estratégia de persistência e a configuração de mensagens.
     public ProgramController(DatabaseSelector databaseSelector, MessageProvider messages) {
         super();
         this.databaseSelector = databaseSelector;
         this.messages = messages;
     }
 
-    // Boots up the Wallet Sub-module and hands over the control flow.
+    // Inicializa o sub-módulo Carteira e transfere o fluxo de controle.
     void actionWallet() {
         final WalletController walletController = new WalletController(walletDAO, new WalletView(messages), messages);
         walletController.start();
     }
 
-    // Boots up the Transaction Sub-module and hands over the control flow.
+    // Inicializa o sub-módulo Transação e transfere o fluxo de controle.
     void actionTransaction() {
         final TransactionController transactionController = new TransactionController(transactionDAO, walletDAO, oracleController, new TransactionView(messages), messages);
         transactionController.start();
     }
 
-    // Boots up the Financial Reports Sub-module and hands over the control flow.
+    // Inicializa o sub-módulo de Relatórios Financeiros e transfere o fluxo de controle.
     void actionReports() {
         final ReportController reportController = new ReportController(walletDAO, transactionDAO, oracleController, new ReportView(messages), messages);
         reportController.start();
     }
 
-    // Boots up the Help Sub-module with long instructions and full credits list.
+    // Inicializa o sub-módulo Ajuda com instruções longas e lista de créditos completa.
     void actionHelp() {
         final Menu helpMenu = new Menu(ConsoleScanner.getInstance(), messages);
         boolean loop = true;
 
-        // Prepare the help sub-menu options using internationalized messages
+        // Prepara as opções do sub-menu de ajuda usando mensagens internacionalizadas
         final List<String> options = new ArrayList<>();
         options.add(messages.get("helpMenu.return"));
         options.add(messages.get("helpMenu.viewInstructions"));
@@ -91,7 +91,7 @@ public class ProgramController {
         }
     }
 
-    // Initializes state components and data connection layers based on strategy selector.
+    // Inicializa os componentes de estado e as camadas de conexão de dados com base no seletor de estratégia.
     private void openDatabase(String serverName)
     {
         OracleDAO oracleDAO;
@@ -119,14 +119,14 @@ public class ProgramController {
         }
     }
 
-    // Terminates network socket bindings securely to prevent open stream leaks.
+    // Encerra as conexões de soquetes de rede de forma segura para evitar vazamentos de recursos.
     private void closeDatabase() {
         if(dbConn != null) {
             dbConn.closeConnection();
         }
     }
 
-    // Prepares localized entry labels mapped to root operation features.
+    // Prepara rótulos de entrada localizados mapeados para os recursos da operação raiz.
     private List<String> getMenuOptions() {
         final List<String> options = new ArrayList<>();
         options.add(messages.get("mainMenu.exit"));
@@ -137,13 +137,13 @@ public class ProgramController {
         return options;
     }
 
-    // Executes the primary processing core daemon shell runner loop.
+    // Executa o loop principal do interpretador e executor de menus.
     public void start(String serverName)
     {
         final Menu userMenu = new Menu(ConsoleScanner.getInstance(), messages);
         boolean    loop     = true;
 
-        // Establish structural state before listening to interactions
+        // Estabelece o estado estrutural antes de ouvir as interações
         openDatabase(serverName);
 
         while (loop)
