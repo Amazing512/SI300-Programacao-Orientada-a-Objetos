@@ -53,10 +53,10 @@ public class TransactionView {
     // Shows the current day's quote consulted from the Oracle before a buy or sell
     // operation, so the user can make an informed decision.
     public void displayDailyQuote(Oracle dailyQuote) {
-        System.out.println("\n----- Cotação do Dia -----");
-        System.out.println("Data:  " + DATE_FORMAT.format(dailyQuote.getDate()));
-        System.out.printf("Preço: %.2f%n", dailyQuote.getPrice());
-        System.out.println("---------------------------");
+        System.out.println("\n" + messages.get("report.oracle.display.title"));
+        System.out.println(messages.get("report.oracle.display.date") + "  " + DATE_FORMAT.format(dailyQuote.getDate()));
+        System.out.printf(messages.get("report.oracle.display.price") + " %.2f%n", dailyQuote.getPrice());
+        System.out.println(messages.get("report.oracle.display.separator"));
     }
 
     public int readWalletId() {
