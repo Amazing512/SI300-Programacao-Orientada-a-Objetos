@@ -58,7 +58,7 @@ public class ProgramController {
 
     // Boots up the Financial Reports Sub-module and hands over the control flow.
     void actionReports() {
-        final ReportController reportController = new ReportController(walletDAO, transactionDAO, new ReportView(messages), messages);
+        final ReportController reportController = new ReportController(walletDAO, transactionDAO, oracleController, new ReportView(messages), messages);
         reportController.start();
     }
 

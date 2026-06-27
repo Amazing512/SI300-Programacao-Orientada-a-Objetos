@@ -41,24 +41,36 @@ public class ReportView {
     }
 
     // Renders a financial panel block showing metrics and net values.
-    public void showFinancialReport(int walletId, double totalCashIn, double totalCashOut, double result) {
+    public void showFinancialReport(
+        int walletId,
+        double totalCoinsBought,
+        double totalCoinsSold,
+        double coinBalance,
+        double totalMoneySpent,
+        double totalMoneyReceived,
+        double currentHoldingsValue,
+        double totalFinancialGainLoss
+    ) {
         System.out.println("\n----------------------------------");
         System.out.println(messages.get("report.financial.title"));
         System.out.println("----------------------------------");
         System.out.println(messages.get("report.financial.walletId") + " " +  walletId);
-        System.out.printf(messages.get("report.financial.totalCashIn") + " " +  "%.2f%n", totalCashIn);
-        System.out.printf(messages.get("report.financial.totalCashOut") + " " + "%.2f%n", totalCashOut);
+        System.out.printf(messages.get("report.financial.totalCashIn") + " " +  "%.4f%n", totalCoinsBought);
+        System.out.printf(messages.get("report.financial.totalCashOut") + " " + "%.4f%n", totalCoinsSold);
+        System.out.printf(messages.get("report.financial.result") + " " + "%.4f%n", coinBalance);
         System.out.println("----------------------------------");
-        System.out.print(messages.get("report.financial.result"));
+        System.out.printf(messages.get("report.financial.moneySpent") + " R$ " + "%.2f%n", totalMoneySpent);
+        System.out.printf(messages.get("report.financial.moneyReceived") + " R$ " + "%.2f%n", totalMoneyReceived);
+        System.out.printf(messages.get("report.financial.holdingsValue") + " R$ " + "%.2f%n", currentHoldingsValue);
+        System.out.println("----------------------------------");
+        System.out.print(messages.get("report.financial.gainLoss") + " ");
 
-        if (result < 0){
-            System.out.println(RED + String.format("%.2f", result) + RESET);
+        if (totalFinancialGainLoss < 0) {
+            System.out.println(RED + String.format("R$ %.2f", totalFinancialGainLoss) + RESET);
+        } else {
+            System.out.println(GREEN + String.format("R$ %.2f", totalFinancialGainLoss) + RESET);
         }
-        else {
-            System.out.println(GREEN + String.format("%.2f", result) + RESET);
-        }
-        System.out.println("--------------------------------");
-
+        System.out.println("----------------------------------");
     }
 
     // Prints wallets sorted by identifier.

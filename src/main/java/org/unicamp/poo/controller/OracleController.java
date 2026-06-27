@@ -59,4 +59,8 @@ public class OracleController {
         Oracle simulatedQuote = new Oracle(today, generateSimulatedPrice());
         return model.create(simulatedQuote);
     }
+
+    public Oracle findByDate(Date date) {
+        return model.findByDate(normalizeToDay(date));
+    }
 }

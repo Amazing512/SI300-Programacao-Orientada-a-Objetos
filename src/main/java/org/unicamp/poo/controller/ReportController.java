@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.unicamp.poo.dao.TransactionDAO;
 import org.unicamp.poo.dao.WalletDAO;
+import org.unicamp.poo.model.Oracle;
 import org.unicamp.poo.model.Transaction;
 import org.unicamp.poo.model.Wallet;
 import org.unicamp.poo.model.enums.OperationType;
@@ -23,14 +24,16 @@ public class ReportController {
 
     private final WalletDAO walletDAO;
     private final TransactionDAO transactionDAO;
+    private final OracleController oracleController;
     private final ReportView view;
     private final MessageProvider messages;
 
     // Initializes the report controller with required DAOs, view, and internationalization provider.
-    public ReportController(WalletDAO walletDAO, TransactionDAO transactionDAO, ReportView view, MessageProvider messages) {
+    public ReportController(WalletDAO walletDAO, TransactionDAO transactionDAO, OracleController oracleController, ReportView view, MessageProvider messages) {
         super();
         this.walletDAO = walletDAO;
         this.transactionDAO = transactionDAO;
+        this.oracleController = oracleController;
         this.view = view;
         this.messages = messages;
     }
@@ -63,23 +66,60 @@ public class ReportController {
         }
 
         List<Transaction> transactions = transactionDAO.findByWalletId(walletId);
-        double totalCashIn = 0.0;
-        double totalCashOut = 0.0;
+        double totalCoinsBought = 0.0;
+        double totalCoinsSold = 0.0;
+        double totalMoneySpent = 0.0;
+        double totalMoneyReceived = 0.0;
 
-        // Consolidating total cash in and cash out amounts
-        for(Transaction t : transactions){
-            if (t.getOperationType() == OperationType.CASH_IN) {
-                totalCashIn += t.getQuantity();
+        for (Transaction t : transactions) {
+            double price = 0.0;
+            Oracle quote = oracleController.findByDate(t.getOperationDate());
+
+            if (quote != null) {
+                price = quote.getPrice();
+            } else {
+                // fallback to today's price if no quote exists for transaction date
+                Oracle todayQuote = oracleController.getOrGenerateDailyQuote();
+                if (todayQuote != null) {
+                    price = todayQuote.getPrice();
+                }
             }
-            else if (t.getOperationType() == OperationType.CASH_OUT){
-                totalCashOut += t.getQuantity();
+
+            double value = t.getQuantity() * price;
+
+            if (t.getOperationType() == OperationType.CASH_IN) {
+                totalCoinsBought += t.getQuantity();
+                totalMoneySpent += value;
+            } else if (t.getOperationType() == OperationType.CASH_OUT) {
+                totalCoinsSold += t.getQuantity();
+                totalMoneyReceived += value;
             }
         }
 
-        double result = totalCashIn - totalCashOut;
+        double coinBalance = totalCoinsBought - totalCoinsSold;
+
+        // Current value of the remaining coins (coinBalance * today's price)
+        double currentPrice = 0.0;
+        Oracle todayQuote = oracleController.getOrGenerateDailyQuote();
+        if (todayQuote != null) {
+            currentPrice = todayQuote.getPrice();
+        }
+        double currentHoldingsValue = coinBalance * currentPrice;
+
+        // Financial Profit / Loss = (Current Value of Remaining Coins + Money Received from Sales) - Money Spent on Purchases
+        double totalFinancialGainLoss = (currentHoldingsValue + totalMoneyReceived) - totalMoneySpent;
 
         // Delegates the visual presentation to the view layer
-        view.showFinancialReport(walletId, totalCashIn, totalCashOut, result);
+        view.showFinancialReport(
+            walletId,
+            totalCoinsBought,
+            totalCoinsSold,
+            coinBalance,
+            totalMoneySpent,
+            totalMoneyReceived,
+            currentHoldingsValue,
+            totalFinancialGainLoss
+        );
     }
 
     // Lists wallets ordered by identifier in ascending order.
@@ -162,6 +202,7 @@ public class ReportController {
         options.add(messages.get("reportMenu.walletBalance"));
         options.add(messages.get("reportMenu.walletHistory"));
         options.add(messages.get("reportMenu.walletGainLoss"));
+
         return options;
     }
 

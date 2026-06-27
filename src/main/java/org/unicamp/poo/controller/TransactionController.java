@@ -85,10 +85,10 @@ public class TransactionController {
 
             // Confirmation step
             double totalValue = newTransaction.getQuantity() * dailyQuote.getPrice();
-            String confirmMsg = messages.get("transaction.confirm.buy.part1")
-                              + " " + String.format("%.4f", newTransaction.getQuantity())
-                              + messages.get("transaction.confirm.buy.part2")
-                              +  " " + String.format("%.2f", totalValue)
+            String confirmMsg = messages.get("transaction.confirm.buy.part1") + " "
+                              + String.format("%.4f", newTransaction.getQuantity()) + " "
+                              + messages.get("transaction.confirm.buy.part2") + " "
+                              + String.format("%.2f", totalValue)
                               + "?";
 
             if (!view.confirmTransaction(confirmMsg)) {
@@ -145,9 +145,9 @@ public class TransactionController {
 
             // Confirmation step
             double totalValue = newTransaction.getQuantity() * dailyQuote.getPrice();
-            String confirmMsg = messages.get("transaction.confirm.sell.part1")
-                              + String.format("%.4f", newTransaction.getQuantity())
-                              + messages.get("transaction.confirm.sell.part2")
+            String confirmMsg = messages.get("transaction.confirm.sell.part1") + " "
+                              + String.format("%.4f", newTransaction.getQuantity()) + " "
+                              + messages.get("transaction.confirm.sell.part2") + " "
                               + String.format("%.2f", totalValue)
                               + "?";
 
