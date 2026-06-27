@@ -58,4 +58,28 @@ public class TransactionView {
         System.out.printf("Preço: %.2f%n", dailyQuote.getPrice());
         System.out.println("---------------------------");
     }
+
+    public boolean confirmTransaction(String confirmMessage) {
+        while (true) {
+            System.out.println("\n" + confirmMessage);
+            System.out.println("1 - " + messages.get("generic.confirmYes"));
+            System.out.println("2 - " + messages.get("generic.confirmNo"));
+
+            Integer option = ConsoleScanner.readIntOrNull();
+            if (option == null) {
+                System.out.println(messages.get("generic.confirmInvalid"));
+                continue;
+            }
+
+            switch (option) {
+                case 1 -> {
+                    return true;
+                }
+                case 2 -> {
+                    return false;
+                }
+                default -> System.out.println(messages.get("generic.confirmInvalid"));
+            }
+        }
+    }
 }

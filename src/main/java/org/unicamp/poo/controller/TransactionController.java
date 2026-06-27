@@ -83,6 +83,19 @@ public class TransactionController {
                 return;
             }
 
+            // Confirmation step
+            double totalValue = newTransaction.getQuantity() * dailyQuote.getPrice();
+            String confirmMsg = messages.get("transaction.confirm.buy.part1")
+                              + " " + String.format("%.4f", newTransaction.getQuantity())
+                              + messages.get("transaction.confirm.buy.part2")
+                              +  " " + String.format("%.2f", totalValue)
+                              + "?";
+
+            if (!view.confirmTransaction(confirmMsg)) {
+                view.showErrorMessage(messages.get("transaction.cancelled"));
+                return;
+            }
+
             // Persist the buy transaction
             Transaction savedTransaction = model.create(newTransaction);
             if (savedTransaction != null) {
@@ -127,6 +140,19 @@ public class TransactionController {
             double currentBalance = calculateWalletBalance(newTransaction.getWalletId());
             if (newTransaction.getQuantity() > currentBalance) {
                 view.showErrorMessage(messages.get("transaction.sell.insufficientBalance"));
+                return;
+            }
+
+            // Confirmation step
+            double totalValue = newTransaction.getQuantity() * dailyQuote.getPrice();
+            String confirmMsg = messages.get("transaction.confirm.sell.part1")
+                              + String.format("%.4f", newTransaction.getQuantity())
+                              + messages.get("transaction.confirm.sell.part2")
+                              + String.format("%.2f", totalValue)
+                              + "?";
+
+            if (!view.confirmTransaction(confirmMsg)) {
+                view.showErrorMessage(messages.get("transaction.cancelled"));
                 return;
             }
 
