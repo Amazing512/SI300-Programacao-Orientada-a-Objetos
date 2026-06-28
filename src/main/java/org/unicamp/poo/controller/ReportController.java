@@ -19,7 +19,6 @@ import org.unicamp.poo.view.ReportView;
 
 /*  Controller responsável por gerar relatórios financeiros consolidados e
     ordenar listas de carteiras com base no seu saldo atual. */
-
 public class ReportController {
 
     private final WalletDAO walletDAO;
@@ -28,8 +27,13 @@ public class ReportController {
     private final ReportView view;
     private final MessageProvider messages;
 
-    // Inicializa o controller de relatório com os DAOs, view e provedor de internacionalização necessários.
-    public ReportController(WalletDAO walletDAO, TransactionDAO transactionDAO, OracleController oracleController, ReportView view, MessageProvider messages) {
+    public ReportController(
+        WalletDAO walletDAO,
+        TransactionDAO transactionDAO,
+        OracleController oracleController,
+        ReportView view,
+        MessageProvider messages
+    ) {
         super();
         this.walletDAO = walletDAO;
         this.transactionDAO = transactionDAO;
@@ -177,7 +181,7 @@ public class ReportController {
         List<Double> cashValues = new ArrayList<>();
 
         double todayPrice = 0.0;
-        
+
         Oracle todayQuote = oracleController.getOrGenerateDailyQuote();
         if (todayQuote != null) {
             todayPrice = todayQuote.getPrice();

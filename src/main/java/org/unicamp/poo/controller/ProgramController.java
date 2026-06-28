@@ -27,9 +27,8 @@ import org.unicamp.poo.view.ReportView;
 import org.unicamp.poo.view.TransactionView;
 import org.unicamp.poo.view.WalletView;
 
-/* Controller orquestrador principal que centraliza o fluxo principal da aplicação,
-   coordenando a navegação de menus, o ciclo de vida dos sub-controllers e as sessões do banco de dados. */
-
+/* Controller principal que centraliza o fluxo principal da aplicação,
+   coordenando a navegação de menus, o ciclo de vida dos sub-controladores e as sessões do banco de dados. */
 public class ProgramController {
 
     private final DatabaseSelector databaseSelector;
@@ -40,7 +39,6 @@ public class ProgramController {
     private TransactionDAO transactionDAO;
     private OracleController oracleController;
 
-    // Inicializa o controller central com a estratégia de persistência e a configuração de mensagens.
     public ProgramController(DatabaseSelector databaseSelector, MessageProvider messages) {
         super();
         this.databaseSelector = databaseSelector;
@@ -70,7 +68,7 @@ public class ProgramController {
         final Menu helpMenu = new Menu(ConsoleScanner.getInstance(), messages);
         boolean loop = true;
 
-        // Prepara as opções do sub-menu de ajuda usando mensagens internacionalizadas
+        // Prepara as opções do sub-menu
         final List<String> options = new ArrayList<>();
         options.add(messages.get("helpMenu.return"));
         options.add(messages.get("helpMenu.viewInstructions"));
@@ -109,9 +107,6 @@ public class ProgramController {
         }
     }
 
-    // Renderiza a tela de créditos: cabeçalho, carimbo do projeto (nome + versão),
-    // copyright, instituição/departamento, equipe agrupada por função e a data/hora
-    // de acesso no momento em que a tela foi aberta.
     private void showCredits() {
         System.out.println(YELLOW + messages.get("help.credits.header") + RESET);
         System.out.println();
@@ -132,7 +127,6 @@ public class ProgramController {
         System.out.println(messages.get("help.credits.accessDate") + " " + new Date());
     }
 
-    // Inicializa os componentes de estado e as camadas de conexão de dados com base no seletor de estratégia.
     private void openDatabase(String serverName)
     {
         OracleDAO oracleDAO;
@@ -164,7 +158,7 @@ public class ProgramController {
         }
     }
 
-    // Encerra as conexões de soquetes de rede de forma segura para evitar vazamentos de recursos.
+    // Encerra as conexões de rede para evitar vazamentos de recursos.
     private void closeDatabase() {
         if(dbConn != null) {
             dbConn.closeConnection();
@@ -182,13 +176,12 @@ public class ProgramController {
         return options;
     }
 
-    // Executa o loop principal do interpretador e executor de menus.
+    // loop principal
     public void start(String serverName)
     {
         final Menu userMenu = new Menu(ConsoleScanner.getInstance(), messages);
         boolean    loop     = true;
 
-        // Estabelece o estado estrutural antes de ouvir as interações
         openDatabase(serverName);
 
         while (loop)

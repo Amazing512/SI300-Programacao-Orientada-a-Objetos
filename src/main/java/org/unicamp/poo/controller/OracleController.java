@@ -1,34 +1,37 @@
 package org.unicamp.poo.controller;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
+
 import org.unicamp.poo.dao.OracleDAO;
 import org.unicamp.poo.model.Oracle;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Random;
-
-/* Internal controller responsible for providing the daily virtual-coin quote (Oracle).
-   This controller has no menu and is never accessed directly by the user: it is only
-   consulted internally by other controllers (e.g. TransactionController) right before
-   a buy or sell operation is confirmed. */
+/* 
+ * Controller responsável por lidar com operações relacionadas ao Oráculo, que fornece a cotação diária da moeda virtual.
+*/
 
 public class OracleController {
 
-    // Simulated price range used when generating a quote automatically (in R$)
+    // Range de preços simulado para a cotação diária da moeda virtual
     private static final double MIN_SIMULATED_PRICE = 1.0;
     private static final double MAX_SIMULATED_PRICE = 10.0;
 
     private final OracleDAO model;
     private final Random random;
 
-    // Constructor using Dependency Injection to initialize the controller components.
+    private final Map<Date, Oracle> cache;
+
     public OracleController(OracleDAO model) {
         super();
         this.model = model;
         this.random = new Random();
+        this.cache = new HashMap<>();
     }
 
-    // Removes the time portion of a Date so quotes are always keyed by calendar day.
+    // Remove a hora da data
     private Date normalizeToDay(Date date) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
@@ -39,28 +42,43 @@ public class OracleController {
         return calendar.getTime();
     }
 
-    // Generates a simulated quote value within the configured price range.
+    // Gera uma cotação aleatória dentro do intervalo definido para simulação.
     private double generateSimulatedPrice() {
         return MIN_SIMULATED_PRICE + (random.nextDouble() * (MAX_SIMULATED_PRICE - MIN_SIMULATED_PRICE));
     }
 
-    /* Returns today's quote, generating and persisting a simulated one automatically
-       the first time it is requested if none exists yet for the current day.
-       Returns null only if persistence itself fails, which callers should treat as
-       "quote unavailable" and block the operation in progress. */
+    /* Pega a cotação diária ou gera uma aleatória se ainda não existir no banco */
     public Oracle getOrGenerateDailyQuote() {
         Date today = normalizeToDay(new Date());
 
+        if (cache.containsKey(today)) {
+            return cache.get(today);
+        }
+
         Oracle existingQuote = model.findByDate(today);
         if (existingQuote != null) {
+            cache.put(today, existingQuote);
             return existingQuote;
         }
 
         Oracle simulatedQuote = new Oracle(today, generateSimulatedPrice());
-        return model.create(simulatedQuote);
+        Oracle createdQuote = model.create(simulatedQuote);
+        if (createdQuote != null) {
+            cache.put(today, createdQuote);
+        }
+        return createdQuote;
     }
 
     public Oracle findByDate(Date date) {
-        return model.findByDate(normalizeToDay(date));
+        Date normalizedDate = normalizeToDay(date);
+        if (cache.containsKey(normalizedDate)) {
+            return cache.get(normalizedDate);
+        }
+
+        Oracle quote = model.findByDate(normalizedDate);
+        if (quote != null) {
+            cache.put(normalizedDate, quote);
+        }
+        return quote;
     }
 }
