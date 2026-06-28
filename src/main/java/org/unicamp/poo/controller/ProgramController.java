@@ -1,6 +1,7 @@
 package org.unicamp.poo.controller;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.unicamp.poo.dao.DatabaseConnection;
@@ -18,6 +19,7 @@ import org.unicamp.poo.model.enums.DatabaseSelector;
 import static org.unicamp.poo.util.ConsoleColors.RESET;
 import static org.unicamp.poo.util.ConsoleColors.YELLOW;
 import org.unicamp.poo.util.ConsoleScanner;
+import org.unicamp.poo.util.Info;
 import org.unicamp.poo.util.MessageProvider;
 import org.unicamp.poo.view.Menu;
 import org.unicamp.poo.view.ReportView;
@@ -82,13 +84,32 @@ public class ProgramController {
                     System.out.println(YELLOW + messages.get("help.instructions.header") + RESET);
                     System.out.println(messages.get("help.instructions"));
                 }
-                case 2 -> {
-                    System.out.println(YELLOW + messages.get("help.credits.header") + RESET);
-                    System.out.println(messages.get("help.credits"));
-                }
+                case 2 -> showCredits();
                 default -> loop = false;
             }
         }
+    }
+
+    // Renderiza a tela de créditos: cabeçalho, carimbo do projeto (nome + versão),
+    // copyright, instituição/departamento, equipe agrupada por função e a data/hora
+    // de acesso no momento em que a tela foi aberta.
+    private void showCredits() {
+        System.out.println(YELLOW + messages.get("help.credits.header") + RESET);
+        System.out.println();
+        System.out.println(Info.getStamp());
+        System.out.println(Info.projectCopyRight);
+        System.out.println();
+        System.out.println(Info.projectInstitution);
+        System.out.println(Info.projectDepartment);
+        System.out.println();
+        System.out.println(messages.get("help.credits.team") + ":");
+        for (Info.AuthorRole authorRole : Info.projectRoles) {
+            System.out.println();
+            System.out.println(" " + messages.get(authorRole.role()));
+            System.out.println("  - " + authorRole.getFormattedAuthors());
+        }
+        System.out.println();
+        System.out.println(messages.get("help.credits.accessDate") + " " + new Date());
     }
 
     // Inicializa os componentes de estado e as camadas de conexão de dados com base no seletor de estratégia.
