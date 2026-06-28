@@ -12,17 +12,14 @@ import org.unicamp.poo.util.MessageProvider;
 import org.unicamp.poo.view.Menu;
 import org.unicamp.poo.view.WalletView;
 
-// Classe Controller responsável por gerenciar operações relacionadas a Carteiras.
-
+// Controller responsável por gerenciar operações relacionadas a Carteiras.
 public final class WalletController {
 
-    // Atributos que encapsulam o Model (DAO), View e mensagens internacionalizadas
     private final WalletDAO model;
     private final WalletView view;
 
     private final MessageProvider messages;
 
-    // Construtor que usa Injeção de Dependência para inicializar os componentes do controller.
     public WalletController(WalletDAO model, WalletView view, MessageProvider messages) {
         super();
         this.model = model;
@@ -30,13 +27,12 @@ public final class WalletController {
         this.messages = messages;
     }
 
-    // Ação para registrar uma nova carteira.
+    // Ação para registrar nova carteira.
     private void actionAddWallet() {
-        // Solicita à view para ler os dados do terminal e retornar um objeto Carteira temporário
+        // Solicita o objeto Carteira pela View
         Wallet newWallet = view.readWalletData();
 
         if (newWallet != null){
-            // Persiste a nova carteira através da camada DAO
             Wallet saveWallet = model.create(newWallet);
             if (saveWallet != null) {
                 view.showSuccessMessage(messages.get("wallet.add.success") + " ID: " + saveWallet.getId());
@@ -52,15 +48,12 @@ public final class WalletController {
         // Obtém da view o ID a ser buscado
         int id = view.readWalletId();
 
-        // Busca a carteira no repositório DAO
         Wallet wallet = model.findById(id);
 
         if(wallet != null) {
-            // Exibe os detalhes da carteira se for encontrada
             view.displayWallet(wallet);
         }
         else{
-            // Mostra uma mensagem de erro se a carteira não existir
             view.showErrorMessage(messages.get("wallet.search.error.notfound"));
         }
 
@@ -71,6 +64,7 @@ public final class WalletController {
 
         // Obtém o ID da carteira a ser editada
         int id = view.readWalletId();
+
         Wallet editableWallet = model.findById(id);
 
         if(editableWallet != null) {
@@ -78,17 +72,15 @@ public final class WalletController {
             Wallet updatedWallet = view.readWalletUpdates(editableWallet);
 
             if (updatedWallet != null) {
-                // Atualiza as informações da carteira no repositório do banco/memória
+                // Atualiza as informações da carteira
                 model.update(updatedWallet);
                 view.showSuccessMessage(messages.get("wallet.edit.success"));
             }
             else{
-                // Tratamento de erro caso a atualização retorne nula
                 view.showErrorMessage(messages.get("wallet.edit.error.cancelled"));
             }
         }
         else{
-            // Mostra uma mensagem de erro se a carteira não existir no repositório
             view.showErrorMessage(messages.get("wallet.search.error.notfound"));
         }
     }
@@ -97,6 +89,7 @@ public final class WalletController {
     private void actionRemoveWallet() {
         // Obtém o ID da carteira a ser removida
         int id = view.readWalletId();
+        
         Wallet removableWallet = model.findById(id);
 
         if (removableWallet != null){
@@ -107,12 +100,10 @@ public final class WalletController {
                 view.showSuccessMessage(messages.get("wallet.remove.success"));
             }
             else {
-                // Feedback de erro se a exclusão for rejeitada
                 view.showErrorMessage(messages.get("wallet.remove.error.cancelled"));
             }
         }
         else {
-            // Tratamento de erro se a carteira alvo não existir no banco de dados
             view.showErrorMessage(messages.get("wallet.search.error.notfound"));
         }
     }
@@ -128,14 +119,13 @@ public final class WalletController {
         return (options);
     }
 
-    // Inicia o loop do menu principal para o sistema de Gerenciamento de Carteiras.
+    // loop do menu principal das carteiras.
     public void start()
     {
         final List<String> options = getMenuOptions();
         final Menu walletMenu = new Menu(ConsoleScanner.getInstance(), messages);
         boolean loop = true;
 
-        // Continua interagindo com o usuário até que a opção de saída (0) seja selecionada
         while (loop) {
             String yellowTitle = YELLOW + messages.get("walletMenu.title") + RESET;
 

@@ -19,17 +19,14 @@ public class Info {
     public static final String PROJECT_NAME = "FT_Coin";
     public static final String PROJECT_VERSION = "Ver. 1.0";
 
-    // Represents one functional area of the project and the authors responsible for it,
-    // used to render the credits screen grouped by role rather than as a single block of text.
+    // Representa um cargo e seus responsáveis
     public record AuthorRole(String role, String[] authors) {
         public String getFormattedAuthors() {
             return String.join(", ", authors);
         }
     }
 
-    // Functional breakdown of the team, grouped by role. Keep this in sync with
-    // help.credits.role.* keys in the message bundles (en/pt_BR), which hold the
-    // translated role label shown for each entry.
+    // Membros da equipe agrupados por cargo.
     public static final AuthorRole[] projectRoles = {
             new AuthorRole("help.credits.role.management", new String[]{"Miguel Barcellos"}),
             new AuthorRole("help.credits.role.architecture", new String[]{"Gabriela Nogueira"}),

@@ -1,8 +1,8 @@
 package org.unicamp.poo.model;
 
-import org.unicamp.poo.model.enums.OperationType;
-
 import java.util.Date;
+
+import org.unicamp.poo.model.enums.OperationType;
 
 public class Transaction {
     private Integer id;
@@ -12,7 +12,7 @@ public class Transaction {
     private final double quantity;
 
     public Transaction(int walletId, Date operationDate, OperationType operationType, double quantity) {
-        this.id = null; // Defined by persistence
+        this.id = null; // Definido no banco
         this.walletId = walletId;
         this.operationDate = operationDate;
         this.operationType = operationType;

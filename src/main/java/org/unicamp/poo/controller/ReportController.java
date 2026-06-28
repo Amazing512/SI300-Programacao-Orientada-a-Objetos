@@ -17,8 +17,9 @@ import org.unicamp.poo.util.MessageProvider;
 import org.unicamp.poo.view.Menu;
 import org.unicamp.poo.view.ReportView;
 
-/*  Controller responsável por gerar relatórios financeiros consolidados e
-    ordenar listas de carteiras com base no seu saldo atual. */
+/*  
+ * Controller responsável por gerar relatórios financeiros consolidados e ordenar listas de carteiras com base no seu saldo atual. 
+ */
 public class ReportController {
 
     private final WalletDAO walletDAO;

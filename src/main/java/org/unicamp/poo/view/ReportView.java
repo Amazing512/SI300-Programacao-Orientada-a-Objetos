@@ -3,7 +3,6 @@ package org.unicamp.poo.view;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
-import org.unicamp.poo.dao.TransactionDAO;
 import org.unicamp.poo.model.Transaction;
 import org.unicamp.poo.model.Wallet;
 import org.unicamp.poo.model.enums.OperationType;
@@ -14,9 +13,7 @@ import static org.unicamp.poo.util.ConsoleColors.YELLOW;
 import org.unicamp.poo.util.ConsoleScanner;
 import org.unicamp.poo.util.MessageProvider;
 
-/* Classe View responsável por interagir com o usuário e formatar layouts de console
-    para relatórios financeiros e de ranking. */
-
+/* View responsável por interagir com o usuário e formatar layouts para relatórios financeiros. */
 public class ReportView {
 
     private final MessageProvider messages;

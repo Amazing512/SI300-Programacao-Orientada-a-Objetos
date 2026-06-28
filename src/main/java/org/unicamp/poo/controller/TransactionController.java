@@ -1,8 +1,8 @@
 package org.unicamp.poo.controller;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Date;
+import java.util.List;
 
 import org.unicamp.poo.dao.TransactionDAO;
 import org.unicamp.poo.dao.WalletDAO;
@@ -17,7 +17,6 @@ import org.unicamp.poo.view.Menu;
 import org.unicamp.poo.view.TransactionView;
 
 // Controller responsável por lidar com operações de compra, venda e histórico de transações de moedas.
-
 public class TransactionController {
 
     final TransactionDAO model;
@@ -36,7 +35,6 @@ public class TransactionController {
     }
 
     // Calcula o saldo atual de uma carteira com base em seu histórico de transações.
-
     private double calculateWalletBalance (int walletId){
         List<Transaction> transactions = model.findByWalletId(walletId);
         double balance = 0.0;
@@ -151,8 +149,6 @@ public class TransactionController {
         }
     }
 
-    // Generates the translated text options for the transaction menu.
-
     private List<String> getMenuOptions()
     {
         final List<String> options = new ArrayList<>();
@@ -161,8 +157,6 @@ public class TransactionController {
         options.add(messages.get("transactionMenu.sellCoin"));
         return (options);
     }
-
-    // Drives the main transaction sub-menu loop.
 
     public void start()
     {

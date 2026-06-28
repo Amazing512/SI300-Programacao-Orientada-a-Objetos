@@ -37,7 +37,8 @@ public class MariaDBConnection implements DatabaseConnection {
             String serverPort = props.getProperty("serverPort");
             String database = props.getProperty("database");
             String tail = props.getProperty("tail");
-            url        = driver + "://" + serverIP + ":" + serverPort + "/" + database + tail;
+            
+            url = driver + "://" + serverIP + ":" + serverPort + "/" + database + tail;
 
             user = System.getenv("MARIADB_USER");
             password = System.getenv("MARIADB_PASSWORD");

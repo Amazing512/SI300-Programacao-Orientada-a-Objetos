@@ -12,8 +12,7 @@ import static org.unicamp.poo.util.ConsoleColors.RESET;
 import org.unicamp.poo.util.ConsoleScanner;
 import org.unicamp.poo.util.MessageProvider;
 
-// Classe View responsável por lidar com interações de console referentes a transações.
-
+// View responsável por lidar com interações referentes a transações.
 public class TransactionView {
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
     private final MessageProvider messages;
