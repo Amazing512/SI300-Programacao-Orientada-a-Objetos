@@ -1,7 +1,5 @@
 package org.unicamp.poo.dao.impl.mariadb;
 
-import org.unicamp.poo.dao.DatabaseConnection;
-
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -10,6 +8,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
+
+import org.unicamp.poo.dao.DatabaseConnection;
 
 public class MariaDBConnection implements DatabaseConnection {
     private String     user;
@@ -39,7 +39,6 @@ public class MariaDBConnection implements DatabaseConnection {
             String tail = props.getProperty("tail");
             url        = driver + "://" + serverIP + ":" + serverPort + "/" + database + tail;
 
-            // TODO: Add serverName based env names
             user = System.getenv("MARIADB_USER");
             password = System.getenv("MARIADB_PASSWORD");
 

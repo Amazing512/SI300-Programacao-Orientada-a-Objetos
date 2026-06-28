@@ -149,31 +149,35 @@ public class ReportView {
         System.out.println("---------------------------------");
     }
 
-    // Imprime o total de ganho ou perda de cada carteira.
-    public void showWalletGainLossReport(List<Wallet> wallets, TransactionDAO transactionDAO) {
-        System.out.println(YELLOW + "\n---------------------------------");
+    // Imprime o total de ganho ou perda de cada carteira com saldo de moedas e valor real.
+    public void showWalletGainLossReport(List<Wallet> wallets, List<Double> coinBalances, List<Double> financialGainLosses) {
+        System.out.println(YELLOW + "\n-----------------------------------------------------------------");
         System.out.println(messages.get("report.wallet.gainLoss.title"));
-        System.out.println("---------------------------------" + RESET);
-        System.out.printf("%-10s | %-25s | %-12s%n", messages.get("report.wallet.gainLoss.table.id"), messages.get("report.wallet.gainLoss.table.holder"), messages.get("report.wallet.gainLoss.table.result"));
-        System.out.println("---------------------------------");
+        System.out.println("-----------------------------------------------------------------" + RESET);
+        System.out.printf("%-10s | %-25s | %-15s | %-20s%n", 
+                          messages.get("report.wallet.gainLoss.table.id"), 
+                          messages.get("report.wallet.gainLoss.table.holder"), 
+                          messages.get("report.wallet.gainLoss.table.coinBalance"),
+                          messages.get("report.wallet.gainLoss.table.netProfit"));
+        System.out.println("-----------------------------------------------------------------");
 
-        for (Wallet wallet : wallets) {
-            double totalCashIn = 0.0;
-            double totalCashOut = 0.0;
+        for (int i = 0; i < wallets.size(); i++) {
+            Wallet wallet = wallets.get(i);
+            double coinBalance = coinBalances.get(i);
+            double gainLoss = financialGainLosses.get(i);
 
-            for (Transaction transaction : transactionDAO.findByWalletId(wallet.getId())) {
-                if (transaction.getOperationType() == OperationType.CASH_IN) {
-                    totalCashIn += transaction.getQuantity();
-                } else if (transaction.getOperationType() == OperationType.CASH_OUT) {
-                    totalCashOut += transaction.getQuantity();
-                }
-            }
+            String gainLossStr = gainLoss < 0 ? 
+                                 RED + String.format("R$ %.2f", gainLoss) + RESET : 
+                                 GREEN + String.format("R$ %.2f", gainLoss) + RESET;
 
-            double result = totalCashIn - totalCashOut;
-            System.out.printf("%-10d | %-25s | %s%.2f%s%n", wallet.getId(), wallet.getHolder(), result < 0 ? RED : GREEN, result, RESET);
+            System.out.printf("%-10d | %-25s | %-15.4f | %s%n", 
+                              wallet.getId(), 
+                              wallet.getHolder(), 
+                              coinBalance, 
+                              gainLossStr);
         }
 
-        System.out.println("---------------------------------");
+        System.out.println("-----------------------------------------------------------------");
     }
 
     // Imprime uma mensagem de erro destacada na cor VERMELHA

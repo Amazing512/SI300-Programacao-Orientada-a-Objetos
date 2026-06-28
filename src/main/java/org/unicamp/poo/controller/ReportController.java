@@ -205,7 +205,49 @@ public class ReportController {
             return;
         }
 
-        view.showWalletGainLossReport(wallets, transactionDAO);
+        double todayPrice = 0.0;
+        Oracle todayQuote = oracleController.getOrGenerateDailyQuote();
+        if (todayQuote != null) {
+            todayPrice = todayQuote.getPrice();
+        }
+
+        List<Double> coinBalances = new ArrayList<>();
+        List<Double> financialGainLosses = new ArrayList<>();
+
+        for (Wallet wallet : wallets) {
+            List<Transaction> transactions = transactionDAO.findByWalletId(wallet.getId());
+            double totalCoinsBought = 0.0;
+            double totalCoinsSold = 0.0;
+            double totalMoneySpent = 0.0;
+            double totalMoneyReceived = 0.0;
+
+            for (Transaction t : transactions) {
+                double price = todayPrice;
+                Oracle quote = oracleController.findByDate(t.getOperationDate());
+                if (quote != null) {
+                    price = quote.getPrice();
+                }
+
+                double value = t.getQuantity() * price;
+
+                if (t.getOperationType() == OperationType.CASH_IN) {
+                    totalCoinsBought += t.getQuantity();
+                    totalMoneySpent += value;
+                } else if (t.getOperationType() == OperationType.CASH_OUT) {
+                    totalCoinsSold += t.getQuantity();
+                    totalMoneyReceived += value;
+                }
+            }
+
+            double coinBalance = totalCoinsBought - totalCoinsSold;
+            double currentHoldingsValue = coinBalance * todayPrice;
+            double totalFinancialGainLoss = (currentHoldingsValue + totalMoneyReceived) - totalMoneySpent;
+
+            coinBalances.add(coinBalance);
+            financialGainLosses.add(totalFinancialGainLoss);
+        }
+
+        view.showWalletGainLossReport(wallets, coinBalances, financialGainLosses);
     }
 
     // Gera a lista de opções de menu traduzidas para a seção de relatórios.
