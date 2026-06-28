@@ -71,6 +71,12 @@ public class ReportController {
         double totalMoneySpent = 0.0;
         double totalMoneyReceived = 0.0;
 
+        double todayPrice = 0.0;
+        Oracle todayQuote = oracleController.getOrGenerateDailyQuote();
+        if (todayQuote != null) {
+            todayPrice = todayQuote.getPrice();
+        }
+
         for (Transaction t : transactions) {
             double price = 0.0;
             Oracle quote = oracleController.findByDate(t.getOperationDate());
@@ -78,11 +84,7 @@ public class ReportController {
             if (quote != null) {
                 price = quote.getPrice();
             } else {
-                // fallback para o preço de hoje caso não exista cotação para a data da transação
-                Oracle todayQuote = oracleController.getOrGenerateDailyQuote();
-                if (todayQuote != null) {
-                    price = todayQuote.getPrice();
-                }
+                price = todayPrice;
             }
 
             double value = t.getQuantity() * price;
@@ -99,12 +101,7 @@ public class ReportController {
         double coinBalance = totalCoinsBought - totalCoinsSold;
 
         // Valor atual das moedas restantes (coinBalance * preço de hoje)
-        double currentPrice = 0.0;
-        Oracle todayQuote = oracleController.getOrGenerateDailyQuote();
-        if (todayQuote != null) {
-            currentPrice = todayQuote.getPrice();
-        }
-        double currentHoldingsValue = coinBalance * currentPrice;
+        double currentHoldingsValue = coinBalance * todayPrice;
 
         // Lucro / Prejuízo Financeiro = (Valor Atual das Moedas Restantes + Dinheiro Recebido de Vendas) - Dinheiro Gasto em Compras
         double totalFinancialGainLoss = (currentHoldingsValue + totalMoneyReceived) - totalMoneySpent;
