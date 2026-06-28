@@ -142,10 +142,30 @@ public final class WalletController {
             switch (walletMenu.getChoice(yellowTitle, options, messages.get("walletMenu.prompt")))
             {
                 case 0 -> loop = false;
-                case 1 -> actionAddWallet();
-                case 2 -> actionSearchWallet();
-                case 3 -> actionEditWallet();
-                case 4 -> actionRemoveWallet();
+                case 1 -> {
+                    ConsoleScanner.clearScreen();
+                    actionAddWallet();
+                    ConsoleScanner.pressEnterToContinue(messages.get("generic.pressEnter"));
+                    ConsoleScanner.clearScreen();
+                }
+                case 2 -> {
+                    ConsoleScanner.clearScreen();
+                    actionSearchWallet();
+                    ConsoleScanner.pressEnterToContinue(messages.get("generic.pressEnter"));
+                    ConsoleScanner.clearScreen();
+                }
+                case 3 -> {
+                    ConsoleScanner.clearScreen();
+                    actionEditWallet();
+                    ConsoleScanner.pressEnterToContinue(messages.get("generic.pressEnter"));
+                    ConsoleScanner.clearScreen();
+                }
+                case 4 -> {
+                    ConsoleScanner.clearScreen();
+                    actionRemoveWallet();
+                    ConsoleScanner.pressEnterToContinue(messages.get("generic.pressEnter"));
+                    ConsoleScanner.clearScreen();
+                }
                 default -> loop = false;
             }
         }

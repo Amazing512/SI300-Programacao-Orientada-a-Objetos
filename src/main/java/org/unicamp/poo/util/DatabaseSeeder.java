@@ -87,5 +87,8 @@ public final class DatabaseSeeder {
         }
 
         System.out.println(GREEN + "Populamento concluido com sucesso! (3 carteiras, 5 cotacoes, 8 movimentacoes inseridas)" + RESET);
+
+        ConsoleScanner.pressEnterToContinue("Pressione ENTER para continuar...");
+        ConsoleScanner.clearScreen();
     }
 }

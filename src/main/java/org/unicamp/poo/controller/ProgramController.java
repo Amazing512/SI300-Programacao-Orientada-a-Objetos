@@ -82,6 +82,7 @@ public class ProgramController {
             switch (helpMenu.getChoice(yellowTitle, options, messages.get("helpMenu.prompt"))) {
                 case 0 -> loop = false;
                 case 1 -> {
+                    ConsoleScanner.clearScreen();
                     System.out.println(YELLOW + messages.get("help.instructions.header") + RESET);
                     System.out.println(messages.get("help.instructions.title"));
                     System.out.println();
@@ -94,8 +95,15 @@ public class ProgramController {
                     System.out.println(messages.get("help.instructions.oracle"));
                     System.out.println();
                     System.out.println(messages.get("help.instructions.tip"));
+                    ConsoleScanner.pressEnterToContinue(messages.get("generic.pressEnter"));
+                    ConsoleScanner.clearScreen();
                 }
-                case 2 -> showCredits();
+                case 2 -> {
+                    ConsoleScanner.clearScreen();
+                    showCredits();
+                    ConsoleScanner.pressEnterToContinue(messages.get("generic.pressEnter"));
+                    ConsoleScanner.clearScreen();
+                }
                 default -> loop = false;
             }
         }

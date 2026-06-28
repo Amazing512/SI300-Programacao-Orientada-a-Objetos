@@ -40,7 +40,7 @@ public class Info {
 
     public static String getStamp()
     {
-        return (PROJECT_NAME + " Ver. " + PROJECT_VERSION);
+        return (PROJECT_NAME + " " + PROJECT_VERSION);
     }
 
     public static String getFormattedAuthors() {

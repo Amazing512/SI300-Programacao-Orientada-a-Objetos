@@ -174,7 +174,26 @@ public class ReportController {
             return;
         }
 
-        view.showWalletHistoryReport(wallet, transactions);
+        List<Double> cashValues = new ArrayList<>();
+
+        double todayPrice = 0.0;
+        
+        Oracle todayQuote = oracleController.getOrGenerateDailyQuote();
+        if (todayQuote != null) {
+            todayPrice = todayQuote.getPrice();
+        }
+
+        for (Transaction t : transactions) {
+            double price = todayPrice;
+            Oracle quote = oracleController.findByDate(t.getOperationDate());
+            if (quote != null) {
+                price = quote.getPrice();
+            }
+            double value = t.getQuantity() * price;
+            cashValues.add(value);
+        }
+
+        view.showWalletHistoryReport(wallet, transactions, cashValues);
     }
 
     // Exibe o total de ganho ou perda de cada carteira.
@@ -214,12 +233,42 @@ public class ReportController {
 
             switch (reportMenu.getChoice(yellowTitle, options, messages.get("reportMenu.prompt"))) {
                 case 0 -> loop = false;
-                case 1 -> showFinancialReport();
-                case 2 -> showWalletsOrderedById();
-                case 3 -> showWalletsOrderedByHolder();
-                case 4 -> showWalletCurrentBalance();
-                case 5 -> showWalletHistory();
-                case 6 -> showWalletGainOrLoss();
+                case 1 -> {
+                    ConsoleScanner.clearScreen();
+                    showFinancialReport();
+                    ConsoleScanner.pressEnterToContinue(messages.get("generic.pressEnter"));
+                    ConsoleScanner.clearScreen();
+                }
+                case 2 -> {
+                    ConsoleScanner.clearScreen();
+                    showWalletsOrderedById();
+                    ConsoleScanner.pressEnterToContinue(messages.get("generic.pressEnter"));
+                    ConsoleScanner.clearScreen();
+                }
+                case 3 -> {
+                    ConsoleScanner.clearScreen();
+                    showWalletsOrderedByHolder();
+                    ConsoleScanner.pressEnterToContinue(messages.get("generic.pressEnter"));
+                    ConsoleScanner.clearScreen();
+                }
+                case 4 -> {
+                    ConsoleScanner.clearScreen();
+                    showWalletCurrentBalance();
+                    ConsoleScanner.pressEnterToContinue(messages.get("generic.pressEnter"));
+                    ConsoleScanner.clearScreen();
+                }
+                case 5 -> {
+                    ConsoleScanner.clearScreen();
+                    showWalletHistory();
+                    ConsoleScanner.pressEnterToContinue(messages.get("generic.pressEnter"));
+                    ConsoleScanner.clearScreen();
+                }
+                case 6 -> {
+                    ConsoleScanner.clearScreen();
+                    showWalletGainOrLoss();
+                    ConsoleScanner.pressEnterToContinue(messages.get("generic.pressEnter"));
+                    ConsoleScanner.clearScreen();
+                }
                 default -> loop = false;
             }
         }

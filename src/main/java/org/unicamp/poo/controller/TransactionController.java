@@ -176,8 +176,18 @@ public class TransactionController {
             switch (transactionMenu.getChoice(yellowTitle, options, messages.get("transactionMenu.prompt")))
             {
                 case 0 -> loop = false;
-                case 1 -> actionBuyCoin();
-                case 2 -> actionSellCoin();
+                case 1 -> {
+                    ConsoleScanner.clearScreen();
+                    actionBuyCoin();
+                    ConsoleScanner.pressEnterToContinue(messages.get("generic.pressEnter"));
+                    ConsoleScanner.clearScreen();
+                }
+                case 2 -> {
+                    ConsoleScanner.clearScreen();
+                    actionSellCoin();
+                    ConsoleScanner.pressEnterToContinue(messages.get("generic.pressEnter"));
+                    ConsoleScanner.clearScreen();
+                }
                 default -> loop = false;
             }
         }

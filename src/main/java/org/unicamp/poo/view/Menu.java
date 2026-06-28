@@ -1,5 +1,6 @@
 package org.unicamp.poo.view;
 
+import org.unicamp.poo.util.ConsoleScanner;
 import org.unicamp.poo.util.MessageProvider;
 
 import java.util.List;
@@ -18,9 +19,16 @@ public final class Menu {
     {
         boolean waiting = true;
         int     choice  = -1;
+        String errorMessage = null;
 
         while (waiting)
         {
+            ConsoleScanner.clearScreen();
+            if (errorMessage != null) {
+                // Imprime a mensagem de erro em vermelho
+                System.out.println("\u001B[31m" + errorMessage + "\u001B[0m");
+                errorMessage = null; // Limpa para a próxima exibição
+            }
             System.out.println(title);
             for (int count = 0; count < options.size(); count++)
             {
@@ -32,11 +40,11 @@ public final class Menu {
                 choice = Integer.parseInt(input);
                 waiting = (choice < 0) || (choice >= options.size());
                 if (waiting) {
-                    System.out.println(messages.get("menu.invalidInput") + " " + (options.size() - 1) + ".");
+                    errorMessage = messages.get("menu.invalidInput") + " " + (options.size() - 1) + ".";
                 }
             }
             catch (NumberFormatException exception) {
-                System.out.println(messages.get("menu.invalidInput") + " " + (options.size() - 1) + ".");
+                errorMessage = messages.get("menu.invalidInput") + " " + (options.size() - 1) + ".";
                 choice = -1;
             }
         }

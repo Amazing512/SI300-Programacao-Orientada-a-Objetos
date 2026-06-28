@@ -115,7 +115,7 @@ public class ReportView {
     }
 
     // Imprime o histórico de transações de uma única carteira.
-    public void showWalletHistoryReport(Wallet wallet, List<Transaction> transactions) {
+    public void showWalletHistoryReport(Wallet wallet, List<Transaction> transactions, List<Double> cashValues) {
         System.out.println(YELLOW + "\n---------------------------------");
         System.out.println(messages.get("report.wallet.history.title"));
         System.out.println("---------------------------------" + RESET);
@@ -123,12 +123,27 @@ public class ReportView {
         System.out.println(messages.get("report.wallet.history.holder") + " " + wallet.getHolder());
         System.out.println(messages.get("report.wallet.history.broker") + " " + wallet.getBroker());
         System.out.println("---------------------------------");
-        System.out.printf("%-12s | %-10s | %-10s%n", messages.get("report.wallet.history.table.date"), messages.get("report.wallet.history.table.type"), messages.get("report.wallet.history.table.quantity"));
+        System.out.printf("%-12s | %-10s | %-10s | %-20s%n", 
+                          messages.get("report.wallet.history.table.date"), 
+                          messages.get("report.wallet.history.table.type"), 
+                          messages.get("report.wallet.history.table.quantity"),
+                          messages.get("report.wallet.history.table.value"));
         System.out.println("---------------------------------");
 
-        for (Transaction transaction : transactions) {
+        for (int i = 0; i < transactions.size(); i++) {
+            Transaction transaction = transactions.get(i);
+            double cashValue = cashValues.get(i);
             String typeLabel = transaction.getOperationType() == OperationType.CASH_IN ? messages.get("report.wallet.history.type.buy") : messages.get("report.wallet.history.type.sell");
-            System.out.printf("%-12s | %-10s | %-10.2f%n", DATE_FORMAT.format(transaction.getOperationDate()), typeLabel, transaction.getQuantity());
+            
+            String valStr = transaction.getOperationType() == OperationType.CASH_IN ?
+                    RED + String.format("- R$ %.2f", cashValue) + RESET :
+                    GREEN + String.format("+ R$ %.2f", cashValue) + RESET;
+
+            System.out.printf("%-12s | %-10s | %-10.2f | %s%n", 
+                              DATE_FORMAT.format(transaction.getOperationDate()), 
+                              typeLabel, 
+                              transaction.getQuantity(),
+                              valStr);
         }
 
         System.out.println("---------------------------------");
