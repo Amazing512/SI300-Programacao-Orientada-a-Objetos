@@ -10,6 +10,7 @@ import org.unicamp.poo.model.enums.OperationType;
 import static org.unicamp.poo.util.ConsoleColors.GREEN;
 import static org.unicamp.poo.util.ConsoleColors.RED;
 import static org.unicamp.poo.util.ConsoleColors.RESET;
+import static org.unicamp.poo.util.ConsoleColors.YELLOW;
 import org.unicamp.poo.util.ConsoleScanner;
 import org.unicamp.poo.util.MessageProvider;
 
@@ -47,9 +48,9 @@ public class ReportView {
         double currentHoldingsValue,
         double totalFinancialGainLoss
     ) {
-        System.out.println("\n----------------------------------");
+        System.out.println(YELLOW + "\n----------------------------------");
         System.out.println(messages.get("report.financial.title"));
-        System.out.println("----------------------------------");
+        System.out.println("----------------------------------"  + RESET);
         System.out.println(messages.get("report.financial.walletId") + " " +  walletId);
         System.out.printf(messages.get("report.financial.totalCashIn") + " " +  "%.4f%n", totalCoinsBought);
         System.out.printf(messages.get("report.financial.totalCashOut") + " " + "%.4f%n", totalCoinsSold);
@@ -71,9 +72,9 @@ public class ReportView {
 
     // Imprime carteiras ordenadas pelo identificador.
     public void showWalletsOrderedByIdReport(List<Wallet> wallets) {
-        System.out.println("\n---------------------------------");
+        System.out.println(YELLOW + "\n---------------------------------");
         System.out.println(messages.get("report.wallets.byId.title"));
-        System.out.println("---------------------------------");
+        System.out.println("---------------------------------" + RESET);
 
         System.out.printf("%-10s | %-25s | %-20s%n", messages.get("report.wallet.table.id"), messages.get("report.wallet.table.holder"), messages.get("report.wallet.table.broker"));
         System.out.println("---------------------------------");
@@ -87,9 +88,9 @@ public class ReportView {
 
     // Imprime carteiras ordenadas alfabeticamente pelo nome do titular.
     public void showWalletsOrderedByHolderReport(List<Wallet> wallets) {
-        System.out.println("\n---------------------------------");
+        System.out.println(YELLOW + "\n---------------------------------");
         System.out.println(messages.get("report.wallets.byHolder.title"));
-        System.out.println("---------------------------------");
+        System.out.println("---------------------------------" + RESET);
 
         System.out.printf("%-10s | %-25s | %-20s%n", messages.get("report.wallet.table.id"), messages.get("report.wallet.table.holder"), messages.get("report.wallet.table.broker"));
         System.out.println("---------------------------------");
@@ -103,9 +104,9 @@ public class ReportView {
 
     // Imprime o saldo atual de uma única carteira.
     public void showWalletCurrentBalanceReport(Wallet wallet, double balance) {
-        System.out.println("\n---------------------------------");
+        System.out.println(YELLOW + "\n---------------------------------");
         System.out.println(messages.get("report.wallet.currentBalance.title"));
-        System.out.println("---------------------------------");
+        System.out.println("---------------------------------" + RESET);
         System.out.println(messages.get("report.wallet.currentBalance.id") + " " +  wallet.getId());
         System.out.println(messages.get("report.wallet.currentBalance.holder") + " " + wallet.getHolder());
         System.out.println(messages.get("report.wallet.currentBalance.broker") + " " + wallet.getBroker());
@@ -115,9 +116,9 @@ public class ReportView {
 
     // Imprime o histórico de transações de uma única carteira.
     public void showWalletHistoryReport(Wallet wallet, List<Transaction> transactions) {
-        System.out.println("\n---------------------------------");
+        System.out.println(YELLOW + "\n---------------------------------");
         System.out.println(messages.get("report.wallet.history.title"));
-        System.out.println("---------------------------------");
+        System.out.println("---------------------------------" + RESET);
         System.out.println(messages.get("report.wallet.history.id") + " " + wallet.getId());
         System.out.println(messages.get("report.wallet.history.holder") + " " + wallet.getHolder());
         System.out.println(messages.get("report.wallet.history.broker") + " " + wallet.getBroker());
@@ -135,9 +136,9 @@ public class ReportView {
 
     // Imprime o total de ganho ou perda de cada carteira.
     public void showWalletGainLossReport(List<Wallet> wallets, TransactionDAO transactionDAO) {
-        System.out.println("\n---------------------------------");
+        System.out.println(YELLOW + "\n---------------------------------");
         System.out.println(messages.get("report.wallet.gainLoss.title"));
-        System.out.println("---------------------------------");
+        System.out.println("---------------------------------" + RESET);
         System.out.printf("%-10s | %-25s | %-12s%n", messages.get("report.wallet.gainLoss.table.id"), messages.get("report.wallet.gainLoss.table.holder"), messages.get("report.wallet.gainLoss.table.result"));
         System.out.println("---------------------------------");
 

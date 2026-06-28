@@ -19,6 +19,7 @@ import org.unicamp.poo.model.enums.DatabaseSelector;
 import static org.unicamp.poo.util.ConsoleColors.RESET;
 import static org.unicamp.poo.util.ConsoleColors.YELLOW;
 import org.unicamp.poo.util.ConsoleScanner;
+import org.unicamp.poo.util.DatabaseSeeder;
 import org.unicamp.poo.util.Info;
 import org.unicamp.poo.util.MessageProvider;
 import org.unicamp.poo.view.Menu;
@@ -141,12 +142,16 @@ public class ProgramController {
                 transactionDAO = new TransactionDAOImplMariaDB(dbConn.getConnection());
                 oracleDAO = new OracleMariaDBDAO(dbConn.getConnection());
                 oracleController = new OracleController(oracleDAO);
+
+                DatabaseSeeder.seed(walletDAO, transactionDAO, oracleDAO);
             }
             case MEMORY -> {
                 walletDAO = new WalletMemoryDAO();
                 transactionDAO = new TransactionMemoryDAO();
                 oracleDAO = new OracleMemoryDAO();
                 oracleController = new OracleController(oracleDAO);
+
+                DatabaseSeeder.seed(walletDAO, transactionDAO, oracleDAO);
             }
         }
     }
