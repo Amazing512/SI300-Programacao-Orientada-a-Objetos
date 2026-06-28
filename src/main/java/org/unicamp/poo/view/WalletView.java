@@ -71,12 +71,11 @@ public class WalletView {
         String broker = read.nextLine();
 
         // Cria uma nova instância usando o mesmo ID da carteira editável alvo
-        Wallet wallet = new Wallet(editableWallet.getId(), holder, broker);
-        return wallet;
+        return new Wallet(editableWallet.getId(), holder, broker);
     }
 
     // Solicita uma escolha de confirmação para executar ações de exclusão irreversíveis de forma segura
-    public boolean confirmDeletion(Wallet removableWallet) {
+    public boolean confirmDeletion() {
         // Loop até que uma opção de decisão válida (1 ou 2) seja fornecida pelo usuário
         while (true) {
             System.out.println(messages.get("wallet.view.prompt.confirmDelete"));

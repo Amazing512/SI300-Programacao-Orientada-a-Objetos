@@ -82,7 +82,17 @@ public class ProgramController {
                 case 0 -> loop = false;
                 case 1 -> {
                     System.out.println(YELLOW + messages.get("help.instructions.header") + RESET);
-                    System.out.println(messages.get("help.instructions"));
+                    System.out.println(messages.get("help.instructions.title"));
+                    System.out.println();
+                    System.out.println(messages.get("help.instructions.wallet"));
+                    System.out.println();
+                    System.out.println(messages.get("help.instructions.transaction"));
+                    System.out.println();
+                    System.out.println(messages.get("help.instructions.reports"));
+                    System.out.println();
+                    System.out.println(messages.get("help.instructions.oracle"));
+                    System.out.println();
+                    System.out.println(messages.get("help.instructions.tip"));
                 }
                 case 2 -> showCredits();
                 default -> loop = false;
@@ -97,10 +107,11 @@ public class ProgramController {
         System.out.println(YELLOW + messages.get("help.credits.header") + RESET);
         System.out.println();
         System.out.println(Info.getStamp());
-        System.out.println(Info.projectCopyRight);
+        System.out.println(Info.PROJECT_LICENSE);
+        System.out.println(Info.PROJECT_COPYRIGHT);
         System.out.println();
-        System.out.println(Info.projectInstitution);
-        System.out.println(Info.projectDepartment);
+        System.out.println(Info.PROJECT_INSTITUTION);
+        System.out.println(Info.PROJECT_DEPARTMENT);
         System.out.println();
         System.out.println(messages.get("help.credits.team") + ":");
         for (Info.AuthorRole authorRole : Info.projectRoles) {

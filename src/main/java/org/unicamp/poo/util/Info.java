@@ -1,7 +1,7 @@
 package org.unicamp.poo.util;
 
 public class Info {
-    public static final String[] projectAuthors      = {
+    public static final String[] PROJECT_AUTHORS = {
             "Samuel Germiniani",
             "Miguel Barcellos",
             "Vitor Cunha",
@@ -11,13 +11,13 @@ public class Info {
             "Gustavo Domingues Mancio",
             "Guilherme Kauã Batista da Silva",
     };
-    public static final String projectLicense   = "MIT License";
-    public static final String projectCopyRight   = "Copyright (c) 2026 " + getFormattedAuthors();
-    public static final String projectDepartment  = "FT - School of Technology";
-    public static final String projectInstitution = "Unicamp - University of Campinas";
+    public static final String PROJECT_LICENSE = "MIT License";
+    public static final String PROJECT_COPYRIGHT = "Copyright (c) 2026 " + getFormattedAuthors();
+    public static final String PROJECT_DEPARTMENT = "FT - School of Technology";
+    public static final String PROJECT_INSTITUTION = "Unicamp - University of Campinas";
 
-    public static final String projectName        = "FT_Coin";
-    public static final String projectVersion     = "Ver. 1.0";
+    public static final String PROJECT_NAME = "FT_Coin";
+    public static final String PROJECT_VERSION = "Ver. 1.0";
 
     // Represents one functional area of the project and the authors responsible for it,
     // used to render the credits screen grouped by role rather than as a single block of text.
@@ -40,10 +40,10 @@ public class Info {
 
     public static String getStamp()
     {
-        return (projectName + " Ver. " + projectVersion);
+        return (PROJECT_NAME + " Ver. " + PROJECT_VERSION);
     }
 
     public static String getFormattedAuthors() {
-        return String.join(", ", projectAuthors);
+        return String.join(", ", PROJECT_AUTHORS);
     }
 }

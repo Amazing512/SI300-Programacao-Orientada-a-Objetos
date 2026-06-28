@@ -4,16 +4,14 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import org.unicamp.poo.dao.OracleDAO;
 import org.unicamp.poo.model.Oracle;
 
 public class OracleMariaDBDAO implements OracleDAO {
     
-    private Connection connection = null;
+    private final Connection connection;
 
     public OracleMariaDBDAO(Connection connection) {
         this.connection = connection;
@@ -60,60 +58,5 @@ public class OracleMariaDBDAO implements OracleDAO {
             System.err.println("Erro ao executar FINDBYDATE no MariaDB: " + e.getMessage());
         }
         return null;
-    }
-
-    @Override
-    public List<Oracle> findAll() {
-        List<Oracle> list = new ArrayList<>();
-        String sql = "SELECT * FROM ORACULO ORDER BY Data DESC";
-
-        try (PreparedStatement stmt = connection.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-
-            while (rs.next()) {
-                try {
-                    Oracle o = new Oracle(
-                            rs.getDate("Data"),
-                            rs.getDouble("Cotacao")
-                    );
-                    list.add(o);
-                } catch (RuntimeException exception) {
-                    System.err.println("Erro ao mapear cotação: " + exception.getMessage());
-                }
-            }
-
-        } catch (SQLException e) {
-            System.err.println("Erro ao executar FINDALL no MariaDB: " + e.getMessage());
-        }
-
-        return list;
-    }
-
-    @Override
-    public void update(Oracle oracle) {
-        String sql = "UPDATE ORACULO SET Cotacao = ? WHERE Data = ?";
-        
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setDouble(1, oracle.getPrice());
-            stmt.setDate(2, new java.sql.Date(oracle.getDate().getTime()));
-            
-            stmt.executeUpdate();
-            System.out.println("[MariaDB] Cotação atualizada com sucesso!");
-        } catch (SQLException e) {
-            System.err.println("Erro ao executar UPDATE no MariaDB: " + e.getMessage());
-        }
-    }
-
-    @Override
-    public void delete(Date date) {
-        String sql = "DELETE FROM ORACULO WHERE Data = ?";
-        
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setDate(1, new java.sql.Date(date.getTime()));
-            stmt.executeUpdate();
-            System.out.println("[MariaDB] Cotação deletada com sucesso!");
-        } catch (SQLException e) {
-            System.err.println("Erro ao executar DELETE no MariaDB: " + e.getMessage());
-        }
     }
 }

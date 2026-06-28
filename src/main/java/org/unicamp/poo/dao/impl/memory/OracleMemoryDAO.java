@@ -27,28 +27,4 @@ public class OracleMemoryDAO implements OracleDAO {
 
         return null;
     }
-
-    @Override
-    public List<Oracle> findAll() {
-        return new ArrayList<>(oracles);
-    }
-
-    @Override
-    public void update(Oracle updatedOracle) {
-
-        for (int i = 0; i < oracles.size(); i++) {
-
-            Oracle currentOracle = oracles.get(i);
-
-            if (currentOracle.getDate().equals(updatedOracle.getDate())) {
-                oracles.set(i, updatedOracle);
-                return;
-            }
-        }
-    }
-
-    @Override
-    public void delete(Date date) {
-        oracles.removeIf(oracle -> oracle.getDate().equals(date));
-    }
 }

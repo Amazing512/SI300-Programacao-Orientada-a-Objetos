@@ -70,7 +70,7 @@ public class TransactionView {
         return quantity;
     }
 
-    public boolean confirmTransaction(String confirmMessage) {
+    public boolean confirmRejectTransaction(String confirmMessage) {
         while (true) {
             System.out.println("\n" + confirmMessage);
             System.out.println("1 - " + messages.get("generic.confirmYes"));
@@ -84,10 +84,10 @@ public class TransactionView {
 
             switch (option) {
                 case 1 -> {
-                    return true;
+                    return false;
                 }
                 case 2 -> {
-                    return false;
+                    return true;
                 }
                 default -> System.out.println(messages.get("generic.confirmInvalid"));
             }

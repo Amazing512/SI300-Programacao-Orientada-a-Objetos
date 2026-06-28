@@ -1,13 +1,9 @@
 package org.unicamp.poo.view;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.Scanner;
 
 import org.unicamp.poo.dao.TransactionDAO;
-import org.unicamp.poo.model.Oracle;
 import org.unicamp.poo.model.Transaction;
 import org.unicamp.poo.model.Wallet;
 import org.unicamp.poo.model.enums.OperationType;
@@ -167,101 +163,5 @@ public class ReportView {
     // Imprime uma mensagem de erro destacada na cor VERMELHA
     public void showErrorMessage(String s) {
         System.out.println(RED + s + RESET);
-    }
-
-    // Imprime uma mensagem de sucesso destacada na cor VERDE
-    public void showSuccessMessage(String s) {
-        System.out.println(GREEN + s + RESET);
-    }
-
-    // Solicita ao usuário uma data, usada para buscas, edições e exclusões no Oráculo.
-    public Date readOracleDate() {
-        Scanner read = ConsoleScanner.getInstance();
-
-        // Loop até que o usuário insira uma data válida no formato esperado
-        while (true) {
-            System.out.print(messages.get("report.oracle.date.prompt"));
-            String input = read.nextLine();
-
-            try {
-                DATE_FORMAT.setLenient(false); // Rejeita datas inválidas como 32/13/2024
-                return DATE_FORMAT.parse(input);
-            } catch (ParseException e) {
-                System.out.println(RED + messages.get("report.oracle.date.invalid") + RESET);
-            }
-        }
-    }
-
-    public Oracle readOracleData() {
-        Date date = readOracleDate();
-
-        double price = ConsoleScanner.readDouble(messages.get("report.oracle.price.prompt"), messages.get("generic.confirmInvalid"));
-
-        while (price <= 0) {
-            price = ConsoleScanner.readDouble(messages.get("report.oracle.price.invalid"), messages.get("generic.confirmInvalid"));
-        }
-
-        return new Oracle(date, price);
-    }
-
-    // Exibe os detalhes de uma única cotação do Oráculo no console.
-    public void displayOracle(Oracle oracle) {
-        System.out.println("\n" + messages.get("report.oracle.display.title"));
-        System.out.println(messages.get("report.oracle.display.date") + " " + DATE_FORMAT.format(oracle.getDate()));
-        System.out.printf(messages.get("report.oracle.display.price") + " " + "%.2f%n", oracle.getPrice());
-        System.out.println(messages.get("report.oracle.display.separator"));
-    }
-
-    // Itera por uma lista de cotações do Oráculo e as imprime formatadas no console.
-    public void displayOracleList(List<Oracle> oracles) {
-        System.out.println("\n" + messages.get("report.oracle.list.title"));
-        for (int i = 0; i < oracles.size(); i++) {
-            Oracle o = oracles.get(i);
-            System.out.println(messages.get("report.oracle.list.separator"));
-            System.out.println(messages.get("report.oracle.list.item") + " " + (i + 1));
-            System.out.println(messages.get("report.oracle.list.date") + " " + DATE_FORMAT.format(o.getDate()));
-            System.out.printf(messages.get("report.oracle.list.price") + " " + "%.2f%n", o.getPrice());
-        }
-        System.out.println(messages.get("report.oracle.list.separator"));
-    }
-
-    // Solicita ao usuário um preço atualizado, mantendo a data original.
-    public Oracle readOracleUpdates(Oracle editableOracle) {
-        System.out.println(messages.get("report.oracle.update.dateCurrent") + " " + DATE_FORMAT.format(editableOracle.getDate()));
-        System.out.printf(messages.get("report.oracle.update.priceCurrent") + " " + "%.2f%n", editableOracle.getPrice());
-
-        double price = ConsoleScanner.readDouble(messages.get("report.oracle.update.pricePrompt"), messages.get("generic.confirmInvalid"));
-
-        while (price <= 0) {
-            price = ConsoleScanner.readDouble(messages.get("report.oracle.price.invalid"), messages.get("generic.confirmInvalid"));
-        }
-
-        // Mantém a mesma data — a chave de um Oráculo é sua data e não pode ser alterada
-        return new Oracle(editableOracle.getDate(), price);
-    }
-
-    // Solicita uma escolha de confirmação para executar ações de exclusão irreversíveis de forma segura.
-    public boolean confirmDeletion(Oracle removableOracle) {
-        while (true) {
-            System.out.println(messages.get("report.oracle.confirmDelete") + DATE_FORMAT.format(removableOracle.getDate()) + messages.get("report.oracle.confirmDelete.suffix"));
-            System.out.println("1 - " + messages.get("generic.confirmYes"));
-            System.out.println("2 - " + messages.get("generic.confirmNo"));
-
-            Integer option = ConsoleScanner.readIntOrNull();
-            if (option == null) {
-                System.out.println(messages.get("generic.confirmInvalid"));
-                continue;
-            }
-
-            switch (option) {
-                case 1 -> {
-                    return true;
-                }
-                case 2 -> {
-                    return false;
-                }
-                default -> System.out.println(messages.get("generic.confirmInvalid"));
-            }
-        }
     }
 }

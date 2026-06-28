@@ -1,13 +1,10 @@
     package org.unicamp.poo.model;
 
-    import java.io.Serializable;
     import java.util.Date;
 
-    public class Oracle implements Serializable {
-        private final static long serialVersionUID = 1L;
-
-        private Date date;
-        private double price;
+    public class Oracle {
+        private final Date date;
+        private final double price;
 
         public Oracle(Date date, double price) {
             this.date = date;

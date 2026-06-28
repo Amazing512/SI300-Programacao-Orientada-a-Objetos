@@ -12,13 +12,8 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 public class MariaDBConnection implements DatabaseConnection {
-    private String     driver;
-    private String     serverIP;
-    private String     serverPort;
-    private String     database;
     private String     user;
     private String     password;
-    private String     tail;
     private String     url;
     private Connection connection = null;
 
@@ -37,11 +32,11 @@ public class MariaDBConnection implements DatabaseConnection {
             Class.forName("org.mariadb.jdbc.Driver");
 
             props.load(input);
-            driver     = props.getProperty("driver");
-            serverIP   = props.getProperty("serverIP");
-            serverPort = props.getProperty("serverPort");
-            database   = props.getProperty("database");
-            tail       = props.getProperty("tail");
+            String driver = props.getProperty("driver");
+            String serverIP = props.getProperty("serverIP");
+            String serverPort = props.getProperty("serverPort");
+            String database = props.getProperty("database");
+            String tail = props.getProperty("tail");
             url        = driver + "://" + serverIP + ":" + serverPort + "/" + database + tail;
 
             // TODO: Add serverName based env names
@@ -64,18 +59,6 @@ public class MariaDBConnection implements DatabaseConnection {
             {
                 throw new IllegalStateException("Defina MARIADB_USER e MARIADB_PASSWORD nas variaveis de ambiente ou no arquivo local mariadb.env.");
             }
-        }
-        catch (final ClassNotFoundException exceptionValue)
-        {
-            System.out.println(exceptionValue.getMessage());
-        }
-        catch (final IllegalStateException exceptionValue)
-        {
-            System.out.println(exceptionValue.getMessage());
-        }
-        catch (final IOException exceptionValue)
-        {
-            System.out.println(exceptionValue.getMessage());
         }
         catch (final Exception exceptionValue)
         {

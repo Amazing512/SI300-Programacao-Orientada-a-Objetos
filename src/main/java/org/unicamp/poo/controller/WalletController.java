@@ -101,7 +101,7 @@ public final class WalletController {
 
         if (removableWallet != null){
             // Solicita uma confirmação de exclusão do usuário através da camada view
-            if (view.confirmDeletion(removableWallet)) {
+            if (view.confirmDeletion()) {
                 // Remove a carteira do repositório DAO
                 model.delete(id);
                 view.showSuccessMessage(messages.get("wallet.remove.success"));

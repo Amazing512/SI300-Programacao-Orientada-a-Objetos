@@ -78,7 +78,7 @@ public class ReportController {
         }
 
         for (Transaction t : transactions) {
-            double price = 0.0;
+            double price;
             Oracle quote = oracleController.findByDate(t.getOperationDate());
 
             if (quote != null) {

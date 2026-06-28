@@ -1,13 +1,9 @@
 package org.unicamp.poo.model;
 
-import java.io.Serializable;
-
-public class Wallet implements Serializable {
-    private static final long serialVersionUID = 1L;
-
+public class Wallet {
     private Integer id;
-    private String holder;
-    private String broker;
+    private final String holder;
+    private final String broker;
 
     public Wallet(Integer id, String holder, String broker) {
         this.id = id;

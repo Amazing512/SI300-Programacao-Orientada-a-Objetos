@@ -2,17 +2,14 @@ package org.unicamp.poo.model;
 
 import org.unicamp.poo.model.enums.OperationType;
 
-import java.io.Serializable;
 import java.util.Date;
 
-public class Transaction implements Serializable {
-    private final static long serialVersionUID = 1L;
-
+public class Transaction {
     private Integer id;
-    private int walletId;
-    private Date operationDate;
-    private OperationType operationType;
-    private double quantity;
+    private final int walletId;
+    private final Date operationDate;
+    private final OperationType operationType;
+    private final double quantity;
 
     public Transaction(int walletId, Date operationDate, OperationType operationType, double quantity) {
         this.id = null; // Defined by persistence

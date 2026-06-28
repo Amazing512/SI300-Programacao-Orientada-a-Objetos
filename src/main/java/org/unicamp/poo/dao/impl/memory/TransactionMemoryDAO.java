@@ -19,21 +19,6 @@ public class TransactionMemoryDAO implements TransactionDAO {
     }
 
     @Override
-    public Transaction findById(int id) {
-        for (Transaction transaction : transactions) {
-            if (transaction.getId() == id) {
-                return transaction;
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public List<Transaction> findAll() {
-        return new ArrayList<>(transactions);
-    }
-
-    @Override
     public List<Transaction> findByWalletId(int walletId) {
         List<Transaction> walletTransactions = new ArrayList<>();
 
@@ -44,22 +29,5 @@ public class TransactionMemoryDAO implements TransactionDAO {
         }
 
         return walletTransactions;
-    }
-
-    @Override
-    public void update(Transaction updatedTransaction) {
-        for (int i = 0; i < transactions.size(); i++) {
-            Transaction currentTransaction = transactions.get(i);
-
-            if (currentTransaction.getId().equals(updatedTransaction.getId())) {
-                transactions.set(i, updatedTransaction);
-                return;
-            }
-        }
-    }
-
-    @Override
-    public void delete(int id) {
-        transactions.removeIf(transaction -> transaction.getId() == id);
     }
 }

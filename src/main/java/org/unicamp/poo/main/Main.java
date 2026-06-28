@@ -10,7 +10,7 @@ public final class Main {
     private final static String          country  = "BR";
     private final static MessageProvider messageProvider = new MessageProvider("messages", lang, country);
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         try {
             final String serverName = "WindServer";
 

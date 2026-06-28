@@ -20,11 +20,11 @@ import org.unicamp.poo.view.TransactionView;
 
 public class TransactionController {
 
-    TransactionDAO model;
-    WalletDAO walletModel;
-    OracleController oracleController;
-    TransactionView view;
-    MessageProvider messages;
+    final TransactionDAO model;
+    final WalletDAO walletModel;
+    final OracleController oracleController;
+    final TransactionView view;
+    final MessageProvider messages;
 
     public TransactionController(TransactionDAO model, WalletDAO walletModel, OracleController oracleController, TransactionView view, MessageProvider messages) {
         super();
@@ -81,7 +81,7 @@ public class TransactionController {
                               + String.format("%.2f", totalValue)
                               + "?";
 
-            if (!view.confirmTransaction(confirmMsg)) {
+            if (view.confirmRejectTransaction(confirmMsg)) {
                 view.showErrorMessage(messages.get("transaction.cancelled"));
                 return;
             }
@@ -137,7 +137,7 @@ public class TransactionController {
                           + String.format("%.2f", totalValue)
                           + "?";
 
-        if (!view.confirmTransaction(confirmMsg)) {
+        if (view.confirmRejectTransaction(confirmMsg)) {
             view.showErrorMessage(messages.get("transaction.cancelled"));
             return;
         }

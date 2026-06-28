@@ -37,7 +37,6 @@ public final class Menu {
             }
             catch (NumberFormatException exception) {
                 System.out.println(messages.get("menu.invalidInput") + " " + (options.size() - 1) + ".");
-                waiting = true;
                 choice = -1;
             }
         }
