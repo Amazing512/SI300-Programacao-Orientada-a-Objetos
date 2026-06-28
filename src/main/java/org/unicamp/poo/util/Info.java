@@ -32,7 +32,7 @@ public class Info {
             new AuthorRole("help.credits.role.architecture", new String[]{"Gabriela Nogueira"}),
             new AuthorRole("help.credits.role.viewController", new String[]{"Luiza Brum"}),
             new AuthorRole("help.credits.role.modelDao", new String[]{"Matheus Mastelini", "Vitor Cunha"}),
-            new AuthorRole("help.credits.role.databaseOracle", new String[]{"Guilherme Kauan", "Gustavo Domingues", "Samuel Germiniani"}),
+            new AuthorRole("help.credits.role.databaseOracle", new String[]{"Guilherme Kauã", "Gustavo Domingues", "Samuel Germiniani"}),
     };
 
     public static String getStamp()

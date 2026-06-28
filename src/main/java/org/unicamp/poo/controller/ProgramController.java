@@ -90,8 +90,6 @@ public class ProgramController {
                     System.out.println();
                     System.out.println(messages.get("help.instructions.reports"));
                     System.out.println();
-                    System.out.println(messages.get("help.instructions.oracle"));
-                    System.out.println();
                     System.out.println(messages.get("help.instructions.tip"));
                     ConsoleScanner.pressEnterToContinue(messages.get("generic.pressEnter"));
                     ConsoleScanner.clearScreen();
@@ -145,7 +143,8 @@ public class ProgramController {
                 oracleDAO = new OracleMariaDBDAO(dbConn.getConnection());
                 oracleController = new OracleController(oracleDAO);
 
-                DatabaseSeeder.seed(walletDAO, transactionDAO, oracleDAO);
+                // Popula o banco de dados com dados fictícios de teste, caso esteja vazio.
+                DatabaseSeeder.seed(walletDAO, transactionDAO, oracleDAO, messages);
             }
             case MEMORY -> {
                 walletDAO = new WalletMemoryDAO();
@@ -153,7 +152,8 @@ public class ProgramController {
                 oracleDAO = new OracleMemoryDAO();
                 oracleController = new OracleController(oracleDAO);
 
-                DatabaseSeeder.seed(walletDAO, transactionDAO, oracleDAO);
+                // Popula o banco de dados com dados fictícios de teste, caso esteja vazio.
+                DatabaseSeeder.seed(walletDAO, transactionDAO, oracleDAO, messages);
             }
         }
     }

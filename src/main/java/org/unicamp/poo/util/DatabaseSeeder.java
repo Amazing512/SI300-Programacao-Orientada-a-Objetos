@@ -32,13 +32,13 @@ public final class DatabaseSeeder {
         return calendar.getTime();
     }
 
-    public static void seed(WalletDAO walletDAO, TransactionDAO transactionDAO, OracleDAO oracleDAO) {
+    public static void seed(WalletDAO walletDAO, TransactionDAO transactionDAO, OracleDAO oracleDAO, MessageProvider messages) {
         // Só popula se não houver carteiras cadastradas para evitar duplicidade
         if (!walletDAO.findAll().isEmpty()) {
             return;
         }
 
-        System.out.println(GREEN + "Populando o banco de dados com dados de teste ficticios..." + RESET);
+        System.out.println(GREEN + messages.get("seeder.start") + RESET);
 
         // 1. Definindo as datas relativas ao dia de hoje
         Calendar cal = Calendar.getInstance();
@@ -86,9 +86,9 @@ public final class DatabaseSeeder {
             transactionDAO.create(new Transaction(w3.getId(), today, OperationType.CASH_IN, 5.0));
         }
 
-        System.out.println(GREEN + "Populamento concluido com sucesso! (3 carteiras, 5 cotacoes, 8 movimentacoes inseridas)" + RESET);
+        System.out.println(GREEN + messages.get("seeder.success") + RESET);
 
-        ConsoleScanner.pressEnterToContinue("Pressione ENTER para continuar...");
+        ConsoleScanner.pressEnterToContinue(messages.get("generic.pressEnter"));
         ConsoleScanner.clearScreen();
     }
 }
