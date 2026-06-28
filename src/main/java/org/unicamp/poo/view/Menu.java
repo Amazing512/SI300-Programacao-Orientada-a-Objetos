@@ -1,10 +1,11 @@
 package org.unicamp.poo.view;
 
-import org.unicamp.poo.util.ConsoleScanner;
-import org.unicamp.poo.util.MessageProvider;
-
 import java.util.List;
 import java.util.Scanner;
+
+import org.unicamp.poo.util.ConsoleColors;
+import org.unicamp.poo.util.ConsoleScanner;
+import org.unicamp.poo.util.MessageProvider;
 
 public final class Menu {
     private final Scanner scanner;
@@ -26,8 +27,10 @@ public final class Menu {
             ConsoleScanner.clearScreen();
             if (errorMessage != null) {
                 // Imprime a mensagem de erro em vermelho
-                System.out.println("\u001B[31m" + errorMessage + "\u001B[0m");
-                errorMessage = null; // Limpa para a próxima exibição
+                System.out.println(ConsoleColors.RED + errorMessage + ConsoleColors.RESET);
+                
+                // Limpa para a próxima exibição
+                errorMessage = null; 
             }
             System.out.println(title);
             for (int count = 0; count < options.size(); count++)

@@ -60,4 +60,15 @@ public class ConsoleScanner {
         System.out.println(message);
         scanner.nextLine();
     }
+
+    public static String readRequiredString(String prompt, String errorMessage) {
+        while (true) {
+            System.out.print(prompt);
+            String input = scanner.nextLine().trim();
+            if (!input.isEmpty()) {
+                return input;
+            }
+            System.out.println(ConsoleColors.RED + errorMessage + ConsoleColors.RESET);
+        }
+    }
 }

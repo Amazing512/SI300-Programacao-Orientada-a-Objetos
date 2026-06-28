@@ -1,7 +1,5 @@
 package org.unicamp.poo.view;
 
-import java.util.Scanner;
-
 import org.unicamp.poo.model.Wallet;
 import static org.unicamp.poo.util.ConsoleColors.GREEN;
 import static org.unicamp.poo.util.ConsoleColors.RED;
@@ -24,14 +22,15 @@ public class WalletView {
 
     // Lê todos os campos requeridos para instanciar e registrar uma nova Carteira
     public Wallet readWalletData() {
-        // Usa a instância centralizada e compartilhada de Scanner dos utilitários do projeto
-        Scanner read = ConsoleScanner.getInstance();
+        String holder = ConsoleScanner.readRequiredString(
+                messages.get("wallet.view.prompt.holder"),
+                messages.get("validation.required")
+        );
 
-        System.out.print(messages.get("wallet.view.prompt.holder"));
-        String holder = read.nextLine();
-
-        System.out.print(messages.get("wallet.view.prompt.broker"));
-        String broker = read.nextLine();
+        String broker = ConsoleScanner.readRequiredString(
+                messages.get("wallet.view.prompt.broker"),
+                messages.get("validation.required")
+        );
 
         return new Wallet(holder, broker);
     }
@@ -62,13 +61,15 @@ public class WalletView {
 
     // Solicita ao usuário detalhes atualizados de titular e corretora, mantendo o ID original da entidade
     public Wallet readWalletUpdates(Wallet editableWallet) {
-        Scanner read = ConsoleScanner.getInstance();
+        String holder = ConsoleScanner.readRequiredString(
+                messages.get("wallet.view.prompt.newHolder"),
+                messages.get("validation.required")
+        );
 
-        System.out.print(messages.get("wallet.view.prompt.newHolder"));
-        String holder = read.nextLine();
-
-        System.out.print(messages.get("wallet.view.prompt.newBroker"));
-        String broker = read.nextLine();
+        String broker = ConsoleScanner.readRequiredString(
+                messages.get("wallet.view.prompt.newBroker"),
+                messages.get("validation.required")
+        );
 
         // Cria uma nova instância usando o mesmo ID da carteira editável alvo
         return new Wallet(editableWallet.getId(), holder, broker);
