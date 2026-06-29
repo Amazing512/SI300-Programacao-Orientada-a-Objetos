@@ -4,9 +4,9 @@ import org.unicamp.poo.model.Oracle;
 
 import java.util.Date;
 
-public abstract interface OracleDAO {
+public abstract class OracleDAO {
 
-    Oracle create(Oracle oracle);
+    public abstract Oracle create(Oracle oracle);
 
-    Oracle findByDate(Date date);
+    public abstract Oracle findByDate(Date date);
 }

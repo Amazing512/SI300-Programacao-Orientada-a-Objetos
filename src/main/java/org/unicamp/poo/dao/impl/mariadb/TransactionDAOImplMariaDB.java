@@ -11,7 +11,7 @@ import org.unicamp.poo.dao.TransactionDAO;
 import org.unicamp.poo.model.Transaction;
 import org.unicamp.poo.model.enums.OperationType;
 
-public class TransactionDAOImplMariaDB implements TransactionDAO {
+public class TransactionDAOImplMariaDB extends TransactionDAO {
     private final Connection connection;
 
     public TransactionDAOImplMariaDB(Connection connection)

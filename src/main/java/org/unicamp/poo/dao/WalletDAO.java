@@ -4,17 +4,17 @@ import org.unicamp.poo.model.Wallet;
 
 import java.util.List;
 
-public abstract interface WalletDAO {
+public abstract class WalletDAO {
 
-    Wallet create(Wallet wallet);
+    public abstract Wallet create(Wallet wallet);
 
-    Wallet findById(int id);
+    public abstract Wallet findById(int id);
 
-    List<Wallet> findAll();
+    public abstract List<Wallet> findAll();
 
-    List<Wallet> findAllOrderByHolder();
+    public abstract List<Wallet> findAllOrderByHolder();
 
-    void update(Wallet wallet);
+    public abstract void update(Wallet wallet);
 
-    void delete(int id);
+    public abstract void delete(int id);
 }

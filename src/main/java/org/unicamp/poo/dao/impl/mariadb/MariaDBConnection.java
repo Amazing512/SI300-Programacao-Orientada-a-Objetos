@@ -11,7 +11,7 @@ import java.util.Properties;
 
 import org.unicamp.poo.dao.DatabaseConnection;
 
-public class MariaDBConnection implements DatabaseConnection {
+public class MariaDBConnection extends DatabaseConnection {
     private String     user;
     private String     password;
     private String     url;

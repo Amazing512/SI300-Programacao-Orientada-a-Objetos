@@ -7,7 +7,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class WalletDAOImplMariaDB implements WalletDAO {
+public class WalletDAOImplMariaDB extends WalletDAO {
 
     private final Connection connection;
 

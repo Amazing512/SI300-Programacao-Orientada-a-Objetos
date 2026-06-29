@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public class WalletMemoryDAO implements WalletDAO {
+public class WalletMemoryDAO extends WalletDAO {
 
     private static final List<Wallet> wallets = new ArrayList<>();
     private static int nextId = 1;

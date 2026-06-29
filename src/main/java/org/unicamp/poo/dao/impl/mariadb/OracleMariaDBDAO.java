@@ -9,7 +9,7 @@ import java.util.Date;
 import org.unicamp.poo.dao.OracleDAO;
 import org.unicamp.poo.model.Oracle;
 
-public class OracleMariaDBDAO implements OracleDAO {
+public class OracleMariaDBDAO extends OracleDAO {
     
     private final Connection connection;
 

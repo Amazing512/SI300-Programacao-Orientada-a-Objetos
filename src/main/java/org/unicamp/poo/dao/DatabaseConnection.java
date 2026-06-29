@@ -2,10 +2,10 @@ package org.unicamp.poo.dao;
 
 import java.sql.Connection;
 
-public abstract interface DatabaseConnection {
-    void closeConnection();
+public abstract class DatabaseConnection {
+    public abstract void closeConnection();
 
-    Connection getConnection();
+    public abstract Connection getConnection();
 
-    void openConnection();
+    public abstract void openConnection();
 }

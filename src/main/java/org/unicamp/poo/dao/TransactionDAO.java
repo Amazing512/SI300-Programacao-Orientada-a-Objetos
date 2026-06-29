@@ -4,9 +4,9 @@ import org.unicamp.poo.model.Transaction;
 
 import java.util.List;
 
-public abstract interface TransactionDAO {
+public abstract class TransactionDAO {
 
-    Transaction create(Transaction transaction);
+    public abstract Transaction create(Transaction transaction);
 
-    List<Transaction> findByWalletId(int walletId);
+    public abstract List<Transaction> findByWalletId(int walletId);
 }
