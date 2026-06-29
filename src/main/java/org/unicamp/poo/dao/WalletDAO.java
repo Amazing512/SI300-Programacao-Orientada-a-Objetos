@@ -4,7 +4,7 @@ import org.unicamp.poo.model.Wallet;
 
 import java.util.List;
 
-public interface WalletDAO {
+public abstract interface WalletDAO {
 
     Wallet create(Wallet wallet);
 

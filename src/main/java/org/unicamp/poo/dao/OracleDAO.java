@@ -4,7 +4,7 @@ import org.unicamp.poo.model.Oracle;
 
 import java.util.Date;
 
-public interface OracleDAO {
+public abstract interface OracleDAO {
 
     Oracle create(Oracle oracle);
 

@@ -4,7 +4,7 @@ import org.unicamp.poo.model.Transaction;
 
 import java.util.List;
 
-public interface TransactionDAO {
+public abstract interface TransactionDAO {
 
     Transaction create(Transaction transaction);
 
