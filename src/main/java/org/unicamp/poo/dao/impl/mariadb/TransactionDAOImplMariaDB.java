@@ -37,11 +37,11 @@ public class TransactionDAOImplMariaDB extends TransactionDAO {
                 }
             }
             
-            System.out.println("Transação criada com sucesso!");
+            System.out.println(java.util.ResourceBundle.getBundle("messages").getString("database.transaction.create.success"));
             return transaction;
             
         } catch (SQLException e) {
-            System.err.println("Erro ao criar transação: " + e.getMessage());
+            System.err.println(java.util.ResourceBundle.getBundle("messages").getString("database.transaction.create.error") + " " + e.getMessage());
             return null;
         }
     }
@@ -72,13 +72,13 @@ public class TransactionDAOImplMariaDB extends TransactionDAO {
 
                         list.add(t);
                     } catch (IllegalArgumentException exception) {
-                        System.err.println("Erro ao mapear transação: " + exception.getMessage());
+                        System.err.println(java.util.ResourceBundle.getBundle("messages").getString("database.transaction.map.error") + " " + exception.getMessage());
                     }
                 }
             }
 
         } catch (SQLException e) {
-            System.err.println("Erro ao listar transações por Wallet ID: " + e.getMessage());
+            System.err.println(java.util.ResourceBundle.getBundle("messages").getString("database.transaction.list.error") + " " + e.getMessage());
         }
 
         return list;

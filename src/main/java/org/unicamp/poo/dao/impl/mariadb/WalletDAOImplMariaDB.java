@@ -43,7 +43,7 @@ public class WalletDAOImplMariaDB extends WalletDAO {
             return wallet;
 
         } catch (SQLException e) {
-            System.err.println("Erro ao criar carteira: " + e.getMessage());
+            System.err.println(java.util.ResourceBundle.getBundle("messages").getString("database.wallet.create.error") + " " + e.getMessage());
             return null;
         }
     }
@@ -68,7 +68,7 @@ public class WalletDAOImplMariaDB extends WalletDAO {
             }
 
         } catch (SQLException e) {
-            System.err.println("Erro ao buscar carteira: " + e.getMessage());
+            System.err.println(java.util.ResourceBundle.getBundle("messages").getString("database.wallet.find.error") + " " + e.getMessage());
         }
 
         return null;
@@ -92,7 +92,7 @@ public class WalletDAOImplMariaDB extends WalletDAO {
             }
 
         } catch (SQLException e) {
-            System.err.println("Erro ao listar carteiras: " + e.getMessage());
+            System.err.println(java.util.ResourceBundle.getBundle("messages").getString("database.wallet.list.error") + " " + e.getMessage());
         }
 
         return wallets;
@@ -117,7 +117,7 @@ public class WalletDAOImplMariaDB extends WalletDAO {
             }
 
         } catch (SQLException e) {
-            System.err.println("Erro ao listar carteiras ordenadas: " + e.getMessage());
+            System.err.println(java.util.ResourceBundle.getBundle("messages").getString("database.wallet.listOrdered.error") + " " + e.getMessage());
         }
 
         return wallets;
@@ -139,7 +139,7 @@ public class WalletDAOImplMariaDB extends WalletDAO {
             stmt.executeUpdate();
 
         } catch (SQLException e) {
-            System.err.println("Erro ao atualizar carteira: " + e.getMessage());
+            System.err.println(java.util.ResourceBundle.getBundle("messages").getString("database.wallet.update.error") + " " + e.getMessage());
         }
     }
 
@@ -155,7 +155,7 @@ public class WalletDAOImplMariaDB extends WalletDAO {
             stmt.executeUpdate();
 
         } catch (SQLException e) {
-            System.err.println("Erro ao excluir carteira: " + e.getMessage());
+            System.err.println(java.util.ResourceBundle.getBundle("messages").getString("database.wallet.delete.error") + " " + e.getMessage());
         }
     }
 }

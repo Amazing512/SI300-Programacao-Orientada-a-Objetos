@@ -26,10 +26,10 @@ public class OracleMariaDBDAO extends OracleDAO {
             stmt.setDouble(2, oracle.getPrice());
             
             stmt.executeUpdate();
-            System.out.println("[MariaDB] Cotação inserida com sucesso!");
+            System.out.println(java.util.ResourceBundle.getBundle("messages").getString("database.oracle.create.success"));
             return oracle;
         } catch (SQLException e) {
-            System.err.println("Erro ao executar CREATE no MariaDB: " + e.getMessage());
+            System.err.println(java.util.ResourceBundle.getBundle("messages").getString("database.oracle.create.error") + " " + e.getMessage());
             return null;
         }
     }
@@ -49,13 +49,13 @@ public class OracleMariaDBDAO extends OracleDAO {
                                 rs.getDouble("Cotacao")
                         );
                     } catch (RuntimeException exception) {
-                        System.err.println("Erro ao mapear cotação: " + exception.getMessage());
+                        System.err.println(java.util.ResourceBundle.getBundle("messages").getString("database.oracle.map.error") + " " + exception.getMessage());
                         return null;
                     }
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Erro ao executar FINDBYDATE no MariaDB: " + e.getMessage());
+            System.err.println(java.util.ResourceBundle.getBundle("messages").getString("database.oracle.find.error") + " " + e.getMessage());
         }
         return null;
     }

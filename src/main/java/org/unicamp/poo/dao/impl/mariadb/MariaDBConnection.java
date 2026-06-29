@@ -19,11 +19,6 @@ public class MariaDBConnection extends DatabaseConnection {
 
     public MariaDBConnection(String serverName)
     {
-        // for OLD drivers use this statment in the method:
-        // Class.forName("org.mariadb.jdbc.Driver");
-        // and catch
-        // ClassNotFoundException
-
         final Properties props = new Properties();
         final Properties credentials = new Properties();
 
@@ -57,7 +52,7 @@ public class MariaDBConnection extends DatabaseConnection {
 
             if ((user == null || user.isBlank()) || (password == null || password.isBlank()))
             {
-                throw new IllegalStateException("Defina MARIADB_USER e MARIADB_PASSWORD nas variaveis de ambiente ou no arquivo local mariadb.env.");
+                throw new IllegalStateException(java.util.ResourceBundle.getBundle("messages").getString("database.connection.credentials.missing"));
             }
         }
         catch (final Exception exceptionValue)
