@@ -1,5 +1,7 @@
 package org.unicamp.poo.main;
 
+//Comentário teste do drogo testando a IDE e testando o GIT tbm é nois fml lembra de apagar dps
+
 import org.unicamp.poo.controller.ProgramController;
 import org.unicamp.poo.model.enums.DatabaseSelector;
 import org.unicamp.poo.util.Info;
