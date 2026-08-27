@@ -1,13 +1,12 @@
 package org.unicamp.poo.main;
 
-//Comentário teste do drogo testando a IDE e testando o GIT tbm é nois fml lembra de apagar dps
-
 import org.unicamp.poo.controller.ProgramController;
 import org.unicamp.poo.model.enums.DatabaseSelector;
 import org.unicamp.poo.util.Info;
 import org.unicamp.poo.util.MessageProvider;
 
-public final class Main {
+public final class
+Main {
     private final static String          lang     = "pt";
     private final static String          country  = "BR";
     private final static MessageProvider messageProvider = new MessageProvider("messages", lang, country);
