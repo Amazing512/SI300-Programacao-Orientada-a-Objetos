@@ -27,8 +27,9 @@ import org.unicamp.poo.view.ReportView;
 import org.unicamp.poo.view.TransactionView;
 import org.unicamp.poo.view.WalletView;
 
-/* Controller principal que centraliza o fluxo principal da aplicação,
-   coordenando a navegação de menus, o ciclo de vida dos sub-controladores e as sessões do banco de dados. */
+/* Controller principal que centraliza o fluxo principal da aplicação, 
+coordenando a navegação de menus, o ciclo de vida dos sub-controladores e as sessões do banco de dados. */
+
 public class ProgramController {
 
     private final DatabaseSelector databaseSelector;
@@ -63,18 +64,50 @@ public class ProgramController {
         reportController.start();
     }
 
-    // Inicializa o sub-módulo Ajuda com instruções longas e lista de créditos completa.
-    void actionHelp() {
-        final Menu helpMenu = new Menu(ConsoleScanner.getInstance(), messages);
-        boolean loop = true;
-
-        // Prepara as opções do sub-menu
+    // Permite ao usuário alterar o idioma do sistema em tempo de execução (PT, ES, EN).
+    void actionLanguage() {
+        final Menu langMenu = new Menu();
         final List<String> options = new ArrayList<>();
         options.add(messages.get("helpMenu.return"));
-        options.add(messages.get("helpMenu.viewInstructions"));
-        options.add(messages.get("helpMenu.viewCredits"));
+        options.add(messages.get("language.option.pt"));
+        options.add(messages.get("language.option.es"));
+        options.add(messages.get("language.option.en"));
+
+        String yellowTitle = YELLOW + messages.get("language.menu.title") + RESET;
+        int choice = langMenu.getChoice(yellowTitle, options, messages.get("language.menu.prompt"));
+
+        switch (choice) {
+            case 1 -> {
+                messages.setLanguage("pt", "BR");
+                System.out.println(messages.get("language.changed.success"));
+                ConsoleScanner.pressEnterToContinue(messages.get("generic.pressEnter"));
+            }
+            case 2 -> {
+                messages.setLanguage("es", "ES");
+                System.out.println(messages.get("language.changed.success"));
+                ConsoleScanner.pressEnterToContinue(messages.get("generic.pressEnter"));
+            }
+            case 3 -> {
+                messages.setLanguage("en", "US");
+                System.out.println(messages.get("language.changed.success"));
+                ConsoleScanner.pressEnterToContinue(messages.get("generic.pressEnter"));
+            }
+            default -> {}
+        }
+        ConsoleScanner.clearScreen();
+    }
+
+    // Inicializa o sub-módulo Ajuda com instruções longas e lista de créditos completa.
+    void actionHelp() {
+        final Menu helpMenu = new Menu();
+        boolean loop = true;
 
         while (loop) {
+            final List<String> options = new ArrayList<>();
+            options.add(messages.get("helpMenu.return"));
+            options.add(messages.get("helpMenu.viewInstructions"));
+            options.add(messages.get("helpMenu.viewCredits"));
+
             String yellowTitle = YELLOW + messages.get("helpMenu.title") + RESET;
 
             switch (helpMenu.getChoice(yellowTitle, options, messages.get("helpMenu.prompt"))) {
@@ -172,14 +205,15 @@ public class ProgramController {
         options.add(messages.get("mainMenu.wallet"));
         options.add(messages.get("mainMenu.transaction"));
         options.add(messages.get("mainMenu.reports"));
+        options.add(messages.get("mainMenu.language"));
         options.add(messages.get("mainMenu.help"));
         return options;
     }
 
-    // loop principal
+    // Loop principal
     public void start(String serverName)
     {
-        final Menu userMenu = new Menu(ConsoleScanner.getInstance(), messages);
+        final Menu userMenu = new Menu();
         boolean    loop     = true;
 
         openDatabase(serverName);
@@ -193,7 +227,8 @@ public class ProgramController {
                 case 1 -> actionWallet();
                 case 2 -> actionTransaction();
                 case 3 -> actionReports();
-                case 4 -> actionHelp();
+                case 4 -> actionLanguage();
+                case 5 -> actionHelp();
                 default -> loop = false;
             }
         }
