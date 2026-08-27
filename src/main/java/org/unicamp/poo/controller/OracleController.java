@@ -9,11 +9,9 @@ import java.util.Random;
 import org.unicamp.poo.dao.OracleDAO;
 import org.unicamp.poo.model.Oracle;
 
-/* 
- * Controller responsável por lidar com operações relacionadas ao Oráculo, que fornece a cotação diária da moeda virtual.
-*/
+//Controller responsável por lidar com operações relacionadas ao Oráculo, que fornece a cotação diária da moeda virtual.
 
-public class OracleController {
+public class OracleController extends OracleDAO {
 
     // Range de preços simulado para a cotação diária da moeda virtual
     private static final double MIN_SIMULATED_PRICE = 1.0;
@@ -47,7 +45,7 @@ public class OracleController {
         return MIN_SIMULATED_PRICE + (random.nextDouble() * (MAX_SIMULATED_PRICE - MIN_SIMULATED_PRICE));
     }
 
-    /* Pega a cotação diária ou gera uma aleatória se ainda não existir no banco */
+    // Pega a cotação diária ou gera uma aleatória se ainda não existir no banco 
     public Oracle getOrGenerateDailyQuote() {
         Date today = normalizeToDay(new Date());
 
@@ -67,6 +65,11 @@ public class OracleController {
             cache.put(today, createdQuote);
         }
         return createdQuote;
+    }
+
+    @Override
+    public Oracle create(Oracle oracle) {
+        return null;
     }
 
     public Oracle findByDate(Date date) {
