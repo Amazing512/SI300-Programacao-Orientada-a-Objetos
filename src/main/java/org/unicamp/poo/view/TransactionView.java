@@ -35,6 +35,21 @@ public class TransactionView {
         return new Transaction(id, new Date(), operationType, quantity);
     }
 
+    // Lê a data da transação/cotação desejada pelo usuario
+    public Date readTransactionDate() {
+        while (true) {
+            try {
+                String input = ConsoleScanner.readRequiredString(
+                        messages.get("transaction.view.prompt.date"),
+                        messages.get("validation.required")
+                );
+                return DATE_FORMAT.parse(input);
+            } catch (Exception e) {
+                System.out.println(RED + messages.get("generic.confirmInvalid") + RESET);
+            }
+        }
+    }
+
     public void showErrorMessage(String s) {
         System.out.println(RED + s + RESET);
     }
