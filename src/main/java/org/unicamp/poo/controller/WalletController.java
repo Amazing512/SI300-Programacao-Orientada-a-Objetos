@@ -123,7 +123,7 @@ public final class WalletController {
     public void start()
     {
         final List<String> options = getMenuOptions();
-        final Menu walletMenu = new Menu(ConsoleScanner.getInstance(), messages);
+        final Menu walletMenu = new Menu();
         boolean loop = true;
 
         while (loop) {
