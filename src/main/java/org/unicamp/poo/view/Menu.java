@@ -8,10 +8,10 @@ import org.unicamp.poo.util.ConsoleScanner;
 import org.unicamp.poo.util.MessageProvider;
 
 public final class Menu {
-    private Scanner scanner = null;
-    private MessageProvider messages;
+    private final Scanner scanner;
+    private final MessageProvider messages;
 
-    public Menu() {
+    public Menu(Scanner scanner, MessageProvider messages) {
         this.scanner = scanner;
         this.messages = messages;
     }

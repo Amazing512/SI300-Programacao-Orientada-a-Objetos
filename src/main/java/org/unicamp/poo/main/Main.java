@@ -5,8 +5,7 @@ import org.unicamp.poo.model.enums.DatabaseSelector;
 import org.unicamp.poo.util.Info;
 import org.unicamp.poo.util.MessageProvider;
 
-public final class
-Main {
+public final class Main {
     private final static String          lang     = "pt";
     private final static String          country  = "BR";
     private final static MessageProvider messageProvider = new MessageProvider("messages", lang, country);
