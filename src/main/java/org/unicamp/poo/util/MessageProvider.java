@@ -4,16 +4,18 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 public class MessageProvider {
-    private final ResourceBundle resourceBundle;
+    private ResourceBundle resourceBundle;
 
-    public MessageProvider(String bundleFileName, String lang, String country)
-    {
-        Locale.setDefault(Locale.of(lang, country));
-        this.resourceBundle = ResourceBundle.getBundle(bundleFileName, Locale.getDefault());
+    public MessageProvider(String bundleFileName, String lang, String country) {
+        changeLanguage(bundleFileName, lang, country);
     }
 
-    public String get(String key)
-    {
+    public void changeLanguage (String bundleFileName, String lang, String country){
+        Locale newLocale = Locale.of(lang, country);
+        this.resourceBundle = ResourceBundle.getBundle(bundleFileName, newLocale);
+    }
+
+    public String get(String key) {
         return (resourceBundle.containsKey(key) ? resourceBundle.getString(key) : ("!!! " + key + "!!!"));
     }
 }

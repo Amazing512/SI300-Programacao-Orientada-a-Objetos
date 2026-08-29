@@ -8,13 +8,13 @@ import org.unicamp.poo.dao.DatabaseConnection;
 import org.unicamp.poo.dao.OracleDAO;
 import org.unicamp.poo.dao.TransactionDAO;
 import org.unicamp.poo.dao.WalletDAO;
-import org.unicamp.poo.dao.impl.mariadb.MariaDBConnection;
+import org.unicamp.poo.dao.MariaDBConnection;
 import org.unicamp.poo.dao.impl.mariadb.OracleMariaDBDAO;
-import org.unicamp.poo.dao.impl.mariadb.TransactionDAOImplMariaDB;
-import org.unicamp.poo.dao.impl.mariadb.WalletDAOImplMariaDB;
+import org.unicamp.poo.dao.TransactionDAOImplMariaDB;
+import org.unicamp.poo.dao.WalletDAOImplMariaDB;
 import org.unicamp.poo.dao.impl.memory.OracleMemoryDAO ;
-import org.unicamp.poo.dao.impl.memory.TransactionMemoryDAO;
-import org.unicamp.poo.dao.impl.memory.WalletMemoryDAO;
+import org.unicamp.poo.dao.TransactionMemoryDAO;
+import org.unicamp.poo.dao.WalletMemoryDAO;
 import org.unicamp.poo.model.enums.DatabaseSelector;
 import static org.unicamp.poo.util.ConsoleColors.RESET;
 import static org.unicamp.poo.util.ConsoleColors.YELLOW;
@@ -28,10 +28,10 @@ import org.unicamp.poo.view.TransactionView;
 import org.unicamp.poo.view.WalletView;
 
 /* Controller principal que centraliza o fluxo principal da aplicação,
-   coordenando a navegação de menus, o ciclo de vida dos sub-controladores e as sessões do banco de dados. */
+   coordenando a navegação de menus, o ciclo de vida dos sub controladores e as sessões do banco de dados. */
 public class ProgramController {
 
-    private final DatabaseSelector databaseSelector;
+    private DatabaseSelector databaseSelector;
     private final MessageProvider messages;
     private DatabaseConnection dbConn;
 
@@ -45,30 +45,86 @@ public class ProgramController {
         this.messages = messages;
     }
 
-    // Inicializa o sub-módulo Carteira e transfere o fluxo de controle.
+    // Inicializa o submódulo Carteira e transfere o fluxo de controle.
     void actionWallet() {
         final WalletController walletController = new WalletController(walletDAO, new WalletView(messages), messages);
         walletController.start();
     }
 
-    // Inicializa o sub-módulo Transação e transfere o fluxo de controle.
+    // Inicializa o submódulo Transação e transfere o fluxo de controle.
     void actionTransaction() {
         final TransactionController transactionController = new TransactionController(transactionDAO, walletDAO, oracleController, new TransactionView(messages), messages);
         transactionController.start();
     }
 
-    // Inicializa o sub-módulo de Relatórios Financeiros e transfere o fluxo de controle.
+    // Inicializa o submódulo de Relatórios Financeiros e transfere o fluxo de controle.
     void actionReports() {
         final ReportController reportController = new ReportController(walletDAO, transactionDAO, oracleController, new ReportView(messages), messages);
         reportController.start();
     }
 
-    // Inicializa o sub-módulo Ajuda com instruções longas e lista de créditos completa.
+    // Inicializa o submódulo de escolha de idioma.
+    void actionLanguage(){
+        boolean loop = true;
+
+        while (loop) {
+
+        final List<String> options = new ArrayList<>();
+        options.add(messages.get("languageMenu.return"));
+        options.add(messages.get("languageMenu.pt"));
+        options.add(messages.get("languageMenu.en"));
+        options.add(messages.get("languageMenu.es"));
+
+            final Menu languageMenu = new Menu(ConsoleScanner.getInstance(), this.messages);
+            String yellowTitle = YELLOW + messages.get("language.title") + RESET;
+
+            switch (languageMenu.getChoice(yellowTitle, options, messages.get("languageMenu.prompt"))) {
+                case 0 -> loop = false;
+                case 1 -> {
+                    messages.changeLanguage("messages", "pt", "BR");
+                }
+                case 2 -> {
+                    messages.changeLanguage("messages", "en", "US");
+                }
+                case 3 -> {
+                    messages.changeLanguage("messages", "es", "ES");
+                }
+            }
+        }
+    }
+
+    // Inicializa o submódulo de escolha do banco de dados.
+    void actionDatabase(){
+        boolean loop = true;
+
+        while (loop) {
+
+            final List<String> options = new ArrayList<>();
+            options.add(messages.get("databaseMenu.return"));
+            options.add(messages.get("databaseMenu.memory"));
+            options.add(messages.get("databaseMenu.mariadb"));
+
+            final Menu databaseMenu = new Menu(ConsoleScanner.getInstance(), this.messages);
+            String yellowTitle = YELLOW + messages.get("database.title") + RESET;
+
+            switch (databaseMenu.getChoice(yellowTitle, options, messages.get("databaseMenu.prompt"))) {
+                case 0 -> loop = false;
+                case 1 -> {
+                    openDatabase(DatabaseSelector.MEMORY, "WindServer");
+                }
+                case 2 -> {
+                    openDatabase(DatabaseSelector.MARIADB, "WindServer");
+                }
+            }
+        }
+    }
+
+    // Inicializa o submódulo Ajuda com instruções longas e lista de créditos completa.
     void actionHelp() {
         final Menu helpMenu = new Menu(ConsoleScanner.getInstance(), messages);
         boolean loop = true;
 
-        // Prepara as opções do sub-menu
+        // Prepara as opções do submenu
         final List<String> options = new ArrayList<>();
         options.add(messages.get("helpMenu.return"));
         options.add(messages.get("helpMenu.viewInstructions"));
@@ -125,7 +181,7 @@ public class ProgramController {
         System.out.println(messages.get("help.credits.accessDate") + " " + new Date());
     }
 
-    private void openDatabase(String serverName)
+    private void openDatabase(DatabaseSelector selector, String serverName)
     {
         OracleDAO oracleDAO;
 
@@ -133,6 +189,7 @@ public class ProgramController {
             case MARIADB -> {
                 dbConn = new MariaDBConnection(serverName);
                 dbConn.openConnection();
+                System.out.println(messages.get("success.message.database"));
 
                 if (dbConn.getConnection() == null) {
                     throw new IllegalStateException("Falha ao abrir a conexão MariaDB.");
@@ -151,6 +208,7 @@ public class ProgramController {
                 transactionDAO = new TransactionMemoryDAO();
                 oracleDAO = new OracleMemoryDAO();
                 oracleController = new OracleController(oracleDAO);
+                System.out.println(messages.get("success.message.database"));
 
                 // Popula o banco de dados com dados fictícios de teste, caso esteja vazio.
                 DatabaseSeeder.seed(walletDAO, transactionDAO, oracleDAO, messages);
@@ -172,6 +230,8 @@ public class ProgramController {
         options.add(messages.get("mainMenu.wallet"));
         options.add(messages.get("mainMenu.transaction"));
         options.add(messages.get("mainMenu.reports"));
+        options.add(messages.get("mainMenu.language")); //Adicionar ao messages.properties
+        options.add(messages.get("mainMenu.database")); //Adicionar ao messages.properties
         options.add(messages.get("mainMenu.help"));
         return options;
     }
@@ -182,7 +242,7 @@ public class ProgramController {
         final Menu userMenu = new Menu(ConsoleScanner.getInstance(), messages);
         boolean    loop     = true;
 
-        openDatabase(serverName);
+        openDatabase(this.databaseSelector, serverName);
 
         while (loop)
         {
@@ -193,7 +253,10 @@ public class ProgramController {
                 case 1 -> actionWallet();
                 case 2 -> actionTransaction();
                 case 3 -> actionReports();
-                case 4 -> actionHelp();
+                case 4 -> actionLanguage();
+                case 5 -> actionDatabase();
+                case 6 -> actionHelp();
+
                 default -> loop = false;
             }
         }
