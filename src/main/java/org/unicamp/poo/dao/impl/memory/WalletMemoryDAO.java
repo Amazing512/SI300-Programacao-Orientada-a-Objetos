@@ -45,11 +45,11 @@ public final class WalletMemoryDAO implements WalletDAO {
 
     @Override
     public void update(Wallet updatedWallet) {
-        for (int i = 0; i < wallets.size(); i++) {
-            Wallet currentWallet = wallets.get(i);
+        for (int walletIndex = 0; walletIndex < wallets.size(); walletIndex++) {
+            Wallet currentWallet = wallets.get(walletIndex);
 
             if (currentWallet.getId().equals(updatedWallet.getId())) {
-                wallets.set(i, updatedWallet);
+                wallets.set(walletIndex, updatedWallet);
                 return;
             }
         }

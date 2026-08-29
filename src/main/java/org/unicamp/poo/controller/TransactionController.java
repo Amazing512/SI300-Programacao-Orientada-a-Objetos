@@ -39,12 +39,12 @@ public class TransactionController {
         List<Transaction> transactions = model.findByWalletId(walletId);
         double balance = 0.0;
 
-        for (Transaction t : transactions){
-            if (t.getOperationType() == OperationType.CASH_IN) {
-                balance += t.getQuantity();
+        for (Transaction transaction : transactions){
+            if (transaction.getOperationType() == OperationType.CASH_IN) {
+                balance += transaction.getQuantity();
             }
-            else if (t.getOperationType() == OperationType.CASH_OUT){
-                balance -= t.getQuantity();
+            else if (transaction.getOperationType() == OperationType.CASH_OUT){
+                balance -= transaction.getQuantity();
             }
         }
         return balance;

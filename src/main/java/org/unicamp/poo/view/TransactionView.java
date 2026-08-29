@@ -35,12 +35,12 @@ public class TransactionView {
         return new Transaction(id, new Date(), operationType, quantity);
     }
 
-    public void showErrorMessage(String s) {
-        System.out.println(RED + s + RESET);
+    public void showErrorMessage(String message) {
+        System.out.println(RED + message + RESET);
     }
 
-    public void showSuccessMessage(String s) {
-        System.out.println(GREEN + s + RESET);
+    public void showSuccessMessage(String message) {
+        System.out.println(GREEN + message + RESET);
     }
 
     public void displayDailyQuote(Oracle dailyQuote) {

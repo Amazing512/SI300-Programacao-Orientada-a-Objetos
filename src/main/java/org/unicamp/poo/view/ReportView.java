@@ -127,9 +127,9 @@ public class ReportView {
                           messages.get("report.wallet.history.table.value"));
         System.out.println("---------------------------------");
 
-        for (int i = 0; i < transactions.size(); i++) {
-            Transaction transaction = transactions.get(i);
-            double cashValue = cashValues.get(i);
+        for (int transactionIndex = 0; transactionIndex < transactions.size(); transactionIndex++) {
+            Transaction transaction = transactions.get(transactionIndex);
+            double cashValue = cashValues.get(transactionIndex);
             String typeLabel = transaction.getOperationType() == OperationType.CASH_IN ? messages.get("report.wallet.history.type.buy") : messages.get("report.wallet.history.type.sell");
             
             String valStr = transaction.getOperationType() == OperationType.CASH_IN ?
@@ -158,10 +158,10 @@ public class ReportView {
                           messages.get("report.wallet.gainLoss.table.netProfit"));
         System.out.println("-----------------------------------------------------------------");
 
-        for (int i = 0; i < wallets.size(); i++) {
-            Wallet wallet = wallets.get(i);
-            double coinBalance = coinBalances.get(i);
-            double gainLoss = financialGainLosses.get(i);
+        for (int walletIndex = 0; walletIndex < wallets.size(); walletIndex++) {
+            Wallet wallet = wallets.get(walletIndex);
+            double coinBalance = coinBalances.get(walletIndex);
+            double gainLoss = financialGainLosses.get(walletIndex);
 
             String gainLossStr = gainLoss < 0 ? 
                                  RED + String.format("R$ %.2f", gainLoss) + RESET : 
@@ -178,7 +178,7 @@ public class ReportView {
     }
 
     // Imprime uma mensagem de erro destacada na cor VERMELHA
-    public void showErrorMessage(String s) {
-        System.out.println(RED + s + RESET);
+    public void showErrorMessage(String message) {
+        System.out.println(RED + message + RESET);
     }
 }

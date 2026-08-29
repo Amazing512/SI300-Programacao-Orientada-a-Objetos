@@ -61,16 +61,16 @@ public final class TransactionDAOImplMariaDB implements TransactionDAO {
 
                 while (rs.next()) {
                     try {
-                        Transaction t = new Transaction(
+                        Transaction transaction = new Transaction(
                                 rs.getInt("IdCarteira"),
                                 rs.getDate("Data"),
                                 OperationType.fromCode(rs.getString("TipoOperacao").charAt(0)),
                                 rs.getDouble("Quantidade")
                         );
 
-                        t.setId(rs.getInt("IdMovimento"));
+                        transaction.setId(rs.getInt("IdMovimento"));
 
-                        list.add(t);
+                        list.add(transaction);
                     } catch (IllegalArgumentException exception) {
                         System.err.println(java.util.ResourceBundle.getBundle("messages").getString("database.transaction.map.error") + " " + exception.getMessage());
                     }

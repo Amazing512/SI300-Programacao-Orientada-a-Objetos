@@ -31,13 +31,13 @@ public class WalletView {
     }
 
     // Imprime uma mensagem de erro destacada
-    public void showErrorMessage(String s) {
-        System.out.println(RED + s + RESET);
+    public void showErrorMessage(String message) {
+        System.out.println(RED + message + RESET);
     }
 
     // Imprime uma mensagem de sucesso destacada
-    public void showSuccessMessage(String s) {
-        System.out.println(GREEN + s + RESET);
+    public void showSuccessMessage(String message) {
+        System.out.println(GREEN + message + RESET);
     }
 
     // Solicita ao usuário um ID de Carteira

@@ -48,12 +48,12 @@ public class ReportController {
         List<Transaction> transactions = transactionDAO.findByWalletId(walletId);
         double balance = 0.0;
 
-        for (Transaction t : transactions){
-            if (t.getOperationType() == OperationType.CASH_IN) {
-                balance += t.getQuantity(); // Incrementa o saldo na compra
+        for (Transaction transaction : transactions){
+            if (transaction.getOperationType() == OperationType.CASH_IN) {
+                balance += transaction.getQuantity(); // Incrementa o saldo na compra
             }
-            else if (t.getOperationType() == OperationType.CASH_OUT){
-                balance -= t.getQuantity(); // Decrementa o saldo na venda
+            else if (transaction.getOperationType() == OperationType.CASH_OUT){
+                balance -= transaction.getQuantity(); // Decrementa o saldo na venda
             }
         }
         return balance;
@@ -82,9 +82,9 @@ public class ReportController {
             todayPrice = todayQuote.getPrice();
         }
 
-        for (Transaction t : transactions) {
+        for (Transaction transaction : transactions) {
             double price;
-            Oracle quote = oracleController.findByDate(t.getOperationDate());
+            Oracle quote = oracleController.findByDate(transaction.getOperationDate());
 
             if (quote != null) {
                 price = quote.getPrice();
@@ -92,13 +92,13 @@ public class ReportController {
                 price = todayPrice;
             }
 
-            double value = t.getQuantity() * price;
+            double value = transaction.getQuantity() * price;
 
-            if (t.getOperationType() == OperationType.CASH_IN) {
-                totalCoinsBought += t.getQuantity();
+            if (transaction.getOperationType() == OperationType.CASH_IN) {
+                totalCoinsBought += transaction.getQuantity();
                 totalMoneySpent += value;
-            } else if (t.getOperationType() == OperationType.CASH_OUT) {
-                totalCoinsSold += t.getQuantity();
+            } else if (transaction.getOperationType() == OperationType.CASH_OUT) {
+                totalCoinsSold += transaction.getQuantity();
                 totalMoneyReceived += value;
             }
         }
@@ -188,13 +188,13 @@ public class ReportController {
             todayPrice = todayQuote.getPrice();
         }
 
-        for (Transaction t : transactions) {
+        for (Transaction transaction : transactions) {
             double price = todayPrice;
-            Oracle quote = oracleController.findByDate(t.getOperationDate());
+            Oracle quote = oracleController.findByDate(transaction.getOperationDate());
             if (quote != null) {
                 price = quote.getPrice();
             }
-            double value = t.getQuantity() * price;
+            double value = transaction.getQuantity() * price;
             cashValues.add(value);
         }
 
@@ -226,20 +226,20 @@ public class ReportController {
             double totalMoneySpent = 0.0;
             double totalMoneyReceived = 0.0;
 
-            for (Transaction t : transactions) {
+            for (Transaction transaction : transactions) {
                 double price = todayPrice;
-                Oracle quote = oracleController.findByDate(t.getOperationDate());
+                Oracle quote = oracleController.findByDate(transaction.getOperationDate());
                 if (quote != null) {
                     price = quote.getPrice();
                 }
 
-                double value = t.getQuantity() * price;
+                double value = transaction.getQuantity() * price;
 
-                if (t.getOperationType() == OperationType.CASH_IN) {
-                    totalCoinsBought += t.getQuantity();
+                if (transaction.getOperationType() == OperationType.CASH_IN) {
+                    totalCoinsBought += transaction.getQuantity();
                     totalMoneySpent += value;
-                } else if (t.getOperationType() == OperationType.CASH_OUT) {
-                    totalCoinsSold += t.getQuantity();
+                } else if (transaction.getOperationType() == OperationType.CASH_OUT) {
+                    totalCoinsSold += transaction.getQuantity();
                     totalMoneyReceived += value;
                 }
             }
