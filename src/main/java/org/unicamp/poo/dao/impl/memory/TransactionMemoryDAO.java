@@ -6,7 +6,7 @@ import org.unicamp.poo.model.Transaction;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TransactionMemoryDAO extends TransactionDAO {
+public final class TransactionMemoryDAO implements TransactionDAO {
 
     private static final List<Transaction> transactions = new ArrayList<>();
     private static int nextId = 1;

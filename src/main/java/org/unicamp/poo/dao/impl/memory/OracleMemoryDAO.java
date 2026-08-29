@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class OracleMemoryDAO extends OracleDAO {
+public final class OracleMemoryDAO implements OracleDAO {
 
     private static final List<Oracle> oracles = new ArrayList<>();
 

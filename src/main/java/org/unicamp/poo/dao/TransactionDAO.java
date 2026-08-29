@@ -4,9 +4,9 @@ import org.unicamp.poo.model.Transaction;
 
 import java.util.List;
 
-public abstract class TransactionDAO {
+public sealed interface TransactionDAO permits org.unicamp.poo.dao.impl.mariadb.TransactionDAOImplMariaDB,
+        org.unicamp.poo.dao.impl.memory.TransactionMemoryDAO {
+    Transaction create(Transaction transaction);
 
-    public abstract Transaction create(Transaction transaction);
-
-    public abstract List<Transaction> findByWalletId(int walletId);
+    List<Transaction> findByWalletId(int walletId);
 }

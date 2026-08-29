@@ -4,9 +4,10 @@ import org.unicamp.poo.model.Oracle;
 
 import java.util.Date;
 
-public abstract class OracleDAO {
+public sealed interface OracleDAO permits org.unicamp.poo.controller.OracleController,
+        org.unicamp.poo.dao.impl.mariadb.OracleMariaDBDAO,
+        org.unicamp.poo.dao.impl.memory.OracleMemoryDAO {
+    Oracle create(Oracle oracle);
 
-    public abstract Oracle create(Oracle oracle);
-
-    public abstract Oracle findByDate(Date date);
+    Oracle findByDate(Date date);
 }
