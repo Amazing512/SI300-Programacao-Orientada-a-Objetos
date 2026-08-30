@@ -1,17 +1,17 @@
 package org.unicamp.poo.model;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import org.unicamp.poo.model.enums.OperationType;
 
 public class Transaction {
     private Integer id;
     private final int walletId;
-    private final Date operationDate;
+    private final LocalDate operationDate;
     private final OperationType operationType;
     private final double quantity;
 
-    public Transaction(int walletId, Date operationDate, OperationType operationType, double quantity) {
+    public Transaction(int walletId, LocalDate operationDate, OperationType operationType, double quantity) {
         this.id = null; // Definido no banco
         this.walletId = walletId;
         this.operationDate = operationDate;
@@ -31,7 +31,7 @@ public class Transaction {
         return walletId;
     }
 
-    public Date getOperationDate() {
+    public LocalDate getOperationDate() {
         return operationDate;
     }
 

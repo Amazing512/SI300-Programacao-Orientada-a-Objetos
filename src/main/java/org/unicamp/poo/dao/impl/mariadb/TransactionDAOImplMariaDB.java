@@ -26,7 +26,7 @@ public final class TransactionDAOImplMariaDB implements TransactionDAO {
         try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             
              stmt.setInt(1, transaction.getWalletId());
-            stmt.setDate(2,new java.sql.Date(transaction.getOperationDate().getTime()));
+            stmt.setDate(2, java.sql.Date.valueOf(transaction.getOperationDate()));
             stmt.setString(3,String.valueOf(transaction.getOperationType().getCode()));
             stmt.setDouble(4,transaction.getQuantity());
             stmt.executeUpdate();
@@ -63,7 +63,7 @@ public final class TransactionDAOImplMariaDB implements TransactionDAO {
                     try {
                         Transaction transaction = new Transaction(
                                 rs.getInt("IdCarteira"),
-                                rs.getDate("Data"),
+                                rs.getDate("Data").toLocalDate(),
                                 OperationType.fromCode(rs.getString("TipoOperacao").charAt(0)),
                                 rs.getDouble("Quantidade")
                         );

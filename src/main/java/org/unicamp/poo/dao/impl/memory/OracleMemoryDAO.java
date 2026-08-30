@@ -4,7 +4,7 @@ import org.unicamp.poo.dao.OracleDAO;
 import org.unicamp.poo.model.Oracle;
 
 import java.util.ArrayList;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 public final class OracleMemoryDAO implements OracleDAO {
@@ -18,7 +18,7 @@ public final class OracleMemoryDAO implements OracleDAO {
     }
 
     @Override
-    public Oracle findByDate(Date date) {
+    public Oracle findByDate(LocalDate date) {
         for (Oracle oracle : oracles) {
             if (oracle.getDate().equals(date)) {
                 return oracle;

@@ -1,7 +1,8 @@
 package org.unicamp.poo.view;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 
 import org.unicamp.poo.model.Oracle;
 import org.unicamp.poo.model.Transaction;
@@ -14,7 +15,7 @@ import org.unicamp.poo.util.MessageProvider;
 
 // View responsável por lidar com interações referentes a transações.
 public class TransactionView {
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
+    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private final MessageProvider messages;
 
     public TransactionView(MessageProvider messages) {
@@ -32,7 +33,7 @@ public class TransactionView {
             }
             quantity = ConsoleScanner.readDouble(messages.get("transaction.view.prompt.positiveQuantity"), messages.get("generic.confirmInvalid"));
         }
-        return new Transaction(id, new Date(), operationType, quantity);
+        return new Transaction(id, LocalDate.now(), operationType, quantity);
     }
 
     public void showErrorMessage(String message) {

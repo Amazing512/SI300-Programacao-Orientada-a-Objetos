@@ -1,7 +1,6 @@
 package org.unicamp.poo.controller;
 
-import java.util.Calendar;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -22,7 +21,7 @@ public class OracleController implements OracleDAO {
     private final OracleDAO model;
     private final Random random;
 
-    private final Map<Date, Oracle> cache;
+    private final Map<LocalDate, Oracle> cache;
 
     public OracleController(OracleDAO model) {
         super();
@@ -31,15 +30,9 @@ public class OracleController implements OracleDAO {
         this.cache = new HashMap<>();
     }
 
-    // Remove a hora da data
-    private Date normalizeToDay(Date date) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-        return calendar.getTime();
+    // LocalDate já não contém horas, minutos ou segundos, então não precisa normalizar
+    private LocalDate normalizeToDay(LocalDate date) {
+        return date;
     }
 
     // Gera uma cotação aleatória dentro do intervalo definido para simulação.
@@ -49,7 +42,7 @@ public class OracleController implements OracleDAO {
 
     /* Pega a cotação diária ou gera uma aleatória se ainda não existir no banco */
     public Oracle getOrGenerateDailyQuote() {
-        Date today = normalizeToDay(new Date());
+        LocalDate today = normalizeToDay(LocalDate.now());
 
         if (cache.containsKey(today)) {
             return cache.get(today);
@@ -69,8 +62,8 @@ public class OracleController implements OracleDAO {
         return createdQuote;
     }
 
-    public Oracle findByDate(Date date) {
-        Date normalizedDate = normalizeToDay(date);
+    public Oracle findByDate(LocalDate date) {
+        LocalDate normalizedDate = normalizeToDay(date);
         if (cache.containsKey(normalizedDate)) {
             return cache.get(normalizedDate);
         }

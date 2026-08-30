@@ -1,7 +1,6 @@
 package org.unicamp.poo.util;
 
-import java.util.Calendar;
-import java.util.Date;
+import java.time.LocalDate;
 
 import org.unicamp.poo.dao.OracleDAO;
 import org.unicamp.poo.dao.TransactionDAO;
@@ -22,16 +21,6 @@ public final class DatabaseSeeder {
         // Construtor vazio e privado p/ evitar instanciação
     }
 
-    private static Date normalizeToDay(Date date) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-        return calendar.getTime();
-    }
-
     public static void seed(WalletDAO walletDAO, TransactionDAO transactionDAO, OracleDAO oracleDAO, MessageProvider messages) {
         // Só popula se não houver carteiras cadastradas para evitar duplicidade
         if (!walletDAO.findAll().isEmpty()) {
@@ -41,20 +30,11 @@ public final class DatabaseSeeder {
         System.out.println(GREEN + messages.get("seeder.start") + RESET);
 
         // 1. Definindo as datas relativas ao dia de hoje
-        Calendar cal = Calendar.getInstance();
-        Date today = normalizeToDay(cal.getTime());
-
-        cal.add(Calendar.DAY_OF_YEAR, -1);
-        Date yesterday = normalizeToDay(cal.getTime());
-
-        cal.add(Calendar.DAY_OF_YEAR, -1);
-        Date twoDaysAgo = normalizeToDay(cal.getTime());
-
-        cal.add(Calendar.DAY_OF_YEAR, -1);
-        Date threeDaysAgo = normalizeToDay(cal.getTime());
-
-        cal.add(Calendar.DAY_OF_YEAR, -1);
-        Date fourDaysAgo = normalizeToDay(cal.getTime());
+        LocalDate today = LocalDate.now();
+        LocalDate yesterday = today.minusDays(1);
+        LocalDate twoDaysAgo = today.minusDays(2);
+        LocalDate threeDaysAgo = today.minusDays(3);
+        LocalDate fourDaysAgo = today.minusDays(4);
 
         // 2. Criando cotações no Oráculo
         oracleDAO.create(new Oracle(today, 5.50));

@@ -1,7 +1,8 @@
 package org.unicamp.poo.controller;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
+
 import java.util.List;
 
 import org.unicamp.poo.dao.DatabaseConnection;
@@ -178,7 +179,7 @@ public class ProgramController {
             System.out.println("  - " + authorRole.getFormattedAuthors());
         }
         System.out.println();
-        System.out.println(messages.get("help.credits.accessDate") + " " + new Date());
+        System.out.println(messages.get("help.credits.accessDate") + " " + LocalDate.now());
     }
 
     private void openDatabase(DatabaseSelector selector, String serverName)

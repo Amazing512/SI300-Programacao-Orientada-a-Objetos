@@ -1,17 +1,17 @@
     package org.unicamp.poo.model;
 
-    import java.util.Date;
+import java.time.LocalDate;
 
     public class Oracle {
-        private final Date date;
+        private final LocalDate date;
         private final double price;
 
-        public Oracle(Date date, double price) {
+        public Oracle(LocalDate date, double price) {
             this.date = date;
             this.price = price;
         }
 
-        public Date getDate() {
+        public LocalDate getDate() {
             return date;
         }
 

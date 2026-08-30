@@ -1,7 +1,8 @@
 package org.unicamp.poo.controller;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
+
 import java.util.List;
 
 import org.unicamp.poo.dao.TransactionDAO;
@@ -126,7 +127,7 @@ public class TransactionController {
             return;
         }
 
-        Transaction newTransaction = new Transaction(walletId, new Date(), OperationType.CASH_OUT, quantity);
+        Transaction newTransaction = new Transaction(walletId, LocalDate.now(), OperationType.CASH_OUT, quantity);
 
         double totalValue = newTransaction.getQuantity() * dailyQuote.getPrice();
         String confirmMsg = messages.get("transaction.confirm.sell.part1") + " "
