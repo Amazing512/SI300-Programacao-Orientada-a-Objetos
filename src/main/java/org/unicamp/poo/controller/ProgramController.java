@@ -8,13 +8,13 @@ import org.unicamp.poo.dao.DatabaseConnection;
 import org.unicamp.poo.dao.OracleDAO;
 import org.unicamp.poo.dao.TransactionDAO;
 import org.unicamp.poo.dao.WalletDAO;
-import org.unicamp.poo.dao.MariaDBConnection;
+import org.unicamp.poo.dao.impl.mariadb.MariaDBConnection;
 import org.unicamp.poo.dao.impl.mariadb.OracleMariaDBDAO;
-import org.unicamp.poo.dao.TransactionDAOImplMariaDB;
-import org.unicamp.poo.dao.WalletDAOImplMariaDB;
+import org.unicamp.poo.dao.impl.mariadb.TransactionDAOImplMariaDB;
+import org.unicamp.poo.dao.impl.mariadb.WalletDAOImplMariaDB;
 import org.unicamp.poo.dao.impl.memory.OracleMemoryDAO ;
-import org.unicamp.poo.dao.TransactionMemoryDAO;
-import org.unicamp.poo.dao.WalletMemoryDAO;
+import org.unicamp.poo.dao.impl.memory.TransactionMemoryDAO;
+import org.unicamp.poo.dao.impl.memory.WalletMemoryDAO;
 import org.unicamp.poo.model.enums.DatabaseSelector;
 import static org.unicamp.poo.util.ConsoleColors.RESET;
 import static org.unicamp.poo.util.ConsoleColors.YELLOW;
@@ -230,8 +230,8 @@ public class ProgramController {
         options.add(messages.get("mainMenu.wallet"));
         options.add(messages.get("mainMenu.transaction"));
         options.add(messages.get("mainMenu.reports"));
-        options.add(messages.get("mainMenu.language")); //Adicionar ao messages.properties
-        options.add(messages.get("mainMenu.database")); //Adicionar ao messages.properties
+        options.add(messages.get("mainMenu.language"));
+        options.add(messages.get("mainMenu.database"));
         options.add(messages.get("mainMenu.help"));
         return options;
     }
