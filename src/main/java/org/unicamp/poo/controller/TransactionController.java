@@ -127,7 +127,8 @@ public class TransactionController {
             return;
         }
 
-        Transaction newTransaction = new Transaction(walletId, LocalDate.now(), OperationType.CASH_OUT, quantity);
+        LocalDate operationDate = view.readOperationDate();
+        Transaction newTransaction = new Transaction(walletId, operationDate, OperationType.CASH_OUT, quantity);
 
         double totalValue = newTransaction.getQuantity() * dailyQuote.getPrice();
         String confirmMsg = messages.get("transaction.confirm.sell.part1") + " "

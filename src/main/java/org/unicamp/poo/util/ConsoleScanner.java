@@ -1,5 +1,8 @@
 package org.unicamp.poo.util;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Scanner;
 
 public class ConsoleScanner {
@@ -69,6 +72,35 @@ public class ConsoleScanner {
                 return input;
             }
             System.out.println(ConsoleColors.RED + errorMessage + ConsoleColors.RESET);
+        }
+    }
+
+    public static LocalDate readLocalDate(String prompt, String errorMessage) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        while (true) {
+            System.out.print(prompt);
+            String input = scanner.nextLine().trim();
+            try {
+                return LocalDate.parse(input, formatter);
+            } catch (DateTimeParseException exception) {
+                System.out.println(ConsoleColors.RED + errorMessage + ConsoleColors.RESET);
+            }
+        }
+    }
+
+    public static LocalDate readLocalDateOrNow(String prompt, String errorMessage) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        while (true) {
+            System.out.print(prompt);
+            String input = scanner.nextLine().trim();
+            if (input.isEmpty()) {
+                return LocalDate.now();
+            }
+            try {
+                return LocalDate.parse(input, formatter);
+            } catch (DateTimeParseException exception) {
+                System.out.println(ConsoleColors.RED + errorMessage + ConsoleColors.RESET);
+            }
         }
     }
 }

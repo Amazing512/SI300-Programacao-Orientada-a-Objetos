@@ -33,7 +33,9 @@ public class TransactionView {
             }
             quantity = ConsoleScanner.readDouble(messages.get("transaction.view.prompt.positiveQuantity"), messages.get("generic.confirmInvalid"));
         }
-        return new Transaction(id, LocalDate.now(), operationType, quantity);
+
+        LocalDate operationDate = readOperationDate();
+        return new Transaction(id, operationDate, operationType, quantity);
     }
 
     public void showErrorMessage(String message) {
@@ -92,5 +94,12 @@ public class TransactionView {
                 default -> System.out.println(messages.get("generic.confirmInvalid"));
             }
         }
+    }
+
+    public LocalDate readOperationDate() {
+        return ConsoleScanner.readLocalDateOrNow(
+            messages.get("transaction.view.prompt.date"),
+            messages.get("generic.confirmInvalid")
+        );
     }
 }
