@@ -12,7 +12,7 @@ import org.unicamp.poo.model.Oracle;
  * Controller responsável por lidar com operações relacionadas ao Oráculo, que fornece a cotação diária da moeda virtual.
 */
 
-public class OracleController implements OracleDAO {
+public final class OracleController implements OracleDAO {
 
     // Range de preços simulado para a cotação diária da moeda virtual
     private static final double MIN_SIMULATED_PRICE = 1.0;
@@ -62,6 +62,12 @@ public class OracleController implements OracleDAO {
         return createdQuote;
     }
 
+    @Override
+    public Oracle create(Oracle oracle) {
+        return model.create(oracle);
+    }
+
+    @Override
     public Oracle findByDate(LocalDate date) {
         LocalDate normalizedDate = normalizeToDay(date);
         if (cache.containsKey(normalizedDate)) {
