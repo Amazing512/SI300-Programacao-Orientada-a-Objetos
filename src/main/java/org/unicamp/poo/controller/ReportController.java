@@ -59,6 +59,50 @@ public class ReportController {
         return balance;
     }
 
+    // Retorna a cotação do dia atual (gera uma nova caso ainda não exista).
+    private double getTodayPrice() {
+        Oracle todayQuote = oracleController.getOrGenerateDailyQuote();
+        return (todayQuote != null) ? todayQuote.getPrice() : 0.0;
+    }
+
+    // Uma linha do extrato: o estado da carteira logo após processar uma transação,
+    // apurado pelo método do custo médio (replica as colunas Custo Médio, Res. Oper.
+    // e Res. Acum. da planilha de referência).
+    private record LedgerRow(double price, double coinBalance, double averageCost, double operationResult, double accumulatedResult) {}
+
+    // Monta o extrato completo de uma carteira, transação a transação, na ordem informada
+    // (que já deve estar em ordem cronológica): o custo médio só é recalculado numa compra
+    // -- ponderando o custo médio anterior pelo saldo anterior com o valor da nova compra --
+    // e uma venda apura resultado como (quantidade vendida) * (preço de venda - custo médio
+    // vigente), sem alterar o custo médio.
+    private List<LedgerRow> buildWalletLedger(List<Transaction> sortedTransactions) {
+        double todayPrice = getTodayPrice();
+        double coinBalance = 0.0;
+        double averageCost = 0.0;
+        double accumulatedResult = 0.0;
+        List<LedgerRow> ledger = new ArrayList<>();
+
+        for (Transaction transaction : sortedTransactions) {
+            Oracle quote = oracleController.findByDate(transaction.getOperationDate());
+            double price = (quote != null) ? quote.getPrice() : todayPrice;
+            double operationResult = 0.0;
+
+            if (transaction.getOperationType() == OperationType.CASH_IN) {
+                double purchaseValue = transaction.getQuantity() * price;
+                averageCost = ((averageCost * coinBalance) + purchaseValue) / (coinBalance + transaction.getQuantity());
+                coinBalance += transaction.getQuantity();
+            } else if (transaction.getOperationType() == OperationType.CASH_OUT) {
+                operationResult = transaction.getQuantity() * (price - averageCost);
+                accumulatedResult += operationResult;
+                coinBalance -= transaction.getQuantity();
+            }
+
+            ledger.add(new LedgerRow(price, coinBalance, averageCost, operationResult, accumulatedResult));
+        }
+
+        return ledger;
+    }
+
     // Processa o fluxo de dados do relatório financeiro para uma carteira específica.
     public void showFinancialReport(){
         int walletId = view.readWalletIdReport();
@@ -201,58 +245,42 @@ public class ReportController {
         view.showWalletHistoryReport(wallet, transactions, cashValues);
     }
 
-    // Exibe o total de ganho ou perda de cada carteira.
+    // Exibe o extrato de uma carteira: cada transação com custo médio e resultado
+    // apurados pelo método do custo médio, mais um resumo final.
     private void showWalletGainOrLoss() {
-        List<Wallet> wallets = walletDAO.findAll();
+        int walletId = view.readWalletIdReport(messages.get("report.wallet.history.prompt"));
+        Wallet wallet = walletDAO.findById(walletId);
 
-        if (wallets == null || wallets.isEmpty()) {
-            view.showErrorMessage(messages.get("report.wallets.empty"));
+        if (wallet == null) {
+            view.showErrorMessage(messages.get("transaction.wallet.notFound"));
             return;
         }
 
-        double todayPrice = 0.0;
-        Oracle todayQuote = oracleController.getOrGenerateDailyQuote();
-        if (todayQuote != null) {
-            todayPrice = todayQuote.getPrice();
+        List<Transaction> transactions = new ArrayList<>(transactionDAO.findByWalletId(walletId));
+        transactions.sort(Comparator.comparing(Transaction::getOperationDate).thenComparing(Transaction::getId));
+
+        if (transactions.isEmpty()) {
+            view.showErrorMessage(messages.get("report.wallet.history.empty"));
+            return;
         }
 
+        List<LedgerRow> ledger = buildWalletLedger(transactions);
+
+        List<Double> prices = new ArrayList<>();
         List<Double> coinBalances = new ArrayList<>();
-        List<Double> financialGainLosses = new ArrayList<>();
+        List<Double> averageCosts = new ArrayList<>();
+        List<Double> operationResults = new ArrayList<>();
+        List<Double> accumulatedResults = new ArrayList<>();
 
-        for (Wallet wallet : wallets) {
-            List<Transaction> transactions = transactionDAO.findByWalletId(wallet.getId());
-            double totalCoinsBought = 0.0;
-            double totalCoinsSold = 0.0;
-            double totalMoneySpent = 0.0;
-            double totalMoneyReceived = 0.0;
-
-            for (Transaction transaction : transactions) {
-                double price = todayPrice;
-                Oracle quote = oracleController.findByDate(transaction.getOperationDate());
-                if (quote != null) {
-                    price = quote.getPrice();
-                }
-
-                double value = transaction.getQuantity() * price;
-
-                if (transaction.getOperationType() == OperationType.CASH_IN) {
-                    totalCoinsBought += transaction.getQuantity();
-                    totalMoneySpent += value;
-                } else if (transaction.getOperationType() == OperationType.CASH_OUT) {
-                    totalCoinsSold += transaction.getQuantity();
-                    totalMoneyReceived += value;
-                }
-            }
-
-            double coinBalance = totalCoinsBought - totalCoinsSold;
-            double currentHoldingsValue = coinBalance * todayPrice;
-            double totalFinancialGainLoss = (currentHoldingsValue + totalMoneyReceived) - totalMoneySpent;
-
-            coinBalances.add(coinBalance);
-            financialGainLosses.add(totalFinancialGainLoss);
+        for (LedgerRow row : ledger) {
+            prices.add(row.price());
+            coinBalances.add(row.coinBalance());
+            averageCosts.add(row.averageCost());
+            operationResults.add(row.operationResult());
+            accumulatedResults.add(row.accumulatedResult());
         }
 
-        view.showWalletGainLossReport(wallets, coinBalances, financialGainLosses);
+        view.showWalletGainLossReport(wallet, transactions, prices, coinBalances, averageCosts, operationResults, accumulatedResults);
     }
 
     // Gera a lista de opções de menu traduzidas para a seção de relatórios.

@@ -1,6 +1,6 @@
 package org.unicamp.poo.view;
 
-import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.unicamp.poo.model.Transaction;
@@ -19,7 +19,7 @@ public class ReportView {
     private final MessageProvider messages;
 
     // Formato de data usado para entrada e saída do Oráculo
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
+    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     // Construtor que fornece Injeção de Dependência para mensagens internacionalizadas
     public ReportView(MessageProvider messages) {
@@ -146,35 +146,84 @@ public class ReportView {
         System.out.println("---------------------------------");
     }
 
-    // Imprime o total de ganho ou perda de cada carteira com saldo de moedas e valor real.
-    public void showWalletGainLossReport(List<Wallet> wallets, List<Double> coinBalances, List<Double> financialGainLosses) {
-        System.out.println(YELLOW + "\n-----------------------------------------------------------------");
+    // Imprime o extrato de uma carteira: cada transação com preço, saldo, custo médio,
+    // resultado da operação e resultado acumulado, apurados pelo método do custo médio.
+    public void showWalletGainLossReport(
+        Wallet wallet,
+        List<Transaction> transactions,
+        List<Double> prices,
+        List<Double> coinBalances,
+        List<Double> averageCosts,
+        List<Double> operationResults,
+        List<Double> accumulatedResults
+    ) {
+        String separator = "------------------------------------------------------------------------------------------------------------------";
+
+        System.out.println(YELLOW + "\n" + separator);
         System.out.println(messages.get("report.wallet.gainLoss.title"));
-        System.out.println("-----------------------------------------------------------------" + RESET);
-        System.out.printf("%-10s | %-25s | %-15s | %-20s%n", 
-                          messages.get("report.wallet.gainLoss.table.id"), 
-                          messages.get("report.wallet.gainLoss.table.holder"), 
-                          messages.get("report.wallet.gainLoss.table.coinBalance"),
-                          messages.get("report.wallet.gainLoss.table.netProfit"));
-        System.out.println("-----------------------------------------------------------------");
+        System.out.println(separator + RESET);
+        System.out.println(messages.get("report.wallet.history.id") + " " + wallet.getId());
+        System.out.println(messages.get("report.wallet.history.holder") + " " + wallet.getHolder());
+        System.out.println(messages.get("report.wallet.history.broker") + " " + wallet.getBroker());
+        System.out.println(separator);
 
-        for (int walletIndex = 0; walletIndex < wallets.size(); walletIndex++) {
-            Wallet wallet = wallets.get(walletIndex);
-            double coinBalance = coinBalances.get(walletIndex);
-            double gainLoss = financialGainLosses.get(walletIndex);
+        System.out.printf("%-12s | %-8s | %-10s | %-10s | %-10s | %-14s | %-18s | %-18s%n",
+                          messages.get("report.wallet.history.table.date"),
+                          messages.get("report.wallet.history.table.type"),
+                          messages.get("report.wallet.history.table.quantity"),
+                          messages.get("report.wallet.gainLoss.table.price"),
+                          messages.get("report.wallet.gainLoss.table.balance"),
+                          messages.get("report.wallet.gainLoss.table.averageCost"),
+                          messages.get("report.wallet.gainLoss.table.operationResult"),
+                          messages.get("report.wallet.gainLoss.table.accumulatedResult"));
+        System.out.println(separator);
 
-            String gainLossStr = gainLoss < 0 ? 
-                                 RED + String.format("R$ %.2f", gainLoss) + RESET : 
-                                 GREEN + String.format("R$ %.2f", gainLoss) + RESET;
+        for (int index = 0; index < transactions.size(); index++) {
+    Transaction transaction = transactions.get(index);
+    String typeLabel = transaction.getOperationType() == OperationType.CASH_IN
+        ? messages.get("report.wallet.history.type.buy")
+        : messages.get("report.wallet.history.type.sell");
 
-            System.out.printf("%-10d | %-25s | %-15.4f | %s%n", 
-                              wallet.getId(), 
-                              wallet.getHolder(), 
-                              coinBalance, 
-                              gainLossStr);
+    double operationResult = operationResults.get(index);
+    double accumulatedResult = accumulatedResults.get(index);
+
+    // 1. Formata apenas os valores como texto puro primeiro (sem cores)
+    String rawOperation = String.format("R$ %.2f", operationResult);
+    String rawAccumulated = String.format("R$ %.2f", accumulatedResult);
+
+    // 2. Aplica o espaçamento (padding) exato exigido pelo cabeçalho (18 caracteres)
+    String paddedOperation = String.format("%-18s", rawOperation);
+    String paddedAccumulated = String.format("%-18s", rawAccumulated);
+
+    // 3. Aplica as cores no texto que já está perfeitamente espaçado
+    String operationStr = operationResult < 0 
+        ? RED + paddedOperation + RESET 
+        : GREEN + paddedOperation + RESET;
+    String accumulatedStr = accumulatedResult < 0 
+        ? RED + paddedAccumulated + RESET 
+        : GREEN + paddedAccumulated + RESET;
+
+    // 4. Imprime usando a correção da data e inserindo as strings já coloridas e espaçadas
+    System.out.printf("%-12s | %-8s | %-10.4f | %-10.4f | %-10.4f | %-14s | %s | %s%n",
+                      transaction.getOperationDate().format(DATE_FORMAT), // <-- Correção do erro de Data
+                      typeLabel,
+                      transaction.getQuantity(),
+                      prices.get(index),
+                      coinBalances.get(index),
+                      String.format("R$ %.4f", averageCosts.get(index)),
+                      operationStr,
+                      accumulatedStr);
+}
+        System.out.println(separator);
+
+        double finalResult = accumulatedResults.get(accumulatedResults.size() - 1);
+        System.out.print(messages.get("report.financial.gainLoss") + " ");
+        if (finalResult < 0) {
+            System.out.println(RED + String.format("R$ %.2f", finalResult) + RESET);
+        } else {
+            System.out.println(GREEN + String.format("R$ %.2f", finalResult) + RESET);
         }
-
-        System.out.println("-----------------------------------------------------------------");
+        System.out.println(separator);
     }
 
     // Imprime uma mensagem de erro destacada na cor VERMELHA
