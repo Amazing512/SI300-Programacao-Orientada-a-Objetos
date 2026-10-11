@@ -6,8 +6,11 @@ import org.unicamp.poo.dao.OracleDAO;
 import org.unicamp.poo.dao.TransactionDAO;
 import org.unicamp.poo.dao.WalletDAO;
 import org.unicamp.poo.model.Oracle;
+import org.unicamp.poo.model.OracleFactory;
 import org.unicamp.poo.model.Transaction;
+import org.unicamp.poo.model.TransactionFactory;
 import org.unicamp.poo.model.Wallet;
+import org.unicamp.poo.model.WalletFactory;
 import org.unicamp.poo.model.enums.OperationType;
 import static org.unicamp.poo.util.ConsoleColors.GREEN;
 import static org.unicamp.poo.util.ConsoleColors.RESET;
@@ -29,41 +32,41 @@ public final class DatabaseSeeder {
 
         System.out.println(GREEN + messages.get("seeder.start") + RESET);
 
-        // 1. Definindo as datas relativas ao dia de hoje
+        // Definindo as datas relativas ao dia de hoje
         LocalDate today = LocalDate.now();
         LocalDate yesterday = today.minusDays(1);
         LocalDate twoDaysAgo = today.minusDays(2);
         LocalDate threeDaysAgo = today.minusDays(3);
         LocalDate fourDaysAgo = today.minusDays(4);
 
-        // 2. Criando cotações no Oráculo
-        oracleDAO.create(new Oracle(today, 5.50));
-        oracleDAO.create(new Oracle(yesterday, 5.25));
-        oracleDAO.create(new Oracle(twoDaysAgo, 5.75));
-        oracleDAO.create(new Oracle(threeDaysAgo, 6.10));
-        oracleDAO.create(new Oracle(fourDaysAgo, 4.90));
+        // Criando cotações no Oráculo
+        oracleDAO.create(OracleFactory.create(today, 5.50));
+        oracleDAO.create(OracleFactory.create(yesterday, 5.25));
+        oracleDAO.create(OracleFactory.create(twoDaysAgo, 5.75));
+        oracleDAO.create(OracleFactory.create(threeDaysAgo, 6.10));
+        oracleDAO.create(OracleFactory.create(fourDaysAgo, 4.90));
 
-        // 3. Criando as carteiras (Wallets)
-        Wallet w1 = walletDAO.create(new Wallet("Alice Silva", "Binance"));
-        Wallet w2 = walletDAO.create(new Wallet("Bob Santos", "Coinbase"));
-        Wallet w3 = walletDAO.create(new Wallet("Carol Costa", "Mercado Bitcoin"));
+        // Criando as carteiras (Wallets)
+        Wallet w1 = walletDAO.create(WalletFactory.create("Alice Silva", "Binance"));
+        Wallet w2 = walletDAO.create(WalletFactory.create("Bob Santos", "Coinbase"));
+        Wallet w3 = walletDAO.create(WalletFactory.create("Carol Costa", "Mercado Bitcoin"));
 
-        // 4. Criando transações para as carteiras
+        // Criando transações para as carteiras
         if (w1 != null) {
-            transactionDAO.create(new Transaction(w1.getId(), threeDaysAgo, OperationType.CASH_IN, 10.0));
-            transactionDAO.create(new Transaction(w1.getId(), twoDaysAgo, OperationType.CASH_IN, 5.5));
-            transactionDAO.create(new Transaction(w1.getId(), yesterday, OperationType.CASH_OUT, 2.0));
+            transactionDAO.create(TransactionFactory.createBuy(w1.getId(), threeDaysAgo, 10.0));
+            transactionDAO.create(TransactionFactory.createBuy(w1.getId(), twoDaysAgo, 5.5));
+            transactionDAO.create(TransactionFactory.createSell(w1.getId(), yesterday, 2.0));
         }
 
         if (w2 != null) {
-            transactionDAO.create(new Transaction(w2.getId(), fourDaysAgo, OperationType.CASH_IN, 20.0));
-            transactionDAO.create(new Transaction(w2.getId(), twoDaysAgo, OperationType.CASH_OUT, 5.0));
-            transactionDAO.create(new Transaction(w2.getId(), yesterday, OperationType.CASH_OUT, 3.0));
+            transactionDAO.create(TransactionFactory.createBuy(w2.getId(), fourDaysAgo, 20.0));
+            transactionDAO.create(TransactionFactory.createSell(w2.getId(), twoDaysAgo, 5.0));
+            transactionDAO.create(TransactionFactory.createSell(w2.getId(), yesterday, 3.0));
         }
 
         if (w3 != null) {
-            transactionDAO.create(new Transaction(w3.getId(), yesterday, OperationType.CASH_IN, 15.0));
-            transactionDAO.create(new Transaction(w3.getId(), today, OperationType.CASH_IN, 5.0));
+            transactionDAO.create(TransactionFactory.createBuy(w3.getId(), yesterday, 15.0));
+            transactionDAO.create(TransactionFactory.createBuy(w3.getId(), today, 5.0));
         }
 
         System.out.println(GREEN + messages.get("seeder.success") + RESET);

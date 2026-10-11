@@ -9,6 +9,7 @@ import org.unicamp.poo.dao.TransactionDAO;
 import org.unicamp.poo.dao.WalletDAO;
 import org.unicamp.poo.model.Oracle;
 import org.unicamp.poo.model.Transaction;
+import org.unicamp.poo.model.TransactionFactory;
 import org.unicamp.poo.model.enums.OperationType;
 import static org.unicamp.poo.util.ConsoleColors.RESET;
 import static org.unicamp.poo.util.ConsoleColors.YELLOW;
@@ -17,7 +18,6 @@ import org.unicamp.poo.util.MessageProvider;
 import org.unicamp.poo.view.Menu;
 import org.unicamp.poo.view.TransactionView;
 
-// Controller responsável por lidar com operações de compra, venda e histórico de transações de moedas.
 public class TransactionController {
 
     final TransactionDAO model;
@@ -35,7 +35,7 @@ public class TransactionController {
         this.messages = messages;
     }
 
-    // Calcula o saldo atual de uma carteira com base em seu histórico de transações.
+    // Calculates the current balance of a wallet based on its transactions.
     private double calculateWalletBalance (int walletId){
         List<Transaction> transactions = model.findByWalletId(walletId);
         double balance = 0.0;
@@ -128,7 +128,7 @@ public class TransactionController {
         }
 
         LocalDate operationDate = view.readOperationDate();
-        Transaction newTransaction = new Transaction(walletId, operationDate, OperationType.CASH_OUT, quantity);
+        Transaction newTransaction = TransactionFactory.createSell(walletId, operationDate, quantity);
 
         double totalValue = newTransaction.getQuantity() * dailyQuote.getPrice();
         String confirmMsg = messages.get("transaction.confirm.sell.part1") + " "

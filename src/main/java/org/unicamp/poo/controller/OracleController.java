@@ -7,6 +7,7 @@ import java.util.Random;
 
 import org.unicamp.poo.dao.OracleDAO;
 import org.unicamp.poo.model.Oracle;
+import org.unicamp.poo.model.OracleFactory;
 
 /* 
  * Controller responsável por lidar com operações relacionadas ao Oráculo, que fornece a cotação diária da moeda virtual.
@@ -54,7 +55,7 @@ public final class OracleController implements OracleDAO {
             return existingQuote;
         }
 
-        Oracle simulatedQuote = new Oracle(today, generateSimulatedPrice());
+        Oracle simulatedQuote = OracleFactory.create(today, generateSimulatedPrice());
         Oracle createdQuote = model.create(simulatedQuote);
         if (createdQuote != null) {
             cache.put(today, createdQuote);

@@ -1,6 +1,7 @@
 package org.unicamp.poo.view;
 
 import org.unicamp.poo.model.Wallet;
+import org.unicamp.poo.model.WalletFactory;
 import static org.unicamp.poo.util.ConsoleColors.GREEN;
 import static org.unicamp.poo.util.ConsoleColors.RED;
 import static org.unicamp.poo.util.ConsoleColors.RESET;
@@ -27,7 +28,7 @@ public class WalletView {
                 messages.get("validation.required")
         );
 
-        return new Wallet(holder, broker);
+        return WalletFactory.create(holder, broker);
     }
 
     // Imprime uma mensagem de erro destacada
@@ -67,7 +68,7 @@ public class WalletView {
         );
 
         // Cria uma nova instância usando o mesmo ID da carteira editada
-        return new Wallet(editableWallet.getId(), holder, broker);
+        return WalletFactory.withUpdatedData(editableWallet.getId(), holder, broker);
     }
 
     // Solicita uma confirmação para executar ações de exclusão

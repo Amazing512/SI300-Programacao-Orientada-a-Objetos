@@ -6,6 +6,7 @@ import java.time.format.DateTimeFormatter;
 
 import org.unicamp.poo.model.Oracle;
 import org.unicamp.poo.model.Transaction;
+import org.unicamp.poo.model.TransactionFactory;
 import org.unicamp.poo.model.enums.OperationType;
 import static org.unicamp.poo.util.ConsoleColors.GREEN;
 import static org.unicamp.poo.util.ConsoleColors.RED;
@@ -35,7 +36,7 @@ public class TransactionView {
         }
 
         LocalDate operationDate = readOperationDate();
-        return new Transaction(id, operationDate, operationType, quantity);
+        return TransactionFactory.create(id, operationDate, operationType, quantity);
     }
 
     public void showErrorMessage(String message) {

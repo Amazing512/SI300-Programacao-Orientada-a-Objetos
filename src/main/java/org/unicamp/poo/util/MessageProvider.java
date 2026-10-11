@@ -12,6 +12,7 @@ public class MessageProvider {
 
     public void changeLanguage (String bundleFileName, String lang, String country){
         Locale newLocale = Locale.of(lang, country);
+        Locale.setDefault(newLocale);
         this.resourceBundle = ResourceBundle.getBundle(bundleFileName, newLocale);
     }
 
