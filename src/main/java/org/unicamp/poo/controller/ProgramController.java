@@ -184,11 +184,14 @@ public class ProgramController {
 
     private void openDatabase(DatabaseSelector selector, String serverName)
     {
+        closeDatabase();
+        this.databaseSelector = selector;
+
         OracleDAO oracleDAO;
 
-        switch (databaseSelector) {
+        switch (this.databaseSelector) {
             case MARIADB -> {
-                dbConn = new MariaDBConnection(serverName);
+                dbConn = MariaDBConnection.getInstance(serverName);
                 dbConn.openConnection();
                 System.out.println(messages.get("success.message.database"));
 

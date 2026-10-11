@@ -12,12 +12,14 @@ import java.util.Properties;
 import org.unicamp.poo.dao.DatabaseConnection;
 
 public final class MariaDBConnection implements DatabaseConnection {
+    private static MariaDBConnection instance = null;
+
     private String     user;
     private String     password;
     private String     url;
     private Connection connection = null;
 
-    public MariaDBConnection(String serverName)
+    private MariaDBConnection(String serverName)
     {
         final Properties props = new Properties();
         final Properties credentials = new Properties();
@@ -61,12 +63,39 @@ public final class MariaDBConnection implements DatabaseConnection {
         }
     }
 
+    public static synchronized MariaDBConnection getInstance(String serverName)
+    {
+        if (instance == null)
+        {
+            instance = new MariaDBConnection(serverName);
+        }
+        return instance;
+    }
+
+    public static synchronized MariaDBConnection getInstance()
+    {
+        if (instance == null)
+        {
+            instance = new MariaDBConnection("WindServer");
+        }
+        return instance;
+    }
+
+    public static synchronized void resetInstance()
+    {
+        if (instance != null)
+        {
+            instance.closeConnection();
+            instance = null;
+        }
+    }
+
     @Override
     public void closeConnection()
     {
         try
         {
-            if (connection != null)
+            if (connection != null && !connection.isClosed())
             {
                 connection.close();
             }
@@ -74,6 +103,10 @@ public final class MariaDBConnection implements DatabaseConnection {
         catch (final SQLException exceptionValue)
         {
             System.out.println(exceptionValue.getMessage());
+        }
+        finally
+        {
+            connection = null;
         }
     }
 
@@ -88,6 +121,10 @@ public final class MariaDBConnection implements DatabaseConnection {
     {
         try
         {
+            if (connection != null && !connection.isClosed())
+            {
+                return;
+            }
             if (connection != null)
             {
                 connection.close();
