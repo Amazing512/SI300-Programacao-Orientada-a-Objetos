@@ -1,6 +1,12 @@
 package org.unicamp.poo.view;
 
+import java.awt.HeadlessException;
+import java.awt.print.PrinterException;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.unicamp.poo.model.Transaction;
@@ -45,6 +51,20 @@ public class ReportView {
         double currentHoldingsValue,
         double totalFinancialGainLoss
     ) {
+        renderFinancialReport(walletId, totalCoinsBought, totalCoinsSold, coinBalance, totalMoneySpent, totalMoneyReceived, currentHoldingsValue, totalFinancialGainLoss);
+        offerPrint(messages.get("report.financial.title").trim(), false, () -> renderFinancialReport(walletId, totalCoinsBought, totalCoinsSold, coinBalance, totalMoneySpent, totalMoneyReceived, currentHoldingsValue, totalFinancialGainLoss));
+    }
+
+    private void renderFinancialReport(
+        int walletId,
+        double totalCoinsBought,
+        double totalCoinsSold,
+        double coinBalance,
+        double totalMoneySpent,
+        double totalMoneyReceived,
+        double currentHoldingsValue,
+        double totalFinancialGainLoss
+    ) {
         System.out.println(YELLOW + "\n----------------------------------");
         System.out.println(messages.get("report.financial.title"));
         System.out.println("----------------------------------"  + RESET);
@@ -69,6 +89,11 @@ public class ReportView {
 
     // Imprime carteiras ordenadas pelo identificador.
     public void showWalletsOrderedByIdReport(List<Wallet> wallets) {
+        renderWalletsOrderedByIdReport(wallets);
+        offerPrint(messages.get("report.wallets.byId.title").trim(), false, () -> renderWalletsOrderedByIdReport(wallets));
+    }
+
+    private void renderWalletsOrderedByIdReport(List<Wallet> wallets) {
         System.out.println(YELLOW + "\n---------------------------------");
         System.out.println(messages.get("report.wallets.byId.title"));
         System.out.println("---------------------------------" + RESET);
@@ -85,6 +110,11 @@ public class ReportView {
 
     // Imprime carteiras ordenadas alfabeticamente pelo nome do titular.
     public void showWalletsOrderedByHolderReport(List<Wallet> wallets) {
+        renderWalletsOrderedByHolderReport(wallets);
+        offerPrint(messages.get("report.wallets.byHolder.title").trim(), false, () -> renderWalletsOrderedByHolderReport(wallets));
+    }
+
+    private void renderWalletsOrderedByHolderReport(List<Wallet> wallets) {
         System.out.println(YELLOW + "\n---------------------------------");
         System.out.println(messages.get("report.wallets.byHolder.title"));
         System.out.println("---------------------------------" + RESET);
@@ -101,6 +131,11 @@ public class ReportView {
 
     // Imprime o saldo atual de uma única carteira.
     public void showWalletCurrentBalanceReport(Wallet wallet, double balance) {
+        renderWalletCurrentBalanceReport(wallet, balance);
+        offerPrint(messages.get("report.wallet.currentBalance.title").trim(), false, () -> renderWalletCurrentBalanceReport(wallet, balance));
+    }
+
+    private void renderWalletCurrentBalanceReport(Wallet wallet, double balance) {
         System.out.println(YELLOW + "\n---------------------------------");
         System.out.println(messages.get("report.wallet.currentBalance.title"));
         System.out.println("---------------------------------" + RESET);
@@ -113,6 +148,11 @@ public class ReportView {
 
     // Imprime o histórico de transações de uma única carteira.
     public void showWalletHistoryReport(Wallet wallet, List<Transaction> transactions, List<Double> cashValues) {
+        renderWalletHistoryReport(wallet, transactions, cashValues);
+        offerPrint(messages.get("report.wallet.history.title").trim(), false, () -> renderWalletHistoryReport(wallet, transactions, cashValues));
+    }
+
+    private void renderWalletHistoryReport(Wallet wallet, List<Transaction> transactions, List<Double> cashValues) {
         System.out.println(YELLOW + "\n---------------------------------");
         System.out.println(messages.get("report.wallet.history.title"));
         System.out.println("---------------------------------" + RESET);
@@ -149,6 +189,19 @@ public class ReportView {
     // Imprime o extrato de uma carteira: cada transação com preço, saldo, custo médio,
     // resultado da operação e resultado acumulado, apurados pelo método do custo médio.
     public void showWalletGainLossReport(
+        Wallet wallet,
+        List<Transaction> transactions,
+        List<Double> prices,
+        List<Double> coinBalances,
+        List<Double> averageCosts,
+        List<Double> operationResults,
+        List<Double> accumulatedResults
+    ) {
+        renderWalletGainLossReport(wallet, transactions, prices, coinBalances, averageCosts, operationResults, accumulatedResults);
+        offerPrint(messages.get("report.wallet.gainLoss.title").trim(), true, () -> renderWalletGainLossReport(wallet, transactions, prices, coinBalances, averageCosts, operationResults, accumulatedResults));
+    }
+
+    private void renderWalletGainLossReport(
         Wallet wallet,
         List<Transaction> transactions,
         List<Double> prices,
@@ -224,6 +277,70 @@ public class ReportView {
             System.out.println(GREEN + String.format("R$ %.2f", finalResult) + RESET);
         }
         System.out.println(separator);
+    }
+
+    // Pergunta se o usuário quer imprimir o relatório que acabou de aparecer na tela.
+    // "render" é a receita que desenha o relatório: ela já existe (é o que mostra na tela),
+    // então a reaproveitamos para gerar as linhas que vão para o papel.
+    private void offerPrint(String jobName, boolean landscape, Runnable render) {
+        if (!askToPrint()) {
+            return;
+        }
+
+        List<String> lines = captureLines(render);
+
+        try {
+            boolean printed = new ReportPrinter(jobName, lines, landscape).print();
+            System.out.println(printed ? messages.get("report.print.sent") : messages.get("report.print.cancelled"));
+        } catch (PrinterException | HeadlessException exception) {
+            String detail = (exception.getMessage() == null) ? "" : " " + exception.getMessage();
+            showErrorMessage(messages.get("report.print.error") + detail);
+        }
+    }
+
+    // Pergunta "Deseja imprimir?" com as opções 1 (Sim) e 2 (Não), igual aos outros menus do projeto.
+    private boolean askToPrint() {
+        while (true) {
+            System.out.println(messages.get("report.print.prompt"));
+            System.out.println("1 - " + messages.get("generic.confirmYes"));
+            System.out.println("2 - " + messages.get("generic.confirmNo"));
+
+            Integer option = ConsoleScanner.readIntOrNull();
+            if (option != null && option == 1) {
+                return true;
+            }
+            if (option != null && option == 2) {
+                return false;
+            }
+            System.out.println(messages.get("generic.confirmInvalid"));
+        }
+    }
+
+    // Executa o relatório "em silêncio": em vez de aparecer na tela, o texto é guardado na memória.
+    // Depois tira as cores (que só servem para o console) e devolve o texto linha por linha.
+    private List<String> captureLines(Runnable render) {
+        PrintStream originalOut = System.out;
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+
+        try {
+            System.setOut(new PrintStream(buffer, true, StandardCharsets.UTF_8));
+            render.run();
+        } finally {
+            System.setOut(originalOut); // sempre devolve a tela ao normal, mesmo se der erro
+        }
+
+        String text = buffer.toString(StandardCharsets.UTF_8).replaceAll("\\u001B\\[[0-9;]*m", "");
+        List<String> lines = new ArrayList<>(text.lines().toList());
+
+        // Remove linhas em branco do começo e do fim
+        while (!lines.isEmpty() && lines.get(0).isBlank()) {
+            lines.remove(0);
+        }
+        while (!lines.isEmpty() && lines.get(lines.size() - 1).isBlank()) {
+            lines.remove(lines.size() - 1);
+        }
+
+        return lines;
     }
 
     // Imprime uma mensagem de erro destacada na cor VERMELHA
