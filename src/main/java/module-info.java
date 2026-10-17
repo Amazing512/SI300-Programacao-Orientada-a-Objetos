@@ -1,4 +1,5 @@
 module org.unicamp.poo {
+    requires java.desktop;
     requires java.sql;
     requires org.mariadb.jdbc;
 
