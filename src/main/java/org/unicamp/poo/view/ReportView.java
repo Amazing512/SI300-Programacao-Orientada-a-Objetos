@@ -19,15 +19,12 @@ import static org.unicamp.poo.util.ConsoleColors.YELLOW;
 import org.unicamp.poo.util.ConsoleScanner;
 import org.unicamp.poo.util.MessageProvider;
 
-/* View responsável por interagir com o usuário e formatar layouts para relatórios financeiros. */
 public class ReportView {
 
     private final MessageProvider messages;
 
-    // Formato de data usado para entrada e saída do Oráculo
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    // Construtor que fornece Injeção de Dependência para mensagens internacionalizadas
     public ReportView(MessageProvider messages) {
         this.messages = messages;
     }
@@ -40,7 +37,6 @@ public class ReportView {
         return ConsoleScanner.readInt(prompt, messages.get("generic.confirmInvalid"));
     }
 
-    // Renderiza um bloco de painel financeiro mostrando métricas e valores líquidos.
     public void showFinancialReport(
         int walletId,
         double totalCoinsBought,
@@ -87,7 +83,6 @@ public class ReportView {
         System.out.println("----------------------------------");
     }
 
-    // Imprime carteiras ordenadas pelo identificador.
     public void showWalletsOrderedByIdReport(List<Wallet> wallets) {
         renderWalletsOrderedByIdReport(wallets);
         offerPrint(messages.get("report.wallets.byId.title").trim(), false, () -> renderWalletsOrderedByIdReport(wallets));
@@ -108,7 +103,6 @@ public class ReportView {
         System.out.println("---------------------------------");
     }
 
-    // Imprime carteiras ordenadas alfabeticamente pelo nome do titular.
     public void showWalletsOrderedByHolderReport(List<Wallet> wallets) {
         renderWalletsOrderedByHolderReport(wallets);
         offerPrint(messages.get("report.wallets.byHolder.title").trim(), false, () -> renderWalletsOrderedByHolderReport(wallets));
@@ -129,7 +123,6 @@ public class ReportView {
         System.out.println("---------------------------------");
     }
 
-    // Imprime o saldo atual de uma única carteira.
     public void showWalletCurrentBalanceReport(Wallet wallet, double balance) {
         renderWalletCurrentBalanceReport(wallet, balance);
         offerPrint(messages.get("report.wallet.currentBalance.title").trim(), false, () -> renderWalletCurrentBalanceReport(wallet, balance));
@@ -146,7 +139,6 @@ public class ReportView {
         System.out.println("---------------------------------");
     }
 
-    // Imprime o histórico de transações de uma única carteira.
     public void showWalletHistoryReport(Wallet wallet, List<Transaction> transactions, List<Double> cashValues) {
         renderWalletHistoryReport(wallet, transactions, cashValues);
         offerPrint(messages.get("report.wallet.history.title").trim(), false, () -> renderWalletHistoryReport(wallet, transactions, cashValues));
@@ -186,8 +178,6 @@ public class ReportView {
         System.out.println("---------------------------------");
     }
 
-    // Imprime o extrato de uma carteira: cada transação com preço, saldo, custo médio,
-    // resultado da operação e resultado acumulado, apurados pelo método do custo médio.
     public void showWalletGainLossReport(
         Wallet wallet,
         List<Transaction> transactions,
@@ -240,15 +230,12 @@ public class ReportView {
     double operationResult = operationResults.get(index);
     double accumulatedResult = accumulatedResults.get(index);
 
-    // 1. Formata apenas os valores como texto puro primeiro (sem cores)
     String rawOperation = String.format("R$ %.2f", operationResult);
     String rawAccumulated = String.format("R$ %.2f", accumulatedResult);
 
-    // 2. Aplica o espaçamento (padding) exato exigido pelo cabeçalho (18 caracteres)
     String paddedOperation = String.format("%-18s", rawOperation);
     String paddedAccumulated = String.format("%-18s", rawAccumulated);
 
-    // 3. Aplica as cores no texto que já está perfeitamente espaçado
     String operationStr = operationResult < 0 
         ? RED + paddedOperation + RESET 
         : GREEN + paddedOperation + RESET;
@@ -256,9 +243,8 @@ public class ReportView {
         ? RED + paddedAccumulated + RESET 
         : GREEN + paddedAccumulated + RESET;
 
-    // 4. Imprime usando a correção da data e inserindo as strings já coloridas e espaçadas
     System.out.printf("%-12s | %-8s | %-10.4f | %-10.4f | %-10.4f | %-14s | %s | %s%n",
-                      transaction.getOperationDate().format(DATE_FORMAT), // <-- Correção do erro de Data
+                      transaction.getOperationDate().format(DATE_FORMAT),
                       typeLabel,
                       transaction.getQuantity(),
                       prices.get(index),
@@ -279,9 +265,6 @@ public class ReportView {
         System.out.println(separator);
     }
 
-    // Pergunta se o usuário quer imprimir o relatório que acabou de aparecer na tela.
-    // "render" é a receita que desenha o relatório: ela já existe (é o que mostra na tela),
-    // então a reaproveitamos para gerar as linhas que vão para o papel.
     private void offerPrint(String jobName, boolean landscape, Runnable render) {
         if (!askToPrint()) {
             return;
@@ -298,7 +281,6 @@ public class ReportView {
         }
     }
 
-    // Pergunta "Deseja imprimir?" com as opções 1 (Sim) e 2 (Não), igual aos outros menus do projeto.
     private boolean askToPrint() {
         while (true) {
             System.out.println(messages.get("report.print.prompt"));
@@ -316,8 +298,6 @@ public class ReportView {
         }
     }
 
-    // Executa o relatório "em silêncio": em vez de aparecer na tela, o texto é guardado na memória.
-    // Depois tira as cores (que só servem para o console) e devolve o texto linha por linha.
     private List<String> captureLines(Runnable render) {
         PrintStream originalOut = System.out;
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
@@ -326,13 +306,12 @@ public class ReportView {
             System.setOut(new PrintStream(buffer, true, StandardCharsets.UTF_8));
             render.run();
         } finally {
-            System.setOut(originalOut); // sempre devolve a tela ao normal, mesmo se der erro
+            System.setOut(originalOut); 
         }
 
         String text = buffer.toString(StandardCharsets.UTF_8).replaceAll("\\u001B\\[[0-9;]*m", "");
         List<String> lines = new ArrayList<>(text.lines().toList());
 
-        // Remove linhas em branco do começo e do fim
         while (!lines.isEmpty() && lines.get(0).isBlank()) {
             lines.remove(0);
         }
@@ -343,7 +322,6 @@ public class ReportView {
         return lines;
     }
 
-    // Imprime uma mensagem de erro destacada na cor VERMELHA
     public void showErrorMessage(String message) {
         System.out.println(RED + message + RESET);
     }
