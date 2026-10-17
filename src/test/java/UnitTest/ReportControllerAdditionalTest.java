@@ -72,26 +72,31 @@ class ReportControllerAdditionalTest {
     }
 
     @Test
-    void calculatesGainLossForEachWallet() throws Exception {
+    void calculatesGainLossForSelectedWallet() throws Exception {
         WalletMemoryDAO wallets = new WalletMemoryDAO();
         Wallet profitable = wallets.create(new Wallet("UnitTest-Gain", "Broker"));
-        Wallet neutral = wallets.create(new Wallet("UnitTest-Neutral", "Broker"));
         TransactionMemoryDAO transactions = new TransactionMemoryDAO();
-        transactions.create(new Transaction(profitable.getId(), LocalDate.now(), OperationType.CASH_IN, 2.0));
-        transactions.create(new Transaction(neutral.getId(), LocalDate.now(), OperationType.CASH_IN, 1.0));
+        LocalDate purchaseDate = LocalDate.of(2026, 6, 1);
+        LocalDate saleDate = LocalDate.of(2026, 6, 2);
+        transactions.create(new Transaction(profitable.getId(), purchaseDate, OperationType.CASH_IN, 2.0));
+        transactions.create(new Transaction(profitable.getId(), saleDate, OperationType.CASH_OUT, 1.0));
         OracleMemoryDAO oracles = new OracleMemoryDAO();
         if (oracles.findByDate(LocalDate.now()) == null) {
             oracles.create(new Oracle(LocalDate.now(), 8.0));
         }
-        CapturingReportView view = new CapturingReportView(0);
+        oracles.create(new Oracle(purchaseDate, 5.0));
+        oracles.create(new Oracle(saleDate, 8.0));
+        CapturingReportView view = new CapturingReportView(profitable.getId());
 
         invoke(controller(wallets, transactions, oracles, view), "showWalletGainOrLoss");
 
-        int profitableIndex = indexOf(view.gainLossWallets, profitable);
-        int neutralIndex = indexOf(view.gainLossWallets, neutral);
-        assertEquals(2.0, view.coinBalances.get(profitableIndex));
-        assertEquals(0.0, view.financialGainLosses.get(profitableIndex));
-        assertEquals(1.0, view.coinBalances.get(neutralIndex));
+        assertEquals(profitable, view.gainLossWallet);
+        assertEquals(2, view.gainLossTransactions.size());
+        assertEquals(List.of(5.0, 8.0), view.prices);
+        assertEquals(List.of(2.0, 1.0), view.coinBalances);
+        assertEquals(List.of(5.0, 5.0), view.averageCosts);
+        assertEquals(List.of(0.0, 3.0), view.operationResults);
+        assertEquals(List.of(0.0, 3.0), view.accumulatedResults);
     }
 
     private static ReportController controller(WalletMemoryDAO wallets, TransactionMemoryDAO transactions,
@@ -119,11 +124,15 @@ class ReportControllerAdditionalTest {
         private final int walletId;
         private List<Wallet> walletsById = List.of();
         private List<Wallet> walletsByHolder = List.of();
-        private List<Wallet> gainLossWallets = List.of();
+        private Wallet gainLossWallet;
+        private List<Transaction> gainLossTransactions = List.of();
+        private List<Double> prices = List.of();
         private List<Transaction> history = List.of();
         private List<Double> cashValues = List.of();
         private List<Double> coinBalances = List.of();
-        private List<Double> financialGainLosses = List.of();
+        private List<Double> averageCosts = List.of();
+        private List<Double> operationResults = List.of();
+        private List<Double> accumulatedResults = List.of();
         private double balance;
 
         CapturingReportView(int walletId) {
@@ -139,10 +148,16 @@ class ReportControllerAdditionalTest {
             history = List.copyOf(transactions);
             cashValues = List.copyOf(values);
         }
-        @Override public void showWalletGainLossReport(List<Wallet> wallets, List<Double> balances, List<Double> gains) {
-            gainLossWallets = List.copyOf(wallets);
-            coinBalances = List.copyOf(balances);
-            financialGainLosses = List.copyOf(gains);
+        @Override public void showWalletGainLossReport(Wallet wallet, List<Transaction> transactions,
+                List<Double> prices, List<Double> coinBalances, List<Double> averageCosts,
+                List<Double> operationResults, List<Double> accumulatedResults) {
+            gainLossWallet = wallet;
+            gainLossTransactions = List.copyOf(transactions);
+            this.prices = List.copyOf(prices);
+            this.coinBalances = List.copyOf(coinBalances);
+            this.averageCosts = List.copyOf(averageCosts);
+            this.operationResults = List.copyOf(operationResults);
+            this.accumulatedResults = List.copyOf(accumulatedResults);
         }
         @Override public void showErrorMessage(String message) { }
     }
