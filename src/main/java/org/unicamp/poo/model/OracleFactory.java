@@ -1,6 +1,7 @@
 package org.unicamp.poo.model;
 
 import java.time.LocalDate;
+import java.util.ResourceBundle;
 
 public final class OracleFactory {
 
