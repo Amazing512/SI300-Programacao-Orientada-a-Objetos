@@ -1,19 +1,17 @@
 package org.unicamp.poo.util;
 
+import static org.unicamp.poo.util.ConsoleColors.GREEN;
+import static org.unicamp.poo.util.ConsoleColors.RESET;
+
 import java.time.LocalDate;
 
 import org.unicamp.poo.dao.OracleDAO;
 import org.unicamp.poo.dao.TransactionDAO;
 import org.unicamp.poo.dao.WalletDAO;
-import org.unicamp.poo.model.Oracle;
 import org.unicamp.poo.model.OracleFactory;
-import org.unicamp.poo.model.Transaction;
 import org.unicamp.poo.model.TransactionFactory;
 import org.unicamp.poo.model.Wallet;
 import org.unicamp.poo.model.WalletFactory;
-import org.unicamp.poo.model.enums.OperationType;
-import static org.unicamp.poo.util.ConsoleColors.GREEN;
-import static org.unicamp.poo.util.ConsoleColors.RESET;
 
 /**
  * Utilitário para popular o banco de dados (em memória ou físico) com dados fictícios para teste.

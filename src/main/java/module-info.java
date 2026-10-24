@@ -1,6 +1,6 @@
 module org.unicamp.poo {
-    requires java.desktop;
-    requires java.sql;
+    requires transitive java.desktop;
+    requires transitive java.sql;
     requires org.mariadb.jdbc;
 
     exports org.unicamp.poo.controller;
