@@ -130,7 +130,6 @@ public final class MariaDBConnection implements DatabaseConnection {
                 connection.close();
             }
             System.out.println("URL = " + url);
-            System.out.println("USER = " + user);
             connection = DriverManager.getConnection(url, user, password);
         }
         catch (final SQLException exceptionValue)

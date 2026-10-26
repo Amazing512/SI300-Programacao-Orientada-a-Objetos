@@ -83,6 +83,27 @@ class MariaDBDaoTest {
     }
 
     @Test
+    void skipsTransactionsWithNullRequiredColumns() {
+        Map<String, Object> nullDate = new HashMap<>(Map.of(
+                "IdCarteira", 12, "TipoOperacao", "C", "Quantidade", 3.5, "IdMovimento", 91));
+        nullDate.put("Data", null);
+
+        Map<String, Object> nullOperationType = new HashMap<>(Map.of(
+                "IdCarteira", 12, "Data", Date.valueOf(LocalDate.of(2026, 10, 1)),
+                "Quantidade", 3.5, "IdMovimento", 92));
+        nullOperationType.put("TipoOperacao", null);
+
+        Map<String, Object> nullQuantity = new HashMap<>(Map.of(
+                "IdCarteira", 12, "Data", Date.valueOf(LocalDate.of(2026, 10, 1)),
+                "TipoOperacao", "C", "IdMovimento", 93));
+        nullQuantity.put("Quantidade", null);
+
+        JdbcFixture jdbc = new JdbcFixture(List.of(nullDate, nullOperationType, nullQuantity), null, false);
+
+        assertTrue(new TransactionDAOImplMariaDB(jdbc.connection).findByWalletId(12).isEmpty());
+    }
+
+    @Test
     void createsTransactionAndAssignsGeneratedId() {
         JdbcFixture jdbc = new JdbcFixture(List.of(), 31, false);
         Transaction transaction = new Transaction(5, LocalDate.of(2026, 10, 2), OperationType.CASH_OUT, 2.25);
@@ -164,7 +185,7 @@ class MariaDBDaoTest {
             int[] index = {-1};
             InvocationHandler handler = (proxy, method, arguments) -> switch (method.getName()) {
                 case "next" -> ++index[0] < rows.size();
-                case "getInt", "getDouble", "getString", "getDate" -> {
+                case "getInt", "getDouble", "getString", "getDate", "getObject" -> {
                     Object key = arguments[0];
                     Object value = rows.get(index[0]).get(String.valueOf(key));
                     yield value;

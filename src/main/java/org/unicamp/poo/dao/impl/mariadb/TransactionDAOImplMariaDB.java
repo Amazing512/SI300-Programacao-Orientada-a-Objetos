@@ -61,11 +61,22 @@ public final class TransactionDAOImplMariaDB implements TransactionDAO {
 
                 while (rs.next()) {
                     try {
+                        java.sql.Date operationDate = rs.getDate("Data");
+                        String operationTypeCode = rs.getString("TipoOperacao");
+                        Object quantityValue = rs.getObject("Quantidade");
+
+                        if (operationDate == null || operationTypeCode == null
+                                || operationTypeCode.length() != 1 || !(quantityValue instanceof Number quantity)) {
+                            System.err.println(java.util.ResourceBundle.getBundle("messages")
+                                    .getString("database.transaction.map.null"));
+                            continue;
+                        }
+
                         Transaction transaction = new Transaction(
                                 rs.getInt("IdCarteira"),
-                                rs.getDate("Data").toLocalDate(),
-                                OperationType.fromCode(rs.getString("TipoOperacao").charAt(0)),
-                                rs.getDouble("Quantidade")
+                                operationDate.toLocalDate(),
+                                OperationType.fromCode(operationTypeCode.charAt(0)),
+                                quantity.doubleValue()
                         );
 
                         transaction.setId(rs.getInt("IdMovimento"));
