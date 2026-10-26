@@ -39,15 +39,15 @@ class WalletMemoryDAOTest {
         List<Wallet> all = dao.findAll();
         all.clear();
 
+        List<Wallet> ordered = dao.findAllOrderByHolder().stream()
+                .filter(wallet -> wallet.getHolder().startsWith("UnitTest-"))
+                .toList();
+
         assertEquals(2, dao.findAll().stream()
                 .filter(wallet -> wallet.getHolder().startsWith("UnitTest-"))
                 .count());
-        assertEquals(alpha, dao.findAllOrderByHolder().stream()
-                .filter(wallet -> wallet.getHolder().startsWith("UnitTest-"))
-                .findFirst().orElseThrow());
-        assertEquals(zulu, dao.findAllOrderByHolder().stream()
-                .filter(wallet -> wallet.getHolder().startsWith("UnitTest-"))
-                .reduce((first, second) -> second).orElseThrow());
+        assertEquals(alpha, ordered.get(0));
+        assertEquals(zulu, ordered.get(1));
     }
 
     @Test
