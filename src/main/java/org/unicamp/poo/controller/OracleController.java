@@ -7,7 +7,7 @@ import java.util.Random;
 
 import org.unicamp.poo.dao.OracleDAO;
 import org.unicamp.poo.model.Oracle;
-import org.unicamp.poo.model.OracleFactory;
+import org.unicamp.poo.model.OraclePriceFactory;
 import org.unicamp.poo.util.DailyCache;
 
 /* 
@@ -52,7 +52,7 @@ public final class OracleController implements OracleDAO {
     /**
      * Retorna a cotação do dia atual usando o DailyCache.
      * Se o cache de hoje estiver vazio ou expirado, busca no banco.
-     * Se não existir no banco, gera uma cotação simulada via OracleFactory e a persiste.
+     * Se não existir no banco, gera uma cotação simulada via OraclePriceFactory e a persiste.
      */
     public Oracle getOrGenerateDailyQuote() {
         // 1. Verifica o cache do dia — retorna imediatamente se válido
@@ -69,8 +69,8 @@ public final class OracleController implements OracleDAO {
             return existing;
         }
 
-        // 3. Não existe no banco: usa OracleFactory para criar (com validação), persiste e guarda no cache
-        Oracle simulatedQuote = OracleFactory.create(today, generateSimulatedPrice());
+        // 3. Não existe no banco: usa OraclePriceFactory para criar (com validação), persiste e guarda no cache
+        Oracle simulatedQuote = OraclePriceFactory.create(today, generateSimulatedPrice());
         Oracle createdQuote = model.create(simulatedQuote);
         if (createdQuote != null) {
             todayCache.put(createdQuote);

@@ -8,7 +8,7 @@ import java.time.LocalDate;
 import org.unicamp.poo.dao.OracleDAO;
 import org.unicamp.poo.dao.TransactionDAO;
 import org.unicamp.poo.dao.WalletDAO;
-import org.unicamp.poo.model.OracleFactory;
+import org.unicamp.poo.model.OraclePriceFactory;
 import org.unicamp.poo.model.TransactionFactory;
 import org.unicamp.poo.model.Wallet;
 import org.unicamp.poo.model.WalletFactory;
@@ -38,11 +38,11 @@ public final class DatabaseSeeder {
         LocalDate fourDaysAgo = today.minusDays(4);
 
         // Criando cotações no Oráculo
-        oracleDAO.create(OracleFactory.create(today, 5.50));
-        oracleDAO.create(OracleFactory.create(yesterday, 5.25));
-        oracleDAO.create(OracleFactory.create(twoDaysAgo, 5.75));
-        oracleDAO.create(OracleFactory.create(threeDaysAgo, 6.10));
-        oracleDAO.create(OracleFactory.create(fourDaysAgo, 4.90));
+        oracleDAO.create(OraclePriceFactory.create(today, 5.50));
+        oracleDAO.create(OraclePriceFactory.create(yesterday, 5.25));
+        oracleDAO.create(OraclePriceFactory.create(twoDaysAgo, 5.75));
+        oracleDAO.create(OraclePriceFactory.create(threeDaysAgo, 6.10));
+        oracleDAO.create(OraclePriceFactory.create(fourDaysAgo, 4.90));
 
         // Criando as carteiras (Wallets)
         Wallet w1 = walletDAO.create(WalletFactory.create("Alice Silva", "Binance"));

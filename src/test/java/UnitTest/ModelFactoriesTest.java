@@ -9,7 +9,7 @@ import java.time.LocalDate;
 
 import org.junit.jupiter.api.Test;
 import org.unicamp.poo.model.Oracle;
-import org.unicamp.poo.model.OracleFactory;
+import org.unicamp.poo.model.OraclePriceFactory;
 import org.unicamp.poo.model.Transaction;
 import org.unicamp.poo.model.TransactionFactory;
 import org.unicamp.poo.model.Wallet;
@@ -109,7 +109,7 @@ class ModelFactoriesTest {
     @Test
     void createsOracleQuote() {
         LocalDate date = LocalDate.of(2026, 5, 1);
-        Oracle quote = OracleFactory.create(date, 5.50);
+        Oracle quote = OraclePriceFactory.create(date, 5.50);
 
         assertNotNull(quote);
         assertEquals(date, quote.getDate());
@@ -118,7 +118,7 @@ class ModelFactoriesTest {
 
     @Test
     void createsOracleQuoteForToday() {
-        Oracle quote = OracleFactory.createForToday(7.20);
+        Oracle quote = OraclePriceFactory.createForToday(7.20);
 
         assertNotNull(quote);
         assertEquals(LocalDate.now(), quote.getDate());
@@ -128,13 +128,13 @@ class ModelFactoriesTest {
     @Test
     void validatesOracleInput() {
         assertThrows(IllegalArgumentException.class, () ->
-            OracleFactory.create(null, 5.0)
+            OraclePriceFactory.create(null, 5.0)
         );
         assertThrows(IllegalArgumentException.class, () ->
-            OracleFactory.create(LocalDate.now(), 0.0)
+            OraclePriceFactory.create(LocalDate.now(), 0.0)
         );
         assertThrows(IllegalArgumentException.class, () ->
-            OracleFactory.create(LocalDate.now(), -1.0)
+            OraclePriceFactory.create(LocalDate.now(), -1.0)
         );
     }
 
