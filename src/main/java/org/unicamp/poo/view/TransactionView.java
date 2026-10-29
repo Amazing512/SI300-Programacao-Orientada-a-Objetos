@@ -14,7 +14,6 @@ import static org.unicamp.poo.util.ConsoleColors.RESET;
 import org.unicamp.poo.util.ConsoleScanner;
 import org.unicamp.poo.util.MessageProvider;
 
-// View responsável por lidar com interações referentes a transações.
 public class TransactionView {
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private final MessageProvider messages;

@@ -35,7 +35,6 @@ public class TransactionController {
         this.messages = messages;
     }
 
-    // Calculates the current balance of a wallet based on its transactions.
     private double calculateWalletBalance (int walletId){
         List<Transaction> transactions = model.findByWalletId(walletId);
         double balance = 0.0;

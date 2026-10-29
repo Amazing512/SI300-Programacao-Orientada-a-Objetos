@@ -8,7 +8,6 @@ import static org.unicamp.poo.util.ConsoleColors.RESET;
 import org.unicamp.poo.util.ConsoleScanner;
 import org.unicamp.poo.util.MessageProvider;
 
-/* View responsável por lidar com operações referentes a Carteira. */
 public class WalletView {
     private final MessageProvider messages;
 
@@ -16,7 +15,6 @@ public class WalletView {
         this.messages = messages;
     }
 
-    // Lê todos os campos requeridos para instanciar e registrar uma nova Carteira
     public Wallet readWalletData() {
         String holder = ConsoleScanner.readRequiredString(
                 messages.get("wallet.view.prompt.holder"),
@@ -31,22 +29,18 @@ public class WalletView {
         return WalletFactory.create(holder, broker);
     }
 
-    // Imprime uma mensagem de erro destacada
     public void showErrorMessage(String message) {
         System.out.println(RED + message + RESET);
     }
 
-    // Imprime uma mensagem de sucesso destacada
     public void showSuccessMessage(String message) {
         System.out.println(GREEN + message + RESET);
     }
 
-    // Solicita ao usuário um ID de Carteira
     public int readWalletId() {
         return ConsoleScanner.readInt(messages.get("wallet.view.prompt.id"), messages.get("generic.confirmInvalid"));
     }
 
-    // Exibe os detalhes atuais de uma Carteira
     public void displayWallet(Wallet wallet) {
 
         System.out.println(messages.get("wallet.view.header"));
@@ -55,7 +49,6 @@ public class WalletView {
         System.out.println(messages.get("wallet.view.broker") + " " + wallet.getBroker());
     }
 
-    // Solicita ao usuário detalhes atualizados de titular e corretora, mantendo o ID original
     public Wallet readWalletUpdates(Wallet editableWallet) {
         String holder = ConsoleScanner.readRequiredString(
                 messages.get("wallet.view.prompt.newHolder"),
@@ -67,11 +60,9 @@ public class WalletView {
                 messages.get("validation.required")
         );
 
-        // Cria uma nova instância usando o mesmo ID da carteira editada
         return WalletFactory.withUpdatedData(editableWallet.getId(), holder, broker);
     }
 
-    // Solicita uma confirmação para executar ações de exclusão
     public boolean confirmDeletion() {
         while (true) {
             System.out.println(messages.get("wallet.view.prompt.confirmDelete"));

@@ -12,7 +12,6 @@ import org.unicamp.poo.util.MessageProvider;
 import org.unicamp.poo.view.Menu;
 import org.unicamp.poo.view.WalletView;
 
-// Controller responsável por gerenciar operações relacionadas a Carteiras.
 public final class WalletController {
 
     private final WalletDAO model;
@@ -27,9 +26,7 @@ public final class WalletController {
         this.messages = messages;
     }
 
-    // Ação para registrar nova carteira.
     private void actionAddWallet() {
-        // Solicita o objeto Carteira pela View
         Wallet newWallet = view.readWalletData();
 
         if (newWallet != null){
@@ -43,9 +40,7 @@ public final class WalletController {
         }
     }
 
-    // Ação para buscar uma carteira pelo seu ID
     private void actionSearchWallet() {
-        // Obtém da view o ID a ser buscado
         int id = view.readWalletId();
 
         Wallet wallet = model.findById(id);
@@ -59,20 +54,16 @@ public final class WalletController {
 
     }
 
-    // Ação para editar os detalhes de uma carteira existente
     private void actionEditWallet() {
 
-        // Obtém o ID da carteira a ser editada
         int id = view.readWalletId();
 
         Wallet editableWallet = model.findById(id);
 
         if(editableWallet != null) {
-            // Solicita à view que peça os detalhes atualizados ao usuário
             Wallet updatedWallet = view.readWalletUpdates(editableWallet);
 
             if (updatedWallet != null) {
-                // Atualiza as informações da carteira
                 model.update(updatedWallet);
                 view.showSuccessMessage(messages.get("wallet.edit.success"));
             }
@@ -85,17 +76,13 @@ public final class WalletController {
         }
     }
 
-    // Ação para remover uma carteira.
     private void actionRemoveWallet() {
-        // Obtém o ID da carteira a ser removida
         int id = view.readWalletId();
         
         Wallet removableWallet = model.findById(id);
 
         if (removableWallet != null){
-            // Solicita uma confirmação de exclusão do usuário através da camada view
             if (view.confirmDeletion()) {
-                // Remove a carteira do repositório DAO
                 model.delete(id);
                 view.showSuccessMessage(messages.get("wallet.remove.success"));
             }
@@ -119,7 +106,6 @@ public final class WalletController {
         return (options);
     }
 
-    // loop do menu principal das carteiras.
     public void start()
     {
         final List<String> options = getMenuOptions();

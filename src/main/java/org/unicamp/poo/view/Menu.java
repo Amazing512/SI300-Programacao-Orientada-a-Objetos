@@ -26,10 +26,7 @@ public final class Menu {
         {
             ConsoleScanner.clearScreen();
             if (errorMessage != null) {
-                // Imprime a mensagem de erro em vermelho
                 System.out.println(ConsoleColors.RED + errorMessage + ConsoleColors.RESET);
-                
-                // Limpa para a próxima exibição
                 errorMessage = null; 
             }
             System.out.println(title);

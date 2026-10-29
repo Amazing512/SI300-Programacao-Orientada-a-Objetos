@@ -17,9 +17,6 @@ import org.unicamp.poo.util.MessageProvider;
 import org.unicamp.poo.view.Menu;
 import org.unicamp.poo.view.ReportView;
 
-/*  
- * Controller responsável por gerar relatórios financeiros consolidados e ordenar listas de carteiras com base no seu saldo atual. 
- */
 public class ReportController {
 
     private final WalletDAO walletDAO;
@@ -43,38 +40,28 @@ public class ReportController {
         this.messages = messages;
     }
 
-    // Calcula dinamicamente o saldo atual total de uma carteira específica.
     private double calculateWalletBalance (int walletId){
         List<Transaction> transactions = transactionDAO.findByWalletId(walletId);
         double balance = 0.0;
 
         for (Transaction transaction : transactions){
             if (transaction.getOperationType() == OperationType.CASH_IN) {
-                balance += transaction.getQuantity(); // Incrementa o saldo na compra
+                balance += transaction.getQuantity();
             }
             else if (transaction.getOperationType() == OperationType.CASH_OUT){
-                balance -= transaction.getQuantity(); // Decrementa o saldo na venda
+                balance -= transaction.getQuantity();
             }
         }
         return balance;
     }
 
-    // Retorna a cotação do dia atual (gera uma nova caso ainda não exista).
     private double getTodayPrice() {
         Oracle todayQuote = oracleController.getOrGenerateDailyQuote();
         return (todayQuote != null) ? todayQuote.getPrice() : 0.0;
     }
 
-    // Uma linha do extrato: o estado da carteira logo após processar uma transação,
-    // apurado pelo método do custo médio (replica as colunas Custo Médio, Res. Oper.
-    // e Res. Acum. da planilha de referência).
     private record LedgerRow(double price, double coinBalance, double averageCost, double operationResult, double accumulatedResult) {}
 
-    // Monta o extrato completo de uma carteira, transação a transação, na ordem informada
-    // (que já deve estar em ordem cronológica): o custo médio só é recalculado numa compra
-    // -- ponderando o custo médio anterior pelo saldo anterior com o valor da nova compra --
-    // e uma venda apura resultado como (quantidade vendida) * (preço de venda - custo médio
-    // vigente), sem alterar o custo médio.
     private List<LedgerRow> buildWalletLedger(List<Transaction> sortedTransactions) {
         double todayPrice = getTodayPrice();
         double coinBalance = 0.0;
@@ -103,11 +90,9 @@ public class ReportController {
         return ledger;
     }
 
-    // Processa o fluxo de dados do relatório financeiro para uma carteira específica.
     public void showFinancialReport(){
         int walletId = view.readWalletIdReport();
 
-        // Garante que a carteira existe antes de buscar as transações
         Wallet wallet = walletDAO.findById(walletId);
         if (wallet == null){
             view.showErrorMessage(messages.get("transaction.wallet.notFound"));
@@ -149,13 +134,10 @@ public class ReportController {
 
         double coinBalance = totalCoinsBought - totalCoinsSold;
 
-        // Valor atual das moedas restantes (coinBalance * preço de hoje)
         double currentHoldingsValue = coinBalance * todayPrice;
 
-        // Lucro / Prejuízo Financeiro = (Valor Atual das Moedas Restantes + Dinheiro Recebido de Vendas) - Dinheiro Gasto em Compras
         double totalFinancialGainLoss = (currentHoldingsValue + totalMoneyReceived) - totalMoneySpent;
 
-        // Delega a apresentação visual para a camada view
         view.showFinancialReport(
             walletId,
             totalCoinsBought,
@@ -168,7 +150,6 @@ public class ReportController {
         );
     }
 
-    // Lista as carteiras ordenadas pelo identificador em ordem crescente.
     private void showWalletsOrderedById() {
         List<Wallet> wallets = walletDAO.findAll();
 
@@ -181,7 +162,6 @@ public class ReportController {
         view.showWalletsOrderedByIdReport(wallets);
     }
 
-    // Lista as carteiras ordenadas alfabeticamente pelo nome do titular.
     private void showWalletsOrderedByHolder() {
         List<Wallet> wallets = walletDAO.findAllOrderByHolder();
 
@@ -193,7 +173,6 @@ public class ReportController {
         view.showWalletsOrderedByHolderReport(wallets);
     }
 
-    // Exibe o saldo atual de uma única carteira.
     private void showWalletCurrentBalance() {
         int walletId = view.readWalletIdReport(messages.get("report.wallet.balance.prompt"));
         Wallet wallet = walletDAO.findById(walletId);
@@ -207,7 +186,6 @@ public class ReportController {
         view.showWalletCurrentBalanceReport(wallet, balance);
     }
 
-    // Exibe o histórico de transações de uma única carteira.
     private void showWalletHistory() {
         int walletId = view.readWalletIdReport(messages.get("report.wallet.history.prompt"));
         Wallet wallet = walletDAO.findById(walletId);
@@ -245,8 +223,6 @@ public class ReportController {
         view.showWalletHistoryReport(wallet, transactions, cashValues);
     }
 
-    // Exibe o extrato de uma carteira: cada transação com custo médio e resultado
-    // apurados pelo método do custo médio, mais um resumo final.
     private void showWalletGainOrLoss() {
         int walletId = view.readWalletIdReport(messages.get("report.wallet.history.prompt"));
         Wallet wallet = walletDAO.findById(walletId);
@@ -283,7 +259,6 @@ public class ReportController {
         view.showWalletGainLossReport(wallet, transactions, prices, coinBalances, averageCosts, operationResults, accumulatedResults);
     }
 
-    // Gera a lista de opções de menu traduzidas para a seção de relatórios.
     private List<String> getMenuOptions(){
         final List<String> options = new ArrayList<>();
         options.add(messages.get("reportMenu.return"));
@@ -297,7 +272,6 @@ public class ReportController {
         return options;
     }
 
-    // Inicia o loop de navegação do submenu principal de relatórios.
     public void start() {
         final List<String> options = getMenuOptions();
         final Menu reportMenu = new Menu(ConsoleScanner.getInstance(), messages);

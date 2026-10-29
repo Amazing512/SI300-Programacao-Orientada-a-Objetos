@@ -28,8 +28,6 @@ import org.unicamp.poo.view.ReportView;
 import org.unicamp.poo.view.TransactionView;
 import org.unicamp.poo.view.WalletView;
 
-/* Controller principal que centraliza o fluxo principal da aplicação,
-   coordenando a navegação de menus, o ciclo de vida dos sub controladores e as sessões do banco de dados. */
 public class ProgramController {
 
     private DatabaseSelector databaseSelector;
@@ -46,25 +44,21 @@ public class ProgramController {
         this.messages = messages;
     }
 
-    // Inicializa o submódulo Carteira e transfere o fluxo de controle.
     void actionWallet() {
         final WalletController walletController = new WalletController(walletDAO, new WalletView(messages), messages);
         walletController.start();
     }
 
-    // Inicializa o submódulo Transação e transfere o fluxo de controle.
     void actionTransaction() {
         final TransactionController transactionController = new TransactionController(transactionDAO, walletDAO, oracleController, new TransactionView(messages), messages);
         transactionController.start();
     }
 
-    // Inicializa o submódulo de Relatórios Financeiros e transfere o fluxo de controle.
     void actionReports() {
         final ReportController reportController = new ReportController(walletDAO, transactionDAO, oracleController, new ReportView(messages), messages);
         reportController.start();
     }
 
-    // Inicializa o submódulo de escolha de idioma.
     void actionLanguage(){
         boolean loop = true;
 
@@ -94,7 +88,6 @@ public class ProgramController {
         }
     }
 
-    // Inicializa o submódulo de escolha do banco de dados.
     void actionDatabase(){
         boolean loop = true;
 
@@ -120,12 +113,10 @@ public class ProgramController {
         }
     }
 
-    // Inicializa o submódulo Ajuda com instruções longas e lista de créditos completa.
     void actionHelp() {
         final Menu helpMenu = new Menu(ConsoleScanner.getInstance(), messages);
         boolean loop = true;
 
-        // Prepara as opções do submenu
         final List<String> options = new ArrayList<>();
         options.add(messages.get("helpMenu.return"));
         options.add(messages.get("helpMenu.viewInstructions"));
@@ -204,7 +195,6 @@ public class ProgramController {
                 oracleDAO = new OracleMariaDBDAO(dbConn.getConnection());
                 oracleController = new OracleController(oracleDAO);
 
-                // Popula o banco de dados com dados fictícios de teste, caso esteja vazio.
                 DatabaseSeeder.seed(walletDAO, transactionDAO, oracleDAO, messages);
             }
             case MEMORY -> {
@@ -214,20 +204,17 @@ public class ProgramController {
                 oracleController = new OracleController(oracleDAO);
                 System.out.println(messages.get("success.message.database"));
 
-                // Popula o banco de dados com dados fictícios de teste, caso esteja vazio.
                 DatabaseSeeder.seed(walletDAO, transactionDAO, oracleDAO, messages);
             }
         }
     }
 
-    // Encerra as conexões de rede para evitar vazamentos de recursos.
     private void closeDatabase() {
         if(dbConn != null) {
             dbConn.closeConnection();
         }
     }
 
-    // Prepara rótulos de entrada localizados mapeados para os recursos da operação raiz.
     private List<String> getMenuOptions() {
         final List<String> options = new ArrayList<>();
         options.add(messages.get("mainMenu.exit"));
@@ -240,7 +227,6 @@ public class ProgramController {
         return options;
     }
 
-    // loop principal
     public void start(String serverName)
     {
         final Menu userMenu = new Menu(ConsoleScanner.getInstance(), messages);
@@ -260,11 +246,8 @@ public class ProgramController {
                 case 4 -> actionLanguage();
                 case 5 -> actionDatabase();
                 case 6 -> actionHelp();
-
                 default -> loop = false;
             }
         }
-
-        closeDatabase();
     }
 }

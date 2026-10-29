@@ -19,14 +19,12 @@ public class Info {
     public static final String PROJECT_NAME = "FT_Coin";
     public static final String PROJECT_VERSION = "Ver. 1.0";
 
-    // Representa um cargo e seus responsáveis
     public record AuthorRole(String role, String[] authors) {
         public String getFormattedAuthors() {
             return String.join(", ", authors);
         }
     }
 
-    // Membros da equipe agrupados por cargo.
     public static final AuthorRole[] projectRoles = {
             new AuthorRole("help.credits.role.management", new String[]{"Miguel Barcellos"}),
             new AuthorRole("help.credits.role.architecture", new String[]{"Gabriela Nogueira"}),
