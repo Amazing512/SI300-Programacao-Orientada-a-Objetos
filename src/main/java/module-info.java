@@ -10,6 +10,8 @@ module org.unicamp.poo {
     exports org.unicamp.poo.main;
     exports org.unicamp.poo.model;
     exports org.unicamp.poo.model.enums;
+    exports org.unicamp.poo.oracle;
+    exports network;
     exports org.unicamp.poo.util;
     exports org.unicamp.poo.view;
 }
