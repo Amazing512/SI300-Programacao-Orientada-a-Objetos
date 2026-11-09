@@ -22,7 +22,7 @@ public final class MariaDBConnection implements DatabaseConnection {
     private String     password;
     private String     url;
     private Connection connection = null;
-
+ 
     private MariaDBConnection(String serverName)
     {
         final Properties props = new Properties();

@@ -2,16 +2,18 @@ package org.unicamp.poo.controller;
 
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.unicamp.poo.dao.OracleDAO;
 import org.unicamp.poo.model.Oracle;
-import org.unicamp.poo.oracle.OracleApiClient;
-import org.unicamp.poo.oracle.OracleApiException;
-import org.unicamp.poo.oracle.SimulatedOracleApiClient;
+import org.unicamp.poo.model.OraclePriceFactory;
+import org.unicamp.poo.oracle.OracleSimpleClient;
 import org.unicamp.poo.util.DailyCache;
+
+import network.ExchangeRate;
 
 /**
  * Fornece cotações da moeda virtual. Ordem de consulta: cache, banco (DAO) e,
@@ -22,19 +24,18 @@ public final class OracleController implements OracleDAO {
     private static final Logger log = LoggerFactory.getLogger(OracleController.class);
 
     private final OracleDAO model;
-    private final OracleApiClient apiClient;
+    private final OracleSimpleClient client;
     private final DailyCache<Oracle> todayCache;
     private final Map<LocalDate, Oracle> historicalCache;
 
-    /** Usa o oráculo simulado (somente hoje). Mantido para testes e uso offline. */
     public OracleController(OracleDAO model) {
-        this(model, new SimulatedOracleApiClient());
+        this(model, new OracleSimpleClient());
     }
 
-    public OracleController(OracleDAO model, OracleApiClient apiClient) {
+    public OracleController(OracleDAO model, OracleSimpleClient client) {
         super();
         this.model = model;
-        this.apiClient = apiClient;
+        this.client = client;
         this.todayCache = new DailyCache<>();
         this.historicalCache = new HashMap<>();
     }
@@ -42,7 +43,7 @@ public final class OracleController implements OracleDAO {
     /**
      * Cotação de hoje (cache, banco ou API).
      *
-     * @return a cotação, ou {@code null} se nenhuma fonte a tiver (erro vai para System.err)
+     * @return a cotação, ou cotação gerada se nenhuma fonte a tiver
      */
     public Oracle getOrGenerateDailyQuote() {
         final Oracle cached = todayCache.get();
@@ -51,12 +52,21 @@ public final class OracleController implements OracleDAO {
             return cached;
         }
         LocalDate today = LocalDate.now();
-        final Oracle quote = loadQuote(LocalDate.now());
+        final Oracle quote = loadQuote(today);
         if (quote != null) {
-            log.info("Cotação diária localizada no banco de dados para a data {}: R$ {}", today, quote.getPrice());
+            log.info("Cotação diária localizada para a data {}: R$ {}", today, quote.getPrice());
             todayCache.put(quote);
+            return quote;
         }
-        return quote;
+
+        // Se nem o banco nem o oráculo tiverem a cotação de hoje, gera uma cotação fallback
+        double simulatedPrice = 1.0 + Math.random() * 9.0;
+        Oracle fallbackQuote = OraclePriceFactory.create(today, simulatedPrice);
+        Oracle created = model.create(fallbackQuote);
+        Oracle toCache = created != null ? created : fallbackQuote;
+        todayCache.put(toCache);
+        log.info("Cotação diária gerada para a data {}: R$ {}", today, toCache.getPrice());
+        return toCache;
     }
 
     @Override
@@ -90,13 +100,23 @@ public final class OracleController implements OracleDAO {
         if (stored != null) {
             return stored;
         }
+        if (client == null) {
+            return null;
+        }
         try {
-            final Oracle fetched = apiClient.fetchQuote(date);
-            final Oracle saved = model.create(fetched);
-            // Se não conseguiu gravar, ainda assim usa a cotação obtida da API.
-            return saved != null ? saved : fetched;
-        } catch (OracleApiException e) {
-            System.err.println("[Oráculo] " + date + ": " + e.getMessage());
+            final List<ExchangeRate> rates = client.getValues(date, date);
+            if (rates != null && !rates.isEmpty()) {
+                for (final ExchangeRate rate : rates) {
+                    if (date.equals(rate.getDate()) && rate.getValue() != null) {
+                        final Oracle oracle = OraclePriceFactory.create(rate.getDate(), rate.getValue().doubleValue());
+                        final Oracle saved = model.create(oracle);
+                        return saved != null ? saved : oracle;
+                    }
+                }
+            }
+            return null;
+        } catch (Exception e) {
+            log.warn("[Oráculo] Erro ao consultar cotação para {}: {}", date, e.getMessage());
             return null;
         }
     }

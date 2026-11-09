@@ -19,11 +19,7 @@ import org.unicamp.poo.dao.impl.memory.OracleMemoryDAO;
 import org.unicamp.poo.dao.impl.memory.TransactionMemoryDAO;
 import org.unicamp.poo.dao.impl.memory.WalletMemoryDAO;
 import org.unicamp.poo.model.enums.DatabaseSelector;
-import org.unicamp.poo.oracle.OracleApiClient;
-import org.unicamp.poo.oracle.OracleApiConfig;
-import org.unicamp.poo.oracle.OracleApiException;
-import org.unicamp.poo.oracle.SimulatedOracleApiClient;
-import org.unicamp.poo.oracle.SocketOracleApiClient;
+import org.unicamp.poo.oracle.OracleSimpleClient;
 import static org.unicamp.poo.util.ConsoleColors.RESET;
 import static org.unicamp.poo.util.ConsoleColors.YELLOW;
 import org.unicamp.poo.util.ConsoleScanner;
@@ -206,7 +202,7 @@ public class ProgramController {
                 walletDAO = new WalletDAOImplMariaDB(dbConn.getConnection());
                 transactionDAO = new TransactionDAOImplMariaDB(dbConn.getConnection());
                 oracleDAO = new OracleMariaDBDAO(dbConn.getConnection());
-                oracleController = new OracleController(oracleDAO, createOracleApiClient());
+                oracleController = new OracleController(oracleDAO, new OracleSimpleClient());
 
                 log.info("Executando carga inicial de dados no MariaDB...");
                 DatabaseSeeder.seed(walletDAO, transactionDAO, oracleDAO, messages);
@@ -215,7 +211,7 @@ public class ProgramController {
                 walletDAO = new WalletMemoryDAO();
                 transactionDAO = new TransactionMemoryDAO();
                 oracleDAO = new OracleMemoryDAO();
-                oracleController = new OracleController(oracleDAO, createOracleApiClient());
+                oracleController = new OracleController(oracleDAO, new OracleSimpleClient());
                 System.out.println(messages.get("success.message.database"));
 
                 log.info("Executando carga inicial de dados no banco em memória...");
@@ -224,15 +220,7 @@ public class ProgramController {
         }
     }
 
-    /** Cliente do servidor do professor; sem configuração/credenciais, cai no oráculo simulado com aviso. */
-    private OracleApiClient createOracleApiClient() {
-        try {
-            return new SocketOracleApiClient(OracleApiConfig.load(OracleApiConfig.DEFAULT_RESOURCE));
-        } catch (OracleApiException e) {
-            System.err.println("[Oráculo] " + e.getMessage() + " - usando cotação simulada.");
-            return new SimulatedOracleApiClient();
-        }
-    }
+
 
     private void closeDatabase() {
         if(dbConn != null) {
