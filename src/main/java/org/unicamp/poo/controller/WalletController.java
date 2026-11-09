@@ -3,6 +3,8 @@ package org.unicamp.poo.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.unicamp.poo.dao.WalletDAO;
 import org.unicamp.poo.model.Wallet;
 import static org.unicamp.poo.util.ConsoleColors.RESET;
@@ -13,6 +15,7 @@ import org.unicamp.poo.view.Menu;
 import org.unicamp.poo.view.WalletView;
 
 public final class WalletController {
+    private static final Logger log = LoggerFactory.getLogger(WalletController.class);
 
     private final WalletDAO model;
     private final WalletView view;
@@ -32,23 +35,31 @@ public final class WalletController {
         if (newWallet != null){
             Wallet saveWallet = model.create(newWallet);
             if (saveWallet != null) {
+                log.info("Carteira criada com sucesso via WalletController: ID={}, titular='{}', corretora='{}'",
+                        saveWallet.getId(), saveWallet.getHolder(), saveWallet.getBroker());
                 view.showSuccessMessage(messages.get("wallet.add.success") + " ID: " + saveWallet.getId());
             }
             else{
+                log.warn("Erro ao cadastrar carteira para titular '{}'", newWallet.getHolder());
                 view.showErrorMessage(messages.get("wallet.add.error"));
             }
+        } else {
+            log.debug("Ação de adicionar carteira cancelada pelo usuário.");
         }
     }
 
     private void actionSearchWallet() {
         int id = view.readWalletId();
+        log.debug("Buscando carteira por ID: {}", id);
 
         Wallet wallet = model.findById(id);
 
         if(wallet != null) {
+            log.info("Carteira ID {} encontrada: titular='{}'", wallet.getId(), wallet.getHolder());
             view.displayWallet(wallet);
         }
         else{
+            log.warn("Carteira ID {} não encontrada.", id);
             view.showErrorMessage(messages.get("wallet.search.error.notfound"));
         }
 
@@ -65,13 +76,17 @@ public final class WalletController {
 
             if (updatedWallet != null) {
                 model.update(updatedWallet);
+                log.info("Carteira ID {} atualizada via WalletController: titular='{}', corretora='{}'",
+                        updatedWallet.getId(), updatedWallet.getHolder(), updatedWallet.getBroker());
                 view.showSuccessMessage(messages.get("wallet.edit.success"));
             }
             else{
+                log.debug("Edição da carteira ID {} cancelada pelo usuário.", id);
                 view.showErrorMessage(messages.get("wallet.edit.error.cancelled"));
             }
         }
         else{
+            log.warn("Tentativa de editar carteira inexistente ID {}.", id);
             view.showErrorMessage(messages.get("wallet.search.error.notfound"));
         }
     }
@@ -84,13 +99,16 @@ public final class WalletController {
         if (removableWallet != null){
             if (view.confirmDeletion()) {
                 model.delete(id);
+                log.info("Carteira ID {} excluída via WalletController.", id);
                 view.showSuccessMessage(messages.get("wallet.remove.success"));
             }
             else {
+                log.debug("Exclusão da carteira ID {} cancelada pelo usuário.", id);
                 view.showErrorMessage(messages.get("wallet.remove.error.cancelled"));
             }
         }
         else {
+            log.warn("Tentativa de remover carteira inexistente ID {}.", id);
             view.showErrorMessage(messages.get("wallet.search.error.notfound"));
         }
     }

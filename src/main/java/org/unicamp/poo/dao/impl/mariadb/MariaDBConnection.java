@@ -9,9 +9,13 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.unicamp.poo.dao.DatabaseConnection;
 
 public final class MariaDBConnection implements DatabaseConnection {
+    private static final Logger log = LoggerFactory.getLogger(MariaDBConnection.class);
+
     private static MariaDBConnection instance = null;
 
     private String     user;
@@ -59,7 +63,7 @@ public final class MariaDBConnection implements DatabaseConnection {
         }
         catch (final Exception exceptionValue)
         {
-            System.out.println(exceptionValue.getMessage());
+            log.error("Erro ao carregar configurações de conexão MariaDB: {}", exceptionValue.getMessage(), exceptionValue);
         }
     }
 
@@ -97,12 +101,13 @@ public final class MariaDBConnection implements DatabaseConnection {
         {
             if (connection != null && !connection.isClosed())
             {
+                log.debug("Fechando conexão com MariaDB.");
                 connection.close();
             }
         }
         catch (final SQLException exceptionValue)
         {
-            System.out.println(exceptionValue.getMessage());
+            log.error("Erro ao fechar conexão com MariaDB: {}", exceptionValue.getMessage(), exceptionValue);
         }
         finally
         {
@@ -129,12 +134,13 @@ public final class MariaDBConnection implements DatabaseConnection {
             {
                 connection.close();
             }
-            System.out.println("URL = " + url);
+            log.info("Abrindo conexão com MariaDB em {}", url);
             connection = DriverManager.getConnection(url, user, password);
+            log.info("Conexão com MariaDB estabelecida com sucesso.");
         }
         catch (final SQLException exceptionValue)
         {
-            System.out.println(exceptionValue.getMessage());
+            log.error("Erro ao abrir conexão com MariaDB: {}", exceptionValue.getMessage(), exceptionValue);
         }
     }
 
@@ -147,11 +153,12 @@ public final class MariaDBConnection implements DatabaseConnection {
         }
         catch (final FileNotFoundException exceptionValue)
         {
+            log.warn("Arquivo mariadb.env não encontrado para carregamento de credenciais");
             return false;
         }
         catch (final IOException exceptionValue)
         {
-            System.out.println(exceptionValue.getMessage());
+            log.error("Erro ao ler credenciais de mariadb.env: {}", exceptionValue.getMessage(), exceptionValue);
             return false;
         }
     }

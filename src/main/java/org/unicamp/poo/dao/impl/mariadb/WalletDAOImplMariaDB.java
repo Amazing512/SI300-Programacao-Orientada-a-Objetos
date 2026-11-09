@@ -1,5 +1,7 @@
 package org.unicamp.poo.dao.impl.mariadb;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.unicamp.poo.dao.WalletDAO;
 import org.unicamp.poo.model.Wallet;
 
@@ -8,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class WalletDAOImplMariaDB implements WalletDAO {
+    private static final Logger log = LoggerFactory.getLogger(WalletDAOImplMariaDB.class);
 
     private final Connection connection;
 
@@ -40,16 +43,19 @@ public final class WalletDAOImplMariaDB implements WalletDAO {
                 }
             }
 
+            log.info("Carteira criada com sucesso no MariaDB: ID={}, titular='{}', corretora='{}'",
+                    wallet.getId(), wallet.getHolder(), wallet.getBroker());
             return wallet;
 
         } catch (SQLException e) {
-            System.err.println(java.util.ResourceBundle.getBundle("messages").getString("database.wallet.create.error") + " " + e.getMessage());
+            log.error("Erro ao criar carteira no MariaDB para o titular '{}': {}", wallet.getHolder(), e.getMessage(), e);
             return null;
         }
     }
 
     @Override
     public Wallet findById(int id) {
+        log.debug("Buscando carteira por ID {} no MariaDB", id);
         String sql = "SELECT * FROM " + TABLE_NAME +
                      " WHERE " + ID_COLUMN + " = ?";
 
@@ -68,7 +74,7 @@ public final class WalletDAOImplMariaDB implements WalletDAO {
             }
 
         } catch (SQLException e) {
-            System.err.println(java.util.ResourceBundle.getBundle("messages").getString("database.wallet.find.error") + " " + e.getMessage());
+            log.error("Erro ao buscar carteira por ID {} no MariaDB: {}", id, e.getMessage(), e);
         }
 
         return null;
@@ -76,6 +82,7 @@ public final class WalletDAOImplMariaDB implements WalletDAO {
 
     @Override
     public List<Wallet> findAll() {
+        log.debug("Buscando todas as carteiras no MariaDB");
         List<Wallet> wallets = new ArrayList<>();
 
         String sql = "SELECT * FROM " + TABLE_NAME;
@@ -92,7 +99,7 @@ public final class WalletDAOImplMariaDB implements WalletDAO {
             }
 
         } catch (SQLException e) {
-            System.err.println(java.util.ResourceBundle.getBundle("messages").getString("database.wallet.list.error") + " " + e.getMessage());
+            log.error("Erro ao listar carteiras no MariaDB: {}", e.getMessage(), e);
         }
 
         return wallets;
@@ -100,6 +107,7 @@ public final class WalletDAOImplMariaDB implements WalletDAO {
 
     @Override
     public List<Wallet> findAllOrderByHolder() {
+        log.debug("Buscando carteiras ordenadas por titular no MariaDB");
         List<Wallet> wallets = new ArrayList<>();
 
         String sql = "SELECT * FROM " + TABLE_NAME +
@@ -117,7 +125,7 @@ public final class WalletDAOImplMariaDB implements WalletDAO {
             }
 
         } catch (SQLException e) {
-            System.err.println(java.util.ResourceBundle.getBundle("messages").getString("database.wallet.listOrdered.error") + " " + e.getMessage());
+            log.error("Erro ao listar carteiras ordenadas por titular no MariaDB: {}", e.getMessage(), e);
         }
 
         return wallets;
@@ -137,9 +145,11 @@ public final class WalletDAOImplMariaDB implements WalletDAO {
             stmt.setInt(3, wallet.getId());
 
             stmt.executeUpdate();
+            log.info("Carteira atualizada no MariaDB: ID={}, titular='{}', corretora='{}'",
+                    wallet.getId(), wallet.getHolder(), wallet.getBroker());
 
         } catch (SQLException e) {
-            System.err.println(java.util.ResourceBundle.getBundle("messages").getString("database.wallet.update.error") + " " + e.getMessage());
+            log.error("Erro ao atualizar carteira ID {} no MariaDB: {}", wallet.getId(), e.getMessage(), e);
         }
     }
 
@@ -153,9 +163,10 @@ public final class WalletDAOImplMariaDB implements WalletDAO {
             stmt.setInt(1, id);
 
             stmt.executeUpdate();
+            log.info("Carteira excluída com sucesso no MariaDB: ID={}", id);
 
         } catch (SQLException e) {
-            System.err.println(java.util.ResourceBundle.getBundle("messages").getString("database.wallet.delete.error") + " " + e.getMessage());
+            log.error("Erro ao excluir carteira ID {} no MariaDB: {}", id, e.getMessage(), e);
         }
     }
 }

@@ -1,4 +1,5 @@
 package org.unicamp.poo.dao.impl.mariadb;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -7,11 +8,15 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.unicamp.poo.dao.TransactionDAO;
 import org.unicamp.poo.model.Transaction;
 import org.unicamp.poo.model.enums.OperationType;
 
 public final class TransactionDAOImplMariaDB implements TransactionDAO {
+    private static final Logger log = LoggerFactory.getLogger(TransactionDAOImplMariaDB.class);
+
     private final Connection connection;
 
     public TransactionDAOImplMariaDB(Connection connection)
@@ -25,10 +30,10 @@ public final class TransactionDAOImplMariaDB implements TransactionDAO {
         
         try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             
-             stmt.setInt(1, transaction.getWalletId());
+            stmt.setInt(1, transaction.getWalletId());
             stmt.setDate(2, java.sql.Date.valueOf(transaction.getOperationDate()));
-            stmt.setString(3,String.valueOf(transaction.getOperationType().getCode()));
-            stmt.setDouble(4,transaction.getQuantity());
+            stmt.setString(3, String.valueOf(transaction.getOperationType().getCode()));
+            stmt.setDouble(4, transaction.getQuantity());
             stmt.executeUpdate();
             
             try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
@@ -37,18 +42,20 @@ public final class TransactionDAOImplMariaDB implements TransactionDAO {
                 }
             }
             
-            System.out.println(java.util.ResourceBundle.getBundle("messages").getString("database.transaction.create.success"));
+            log.info("Transação registrada com sucesso no MariaDB: ID={}, Carteira={}, Data={}, Tipo={}, Quantidade={}",
+                    transaction.getId(), transaction.getWalletId(), transaction.getOperationDate(),
+                    transaction.getOperationType(), transaction.getQuantity());
             return transaction;
             
         } catch (SQLException e) {
-            System.err.println(java.util.ResourceBundle.getBundle("messages").getString("database.transaction.create.error") + " " + e.getMessage());
+            log.error("Erro ao registrar transação no MariaDB para a carteira {}: {}", transaction.getWalletId(), e.getMessage(), e);
             return null;
         }
     }
 
     @Override
     public List<Transaction> findByWalletId(int walletId) {
-
+        log.debug("Buscando transações da carteira ID {} no MariaDB", walletId);
         List<Transaction> list = new ArrayList<>();
 
         String sql = "SELECT * FROM MOVIMENTACAO WHERE IdCarteira = ?";
@@ -67,8 +74,7 @@ public final class TransactionDAOImplMariaDB implements TransactionDAO {
 
                         if (operationDate == null || operationTypeCode == null
                                 || operationTypeCode.length() != 1 || !(quantityValue instanceof Number quantity)) {
-                            System.err.println(java.util.ResourceBundle.getBundle("messages")
-                                    .getString("database.transaction.map.null"));
+                            log.warn("Movimentação ignorada: campos obrigatórios nulos ou inválidos na carteira {}", walletId);
                             continue;
                         }
 
@@ -83,13 +89,13 @@ public final class TransactionDAOImplMariaDB implements TransactionDAO {
 
                         list.add(transaction);
                     } catch (IllegalArgumentException exception) {
-                        System.err.println(java.util.ResourceBundle.getBundle("messages").getString("database.transaction.map.error") + " " + exception.getMessage());
+                        log.warn("Erro ao mapear transação na carteira {}: {}", walletId, exception.getMessage());
                     }
                 }
             }
 
         } catch (SQLException e) {
-            System.err.println(java.util.ResourceBundle.getBundle("messages").getString("database.transaction.list.error") + " " + e.getMessage());
+            log.error("Erro ao listar transações da carteira {} no MariaDB: {}", walletId, e.getMessage(), e);
         }
 
         return list;

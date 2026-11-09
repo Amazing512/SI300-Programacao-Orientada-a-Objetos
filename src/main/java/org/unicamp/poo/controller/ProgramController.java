@@ -5,6 +5,8 @@ import java.util.ArrayList;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.unicamp.poo.dao.DatabaseConnection;
 import org.unicamp.poo.dao.OracleDAO;
 import org.unicamp.poo.dao.TransactionDAO;
@@ -13,7 +15,7 @@ import org.unicamp.poo.dao.impl.mariadb.MariaDBConnection;
 import org.unicamp.poo.dao.impl.mariadb.OracleMariaDBDAO;
 import org.unicamp.poo.dao.impl.mariadb.TransactionDAOImplMariaDB;
 import org.unicamp.poo.dao.impl.mariadb.WalletDAOImplMariaDB;
-import org.unicamp.poo.dao.impl.memory.OracleMemoryDAO ;
+import org.unicamp.poo.dao.impl.memory.OracleMemoryDAO;
 import org.unicamp.poo.dao.impl.memory.TransactionMemoryDAO;
 import org.unicamp.poo.dao.impl.memory.WalletMemoryDAO;
 import org.unicamp.poo.model.enums.DatabaseSelector;
@@ -34,6 +36,7 @@ import org.unicamp.poo.view.TransactionView;
 import org.unicamp.poo.view.WalletView;
 
 public class ProgramController {
+    private static final Logger log = LoggerFactory.getLogger(ProgramController.class);
 
     private DatabaseSelector databaseSelector;
     private final MessageProvider messages;
@@ -82,12 +85,15 @@ public class ProgramController {
                 case 0 -> loop = false;
                 case 1 -> {
                     messages.changeLanguage("messages", "pt", "BR");
+                    log.info("Idioma alterado para Português (pt-BR)");
                 }
                 case 2 -> {
                     messages.changeLanguage("messages", "en", "US");
+                    log.info("Language changed to English (en-US)");
                 }
                 case 3 -> {
                     messages.changeLanguage("messages", "es", "ES");
+                    log.info("Idioma cambiado a Español (es-ES)");
                 }
             }
         }
@@ -182,6 +188,7 @@ public class ProgramController {
     {
         closeDatabase();
         this.databaseSelector = selector;
+        log.info("Inicializando banco de dados no modo: {} (servidor: {})", selector, serverName);
 
         OracleDAO oracleDAO;
 
@@ -192,6 +199,7 @@ public class ProgramController {
                 System.out.println(messages.get("success.message.database"));
 
                 if (dbConn.getConnection() == null) {
+                    log.error("Falha ao abrir a conexão MariaDB no servidor {}.", serverName);
                     throw new IllegalStateException("Falha ao abrir a conexão MariaDB.");
                 }
 
@@ -200,6 +208,7 @@ public class ProgramController {
                 oracleDAO = new OracleMariaDBDAO(dbConn.getConnection());
                 oracleController = new OracleController(oracleDAO, createOracleApiClient());
 
+                log.info("Executando carga inicial de dados no MariaDB...");
                 DatabaseSeeder.seed(walletDAO, transactionDAO, oracleDAO, messages);
             }
             case MEMORY -> {
@@ -209,6 +218,7 @@ public class ProgramController {
                 oracleController = new OracleController(oracleDAO, createOracleApiClient());
                 System.out.println(messages.get("success.message.database"));
 
+                log.info("Executando carga inicial de dados no banco em memória...");
                 DatabaseSeeder.seed(walletDAO, transactionDAO, oracleDAO, messages);
             }
         }
@@ -226,6 +236,7 @@ public class ProgramController {
 
     private void closeDatabase() {
         if(dbConn != null) {
+            log.info("Fechando conexão ativa com banco de dados...");
             dbConn.closeConnection();
         }
     }
@@ -247,6 +258,7 @@ public class ProgramController {
         final Menu userMenu = new Menu(ConsoleScanner.getInstance(), messages);
         boolean    loop     = true;
 
+        log.info("Iniciando aplicação com servidor {}", serverName);
         openDatabase(this.databaseSelector, serverName);
 
         while (loop)
@@ -254,7 +266,10 @@ public class ProgramController {
             String yellowTitle = YELLOW + messages.get("mainMenu.title") + RESET;
             switch (userMenu.getChoice(yellowTitle, getMenuOptions(), messages.get("mainMenu.prompt")))
             {
-                case 0 -> loop = false;
+                case 0 -> {
+                    log.info("Encerrando execução pelo menu principal.");
+                    loop = false;
+                }
                 case 1 -> actionWallet();
                 case 2 -> actionTransaction();
                 case 3 -> actionReports();

@@ -1,0 +1,22 @@
+<configuration>
+    <!-- Destino 1: Console -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %-5level %logger{15} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Destino 2: Arquivo local -->
+    <appender name="ARQUIVO" class="ch.qos.logback.core.FileAppender">
+        <file>logs/ftcoin.log</file>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %-5level [%thread] %logger - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Nível global de log -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="ARQUIVO"/>
+    </root>
+</configuration>

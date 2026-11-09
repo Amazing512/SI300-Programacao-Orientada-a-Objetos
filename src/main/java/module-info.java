@@ -2,6 +2,7 @@ module org.unicamp.poo {
     requires transitive java.desktop;
     requires transitive java.sql;
     requires org.mariadb.jdbc;
+    requires org.slf4j;
 
     exports org.unicamp.poo.controller;
     exports org.unicamp.poo.dao;

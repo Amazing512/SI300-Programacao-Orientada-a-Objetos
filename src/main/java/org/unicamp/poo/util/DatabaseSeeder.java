@@ -5,6 +5,8 @@ import static org.unicamp.poo.util.ConsoleColors.RESET;
 
 import java.time.LocalDate;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.unicamp.poo.dao.OracleDAO;
 import org.unicamp.poo.dao.TransactionDAO;
 import org.unicamp.poo.dao.WalletDAO;
@@ -14,15 +16,18 @@ import org.unicamp.poo.model.Wallet;
 import org.unicamp.poo.model.WalletFactory;
 
 public final class DatabaseSeeder {
+    private static final Logger log = LoggerFactory.getLogger(DatabaseSeeder.class);
 
     private DatabaseSeeder() {
     }
 
     public static void seed(WalletDAO walletDAO, TransactionDAO transactionDAO, OracleDAO oracleDAO, MessageProvider messages) {
         if (!walletDAO.findAll().isEmpty()) {
+            log.debug("DatabaseSeeder: base de dados já possui registros. Seeding skippado.");
             return;
         }
 
+        log.info("DatabaseSeeder: iniciando carga de dados");
         System.out.println(GREEN + messages.get("seeder.start") + RESET);
 
         LocalDate today = LocalDate.now();
@@ -58,6 +63,7 @@ public final class DatabaseSeeder {
             transactionDAO.create(TransactionFactory.createBuy(w3.getId(), today, 5.0));
         }
 
+        log.info("DatabaseSeeder: carga de dados finalizada com sucesso.");
         System.out.println(GREEN + messages.get("seeder.success") + RESET);
 
         ConsoleScanner.pressEnterToContinue(messages.get("generic.pressEnter"));

@@ -6,10 +6,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.unicamp.poo.dao.OracleDAO;
 import org.unicamp.poo.model.Oracle;
 
 public final class OracleMariaDBDAO implements OracleDAO {
+    private static final Logger log = LoggerFactory.getLogger(OracleMariaDBDAO.class);
     
     private final Connection connection;
 
@@ -26,16 +29,17 @@ public final class OracleMariaDBDAO implements OracleDAO {
             stmt.setDouble(2, oracle.getPrice());
             
             stmt.executeUpdate();
-            System.out.println(java.util.ResourceBundle.getBundle("messages").getString("database.oracle.create.success"));
+            log.info("Cotação gravada com sucesso no MariaDB: Data={}, Cotação={}", oracle.getDate(), oracle.getPrice());
             return oracle;
         } catch (SQLException e) {
-            System.err.println(java.util.ResourceBundle.getBundle("messages").getString("database.oracle.create.error") + " " + e.getMessage());
+            log.error("Erro ao gravar cotação no MariaDB para a data {}: {}", oracle.getDate(), e.getMessage(), e);
             return null;
         }
     }
 
     @Override
     public Oracle findByDate(LocalDate date) {
+        log.debug("Buscando cotação para a data {} no MariaDB", date);
         String sql = "SELECT * FROM ORACULO WHERE Data = ?";
         
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -49,13 +53,13 @@ public final class OracleMariaDBDAO implements OracleDAO {
                                 rs.getDouble("Cotacao")
                         );
                     } catch (RuntimeException exception) {
-                        System.err.println(java.util.ResourceBundle.getBundle("messages").getString("database.oracle.map.error") + " " + exception.getMessage());
+                        log.error("Erro ao mapear cotação para a data {}: {}", date, exception.getMessage());
                         return null;
                     }
                 }
             }
         } catch (SQLException e) {
-            System.err.println(java.util.ResourceBundle.getBundle("messages").getString("database.oracle.find.error") + " " + e.getMessage());
+            log.error("Erro ao consultar cotação para a data {} no MariaDB: {}", date, e.getMessage(), e);
         }
         return null;
     }
