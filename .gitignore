@@ -42,3 +42,4 @@ mariadb.env
 
 ### Mac OS ###
 .DS_Store
+oracle.env
