@@ -2,7 +2,7 @@
     <!-- Destino 1: Console -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} %-5level %logger{15} - %msg%n</pattern>
+            <pattern>%d{HH:mm:ss.SSS} %-5level %logger{15}%replace( [carteira=%X{walletId}]){' \[carteira=\]', ''} - %msg%n</pattern>
         </encoder>
     </appender>
 
@@ -10,7 +10,7 @@
     <appender name="ARQUIVO" class="ch.qos.logback.core.FileAppender">
         <file>logs/ftcoin.log</file>
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} %-5level [%thread] %logger - %msg%n</pattern>
+            <pattern>%d{HH:mm:ss.SSS} %-5level [%thread] %logger%replace( [carteira=%X{walletId}]){' \[carteira=\]', ''} - %msg%n</pattern>
         </encoder>
     </appender>
 
