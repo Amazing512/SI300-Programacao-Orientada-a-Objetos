@@ -21,7 +21,7 @@ public final class Main {
 
             System.out.println(Info.getStamp());
 
-            (new ProgramController(DatabaseSelector.MEMORY, messageProvider)).start(serverName);
+            (new ProgramController(DatabaseSelector.MARIADB, messageProvider)).start(serverName);
 
             log.info("Aplicação finalizada normalmente.");
         } catch(Exception ex) {
