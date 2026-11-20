@@ -7,7 +7,6 @@ import java.lang.reflect.Method;
 import java.time.LocalDate;
 
 import org.junit.jupiter.api.Test;
-import org.unicamp.poo.controller.OracleController;
 import org.unicamp.poo.controller.TransactionController;
 import org.unicamp.poo.dao.impl.memory.TransactionMemoryDAO;
 import org.unicamp.poo.dao.impl.memory.WalletMemoryDAO;
@@ -16,6 +15,7 @@ import org.unicamp.poo.model.Transaction;
 import org.unicamp.poo.model.Wallet;
 import org.unicamp.poo.model.enums.OperationType;
 import org.unicamp.poo.oracle.OracleSimpleClient;
+import org.unicamp.poo.service.OracleService;
 import org.unicamp.poo.util.MessageProvider;
 import org.unicamp.poo.view.TransactionView;
 
@@ -30,7 +30,7 @@ class TransactionControllerTest {
         view.transaction = new Transaction(wallet.getId(), LocalDate.of(2026, 5, 1), OperationType.CASH_IN, 2.5);
         view.rejectConfirmation = false;
 
-        invoke(new TransactionController(transactions, wallets, oracleController(), view, messages()), "actionBuyCoin");
+        invoke(new TransactionController(transactions, wallets, oracleService(), view, messages()), "actionBuyCoin");
 
         assertEquals(1, transactions.findByWalletId(wallet.getId()).size());
         assertEquals(2.5, transactions.findByWalletId(wallet.getId()).get(0).getQuantity());
@@ -46,7 +46,7 @@ class TransactionControllerTest {
         view.transaction = new Transaction(wallet.getId(), LocalDate.now(), OperationType.CASH_IN, 2.0);
         view.rejectConfirmation = true;
 
-        invoke(new TransactionController(transactions, wallets, oracleController(), view, messages()), "actionBuyCoin");
+        invoke(new TransactionController(transactions, wallets, oracleService(), view, messages()), "actionBuyCoin");
 
         assertEquals(0, transactions.findByWalletId(wallet.getId()).size());
         assertTrue(view.error != null);
@@ -58,7 +58,7 @@ class TransactionControllerTest {
         TestTransactionView view = new TestTransactionView();
         view.transaction = new Transaction(999999, LocalDate.now(), OperationType.CASH_IN, 2.0);
 
-        invoke(new TransactionController(transactions, new WalletMemoryDAO(), oracleController(), view, messages()), "actionBuyCoin");
+        invoke(new TransactionController(transactions, new WalletMemoryDAO(), oracleService(), view, messages()), "actionBuyCoin");
 
         assertEquals(0, transactions.findByWalletId(999999).size());
         assertTrue(view.error != null);
@@ -76,7 +76,7 @@ class TransactionControllerTest {
         view.operationDate = LocalDate.of(2026, 5, 2);
         view.rejectConfirmation = false;
 
-        invoke(new TransactionController(transactions, wallets, oracleController(), view, messages()), "actionSellCoin");
+        invoke(new TransactionController(transactions, wallets, oracleService(), view, messages()), "actionSellCoin");
 
         assertEquals(2, transactions.findByWalletId(wallet.getId()).size());
         Transaction sale = transactions.findByWalletId(wallet.getId()).get(1);
@@ -94,7 +94,7 @@ class TransactionControllerTest {
         view.walletId = wallet.getId();
         view.quantity = 3.0;
 
-        invoke(new TransactionController(transactions, wallets, oracleController(), view, messages()), "actionSellCoin");
+        invoke(new TransactionController(transactions, wallets, oracleService(), view, messages()), "actionSellCoin");
 
         assertEquals(1, transactions.findByWalletId(wallet.getId()).size());
         assertTrue(view.error != null);
@@ -106,18 +106,18 @@ class TransactionControllerTest {
         Wallet wallet = wallets.create(new Wallet("UnitTest-No-Quote", "Broker"));
         TransactionMemoryDAO transactions = new TransactionMemoryDAO();
         TestTransactionView view = new TestTransactionView();
-        OracleController emptyOracleController = new OracleController(new OracleSimpleClient());
+        OracleService emptyOracleService = new OracleService(new OracleSimpleClient());
 
-        invoke(new TransactionController(transactions, wallets, emptyOracleController, view, messages()), "actionBuyCoin");
+        invoke(new TransactionController(transactions, wallets, emptyOracleService, view, messages()), "actionBuyCoin");
 
         assertEquals(0, transactions.findByWalletId(wallet.getId()).size());
         assertEquals(messages().get("transaction.oracle.notAvailable"), view.error);
     }
 
-    private static OracleController oracleController() {
-        OracleController controller = new OracleController();
-        controller.create(new Oracle(LocalDate.now(), 8.0));
-        return controller;
+    private static OracleService oracleService() {
+        OracleService service = new OracleService();
+        service.create(new Oracle(LocalDate.now(), 8.0));
+        return service;
     }
 
     private static MessageProvider messages() {

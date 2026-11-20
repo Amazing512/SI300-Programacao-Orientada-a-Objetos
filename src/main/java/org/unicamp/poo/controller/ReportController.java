@@ -12,6 +12,7 @@ import org.unicamp.poo.model.Oracle;
 import org.unicamp.poo.model.Transaction;
 import org.unicamp.poo.model.Wallet;
 import org.unicamp.poo.model.enums.OperationType;
+import org.unicamp.poo.service.OracleService;
 import static org.unicamp.poo.util.ConsoleColors.RESET;
 import static org.unicamp.poo.util.ConsoleColors.YELLOW;
 import org.unicamp.poo.util.ConsoleScanner;
@@ -24,21 +25,21 @@ public class ReportController {
 
     private final WalletDAO walletDAO;
     private final TransactionDAO transactionDAO;
-    private final OracleController oracleController;
+    private final OracleService oracleService;
     private final ReportView view;
     private final MessageProvider messages;
 
     public ReportController(
         WalletDAO walletDAO,
         TransactionDAO transactionDAO,
-        OracleController oracleController,
+        OracleService oracleService,
         ReportView view,
         MessageProvider messages
     ) {
         super();
         this.walletDAO = walletDAO;
         this.transactionDAO = transactionDAO;
-        this.oracleController = oracleController;
+        this.oracleService = oracleService;
         this.view = view;
         this.messages = messages;
     }
@@ -60,7 +61,7 @@ public class ReportController {
 
     private double getTodayPrice() {
         try {
-            Oracle todayQuote = oracleController.getDailyQuote();
+            Oracle todayQuote = oracleService.getDailyQuote();
             return (todayQuote != null) ? todayQuote.getPrice() : 0.0;
         } catch (Exception e) {
             log.warn("Não foi possível obter a cotação de hoje: {}", e.getMessage());
@@ -78,7 +79,7 @@ public class ReportController {
         List<LedgerRow> ledger = new ArrayList<>();
 
         for (Transaction transaction : sortedTransactions) {
-            Oracle quote = oracleController.findByDate(transaction.getOperationDate());
+            Oracle quote = oracleService.findByDate(transaction.getOperationDate());
             double price = (quote != null) ? quote.getPrice() : todayPrice;
             double operationResult = 0.0;
 
@@ -119,7 +120,7 @@ public class ReportController {
 
         for (Transaction transaction : transactions) {
             double price;
-            Oracle quote = oracleController.findByDate(transaction.getOperationDate());
+            Oracle quote = oracleService.findByDate(transaction.getOperationDate());
 
             if (quote != null) {
                 price = quote.getPrice();
@@ -226,7 +227,7 @@ public class ReportController {
 
         for (Transaction transaction : transactions) {
             double price = todayPrice;
-            Oracle quote = oracleController.findByDate(transaction.getOperationDate());
+            Oracle quote = oracleService.findByDate(transaction.getOperationDate());
             if (quote != null) {
                 price = quote.getPrice();
             }

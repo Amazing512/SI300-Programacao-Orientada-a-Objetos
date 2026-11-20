@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import java.time.LocalDate;
 
 import org.junit.jupiter.api.Test;
-import org.unicamp.poo.controller.OracleController;
 import org.unicamp.poo.controller.ReportController;
 import org.unicamp.poo.dao.impl.memory.TransactionMemoryDAO;
 import org.unicamp.poo.dao.impl.memory.WalletMemoryDAO;
@@ -14,6 +13,7 @@ import org.unicamp.poo.model.Oracle;
 import org.unicamp.poo.model.Transaction;
 import org.unicamp.poo.model.Wallet;
 import org.unicamp.poo.model.enums.OperationType;
+import org.unicamp.poo.service.OracleService;
 import org.unicamp.poo.util.MessageProvider;
 import org.unicamp.poo.view.ReportView;
 
@@ -23,18 +23,18 @@ class ReportControllerTest {
     void calculatesFinancialReportWithHistoricalQuotes() {
         WalletMemoryDAO wallets = new WalletMemoryDAO();
         TransactionMemoryDAO transactions = new TransactionMemoryDAO();
-        OracleController oracleController = new OracleController();
+        OracleService oracleService = new OracleService();
         Wallet wallet = wallets.create(new Wallet("UnitTest-Report", "Broker"));
         LocalDate purchaseDate = LocalDate.of(2026, 4, 10);
         LocalDate saleDate = LocalDate.of(2026, 4, 11);
         transactions.create(new Transaction(wallet.getId(), purchaseDate, OperationType.CASH_IN, 10.0));
         transactions.create(new Transaction(wallet.getId(), saleDate, OperationType.CASH_OUT, 2.0));
-        Oracle todayQuote = oracleController.create(new Oracle(LocalDate.now(), 8.0));
-        oracleController.create(new Oracle(purchaseDate, 5.0));
-        oracleController.create(new Oracle(saleDate, todayQuote.getPrice()));
+        Oracle todayQuote = oracleService.create(new Oracle(LocalDate.now(), 8.0));
+        oracleService.create(new Oracle(purchaseDate, 5.0));
+        oracleService.create(new Oracle(saleDate, todayQuote.getPrice()));
         CapturingReportView view = new CapturingReportView(wallet.getId());
 
-        new ReportController(wallets, transactions, oracleController, view, messages())
+        new ReportController(wallets, transactions, oracleService, view, messages())
                 .showFinancialReport();
 
         double todayPrice = todayQuote.getPrice();
@@ -49,7 +49,7 @@ class ReportControllerTest {
         CapturingReportView view = new CapturingReportView(999999);
         ReportController controller = new ReportController(
                 new WalletMemoryDAO(), new TransactionMemoryDAO(),
-                new OracleController(), view, messages());
+                new OracleService(), view, messages());
 
         controller.showFinancialReport();
 

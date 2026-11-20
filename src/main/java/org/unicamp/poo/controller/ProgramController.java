@@ -17,6 +17,7 @@ import org.unicamp.poo.dao.impl.memory.TransactionMemoryDAO;
 import org.unicamp.poo.dao.impl.memory.WalletMemoryDAO;
 import org.unicamp.poo.model.enums.DatabaseSelector;
 import org.unicamp.poo.oracle.OracleSimpleClient;
+import org.unicamp.poo.service.OracleService;
 import static org.unicamp.poo.util.ConsoleColors.RESET;
 import static org.unicamp.poo.util.ConsoleColors.YELLOW;
 import org.unicamp.poo.util.ConsoleScanner;
@@ -37,7 +38,7 @@ public class ProgramController {
 
     private WalletDAO walletDAO;
     private TransactionDAO transactionDAO;
-    private OracleController oracleController;
+    private OracleService oracleService;
 
     public ProgramController(DatabaseSelector databaseSelector, MessageProvider messages) {
         super();
@@ -51,12 +52,12 @@ public class ProgramController {
     }
 
     void actionTransaction() {
-        final TransactionController transactionController = new TransactionController(transactionDAO, walletDAO, oracleController, new TransactionView(messages), messages);
+        final TransactionController transactionController = new TransactionController(transactionDAO, walletDAO, oracleService, new TransactionView(messages), messages);
         transactionController.start();
     }
 
     void actionReports() {
-        final ReportController reportController = new ReportController(walletDAO, transactionDAO, oracleController, new ReportView(messages), messages);
+        final ReportController reportController = new ReportController(walletDAO, transactionDAO, oracleService, new ReportView(messages), messages);
         reportController.start();
     }
 
@@ -183,8 +184,8 @@ public class ProgramController {
         this.databaseSelector = selector;
         log.info("Inicializando banco de dados no modo: {} (servidor: {})", selector, serverName);
 
-        if (oracleController == null) {
-            oracleController = new OracleController(new OracleSimpleClient());
+        if (oracleService == null) {
+            oracleService = new OracleService(new OracleSimpleClient());
         }
 
         switch (this.databaseSelector) {

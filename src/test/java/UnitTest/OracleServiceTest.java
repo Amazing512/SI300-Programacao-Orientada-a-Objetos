@@ -12,23 +12,23 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-import org.unicamp.poo.controller.OracleController;
 import org.unicamp.poo.model.Oracle;
 import org.unicamp.poo.oracle.OracleSimpleClient;
+import org.unicamp.poo.service.OracleService;
 
 import network.ExchangeRate;
 
-class OracleControllerTest {
+class OracleServiceTest {
 
     @Test
     void usesExistingQuoteAndCachesIt() {
-        OracleController controller = new OracleController(new OracleSimpleClient());
+        OracleService service = new OracleService(new OracleSimpleClient());
         LocalDate today = LocalDate.now();
         Oracle existing = new Oracle(today, 6.5);
-        controller.create(existing);
+        service.create(existing);
 
-        Oracle first = controller.getDailyQuote();
-        Oracle second = controller.getDailyQuote();
+        Oracle first = service.getDailyQuote();
+        Oracle second = service.getDailyQuote();
 
         assertSame(existing, first);
         assertSame(first, second);
@@ -37,24 +37,24 @@ class OracleControllerTest {
 
     @Test
     void throwsExceptionWhenDailyQuoteNotFound() {
-        OracleController controller = new OracleController(new OracleSimpleClient());
+        OracleService service = new OracleService(new OracleSimpleClient());
 
         IllegalStateException exception = assertThrows(
                 IllegalStateException.class,
-                controller::getDailyQuote
+                service::getDailyQuote
         );
         assertTrue(exception.getMessage().contains("Cotação não encontrada"));
     }
 
     @Test
     void findsQuoteByDateAndReturnsNullWhenMissing() {
-        OracleController controller = new OracleController(new OracleSimpleClient());
+        OracleService service = new OracleService(new OracleSimpleClient());
         LocalDate date = LocalDate.of(2026, 3, 15);
         Oracle expected = new Oracle(date, 4.0);
-        controller.create(expected);
+        service.create(expected);
 
-        assertSame(expected, controller.findByDate(date));
-        assertNull(controller.findByDate(date.plusDays(1)));
+        assertSame(expected, service.findByDate(date));
+        assertNull(service.findByDate(date.plusDays(1)));
     }
 
     @Test
@@ -67,14 +67,14 @@ class OracleControllerTest {
             }
         };
 
-        OracleController controller = new OracleController(mockClient);
-        Oracle loaded = controller.findByDate(targetDate);
+        OracleService service = new OracleService(mockClient);
+        Oracle loaded = service.findByDate(targetDate);
 
         assertNotNull(loaded);
         assertEquals(targetDate, loaded.getDate());
         assertEquals(7.85, loaded.getPrice());
 
         // Segundo acesso deve vir do cache
-        assertSame(loaded, controller.findByDate(targetDate));
+        assertSame(loaded, service.findByDate(targetDate));
     }
 }

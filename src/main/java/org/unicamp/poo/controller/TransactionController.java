@@ -14,6 +14,7 @@ import org.unicamp.poo.model.Oracle;
 import org.unicamp.poo.model.Transaction;
 import org.unicamp.poo.model.TransactionFactory;
 import org.unicamp.poo.model.enums.OperationType;
+import org.unicamp.poo.service.OracleService;
 import static org.unicamp.poo.util.ConsoleColors.RESET;
 import static org.unicamp.poo.util.ConsoleColors.YELLOW;
 import org.unicamp.poo.util.ConsoleScanner;
@@ -26,15 +27,15 @@ public class TransactionController {
 
     final TransactionDAO model;
     final WalletDAO walletModel;
-    final OracleController oracleController;
+    final OracleService oracleService;
     final TransactionView view;
     final MessageProvider messages;
 
-    public TransactionController(TransactionDAO model, WalletDAO walletModel, OracleController oracleController, TransactionView view, MessageProvider messages) {
+    public TransactionController(TransactionDAO model, WalletDAO walletModel, OracleService oracleService, TransactionView view, MessageProvider messages) {
         super();
         this.model = model;
         this.walletModel = walletModel;
-        this.oracleController = oracleController;
+        this.oracleService = oracleService;
         this.view = view;
         this.messages = messages;
     }
@@ -57,7 +58,7 @@ public class TransactionController {
     private void actionBuyCoin() {
         Oracle dailyQuote;
         try {
-            dailyQuote = oracleController.getDailyQuote();
+            dailyQuote = oracleService.getDailyQuote();
         } catch (Exception e) {
             log.warn("Não foi possível obter a cotação do oráculo para a compra: {}", e.getMessage());
             view.showErrorMessage(messages.get("transaction.oracle.notAvailable"));
@@ -126,7 +127,7 @@ public class TransactionController {
     private void actionSellCoin() {
         Oracle dailyQuote;
         try {
-            dailyQuote = oracleController.getDailyQuote();
+            dailyQuote = oracleService.getDailyQuote();
         } catch (Exception e) {
             log.warn("Não foi possível obter a cotação do oráculo para a venda: {}", e.getMessage());
             view.showErrorMessage(messages.get("transaction.oracle.notAvailable"));
