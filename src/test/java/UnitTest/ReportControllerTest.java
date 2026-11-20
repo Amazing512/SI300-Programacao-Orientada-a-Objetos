@@ -8,7 +8,6 @@ import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 import org.unicamp.poo.controller.OracleController;
 import org.unicamp.poo.controller.ReportController;
-import org.unicamp.poo.dao.impl.memory.OracleMemoryDAO;
 import org.unicamp.poo.dao.impl.memory.TransactionMemoryDAO;
 import org.unicamp.poo.dao.impl.memory.WalletMemoryDAO;
 import org.unicamp.poo.model.Oracle;
@@ -24,18 +23,15 @@ class ReportControllerTest {
     void calculatesFinancialReportWithHistoricalQuotes() {
         WalletMemoryDAO wallets = new WalletMemoryDAO();
         TransactionMemoryDAO transactions = new TransactionMemoryDAO();
-        OracleMemoryDAO oracles = new OracleMemoryDAO();
+        OracleController oracleController = new OracleController();
         Wallet wallet = wallets.create(new Wallet("UnitTest-Report", "Broker"));
         LocalDate purchaseDate = LocalDate.of(2026, 4, 10);
         LocalDate saleDate = LocalDate.of(2026, 4, 11);
         transactions.create(new Transaction(wallet.getId(), purchaseDate, OperationType.CASH_IN, 10.0));
         transactions.create(new Transaction(wallet.getId(), saleDate, OperationType.CASH_OUT, 2.0));
-        Oracle todayQuote = oracles.findByDate(LocalDate.now());
-        if (todayQuote == null) {
-            todayQuote = oracles.create(new Oracle(LocalDate.now(), 8.0));
-        }
-        oracles.create(new Oracle(purchaseDate, 5.0));
-        OracleController oracleController = new OracleController(oracles);
+        Oracle todayQuote = oracleController.create(new Oracle(LocalDate.now(), 8.0));
+        oracleController.create(new Oracle(purchaseDate, 5.0));
+        oracleController.create(new Oracle(saleDate, todayQuote.getPrice()));
         CapturingReportView view = new CapturingReportView(wallet.getId());
 
         new ReportController(wallets, transactions, oracleController, view, messages())
@@ -53,7 +49,7 @@ class ReportControllerTest {
         CapturingReportView view = new CapturingReportView(999999);
         ReportController controller = new ReportController(
                 new WalletMemoryDAO(), new TransactionMemoryDAO(),
-                new OracleController(new OracleMemoryDAO()), view, messages());
+                new OracleController(), view, messages());
 
         controller.showFinancialReport();
 

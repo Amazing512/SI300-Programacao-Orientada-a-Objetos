@@ -10,7 +10,6 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.unicamp.poo.controller.OracleController;
 import org.unicamp.poo.controller.ReportController;
-import org.unicamp.poo.dao.impl.memory.OracleMemoryDAO;
 import org.unicamp.poo.dao.impl.memory.TransactionMemoryDAO;
 import org.unicamp.poo.dao.impl.memory.WalletMemoryDAO;
 import org.unicamp.poo.model.Oracle;
@@ -28,7 +27,7 @@ class ReportControllerAdditionalTest {
         Wallet first = wallets.create(new Wallet("UnitTest-Order-Z", "Broker"));
         Wallet second = wallets.create(new Wallet("UnitTest-Order-A", "Broker"));
         CapturingReportView view = new CapturingReportView(0);
-        ReportController controller = controller(wallets, new TransactionMemoryDAO(), new OracleMemoryDAO(), view);
+        ReportController controller = controller(wallets, new TransactionMemoryDAO(), new OracleController(), view);
 
         invoke(controller, "showWalletsOrderedById");
         assertTrue(indexOf(view.walletsById, first) < indexOf(view.walletsById, second));
@@ -46,7 +45,7 @@ class ReportControllerAdditionalTest {
         transactions.create(new Transaction(wallet.getId(), LocalDate.now(), OperationType.CASH_OUT, 3.5));
         CapturingReportView view = new CapturingReportView(wallet.getId());
 
-        invoke(controller(wallets, transactions, new OracleMemoryDAO(), view), "showWalletCurrentBalance");
+        invoke(controller(wallets, transactions, new OracleController(), view), "showWalletCurrentBalance");
 
         assertEquals(6.5, view.balance);
     }
@@ -58,14 +57,12 @@ class ReportControllerAdditionalTest {
         TransactionMemoryDAO transactions = new TransactionMemoryDAO();
         LocalDate date = LocalDate.of(2026, 6, 1);
         transactions.create(new Transaction(wallet.getId(), date, OperationType.CASH_IN, 4.0));
-        OracleMemoryDAO oracles = new OracleMemoryDAO();
-        if (oracles.findByDate(LocalDate.now()) == null) {
-            oracles.create(new Oracle(LocalDate.now(), 8.0));
-        }
-        oracles.create(new Oracle(date, 5.0));
+        OracleController oracleController = new OracleController();
+        oracleController.create(new Oracle(LocalDate.now(), 8.0));
+        oracleController.create(new Oracle(date, 5.0));
         CapturingReportView view = new CapturingReportView(wallet.getId());
 
-        invoke(controller(wallets, transactions, oracles, view), "showWalletHistory");
+        invoke(controller(wallets, transactions, oracleController, view), "showWalletHistory");
 
         assertEquals(1, view.history.size());
         assertEquals(20.0, view.cashValues.get(0));
@@ -80,15 +77,13 @@ class ReportControllerAdditionalTest {
         LocalDate saleDate = LocalDate.of(2026, 6, 2);
         transactions.create(new Transaction(profitable.getId(), purchaseDate, OperationType.CASH_IN, 2.0));
         transactions.create(new Transaction(profitable.getId(), saleDate, OperationType.CASH_OUT, 1.0));
-        OracleMemoryDAO oracles = new OracleMemoryDAO();
-        if (oracles.findByDate(LocalDate.now()) == null) {
-            oracles.create(new Oracle(LocalDate.now(), 8.0));
-        }
-        oracles.create(new Oracle(purchaseDate, 5.0));
-        oracles.create(new Oracle(saleDate, 8.0));
+        OracleController oracleController = new OracleController();
+        oracleController.create(new Oracle(LocalDate.now(), 8.0));
+        oracleController.create(new Oracle(purchaseDate, 5.0));
+        oracleController.create(new Oracle(saleDate, 8.0));
         CapturingReportView view = new CapturingReportView(profitable.getId());
 
-        invoke(controller(wallets, transactions, oracles, view), "showWalletGainOrLoss");
+        invoke(controller(wallets, transactions, oracleController, view), "showWalletGainOrLoss");
 
         assertEquals(profitable, view.gainLossWallet);
         assertEquals(2, view.gainLossTransactions.size());
@@ -100,8 +95,8 @@ class ReportControllerAdditionalTest {
     }
 
     private static ReportController controller(WalletMemoryDAO wallets, TransactionMemoryDAO transactions,
-            OracleMemoryDAO oracles, CapturingReportView view) {
-        return new ReportController(wallets, transactions, new OracleController(oracles), view,
+            OracleController oracleController, CapturingReportView view) {
+        return new ReportController(wallets, transactions, oracleController, view,
                 new MessageProvider("messages", "pt", "BR"));
     }
 

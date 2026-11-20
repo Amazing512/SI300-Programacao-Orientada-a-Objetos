@@ -7,10 +7,8 @@ import java.time.LocalDate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.unicamp.poo.dao.OracleDAO;
 import org.unicamp.poo.dao.TransactionDAO;
 import org.unicamp.poo.dao.WalletDAO;
-import org.unicamp.poo.model.OraclePriceFactory;
 import org.unicamp.poo.model.TransactionFactory;
 import org.unicamp.poo.model.Wallet;
 import org.unicamp.poo.model.WalletFactory;
@@ -21,7 +19,7 @@ public final class DatabaseSeeder {
     private DatabaseSeeder() {
     }
 
-    public static void seed(WalletDAO walletDAO, TransactionDAO transactionDAO, OracleDAO oracleDAO, MessageProvider messages) {
+    public static void seed(WalletDAO walletDAO, TransactionDAO transactionDAO, MessageProvider messages) {
         if (!walletDAO.findAll().isEmpty()) {
             log.debug("DatabaseSeeder: base de dados já possui registros. Seeding skippado.");
             return;
@@ -35,12 +33,6 @@ public final class DatabaseSeeder {
         LocalDate twoDaysAgo = today.minusDays(2);
         LocalDate threeDaysAgo = today.minusDays(3);
         LocalDate fourDaysAgo = today.minusDays(4);
-
-        oracleDAO.create(OraclePriceFactory.create(today, 5.50));
-        oracleDAO.create(OraclePriceFactory.create(yesterday, 5.25));
-        oracleDAO.create(OraclePriceFactory.create(twoDaysAgo, 5.75));
-        oracleDAO.create(OraclePriceFactory.create(threeDaysAgo, 6.10));
-        oracleDAO.create(OraclePriceFactory.create(fourDaysAgo, 4.90));
 
         Wallet w1 = walletDAO.create(WalletFactory.create("Alice Silva", "Binance"));
         Wallet w2 = walletDAO.create(WalletFactory.create("Bob Santos", "Coinbase"));

@@ -7,7 +7,6 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.unicamp.poo.dao.OracleDAO;
 import org.unicamp.poo.model.Oracle;
 import org.unicamp.poo.model.OraclePriceFactory;
 import org.unicamp.poo.oracle.OracleSimpleClient;
@@ -16,32 +15,29 @@ import org.unicamp.poo.util.DailyCache;
 import network.ExchangeRate;
 
 /**
- * Fornece cotações da moeda virtual. Ordem de consulta: cache, banco (DAO) e,
- * por último, a API do oráculo; o que vem da API é gravado no banco e no cache
- * para reduzir chamadas de rede.
+ * Fornece cotações da moeda virtual gerenciadas através do OracleSimpleClient.
+ * Mantém cache em memória para cotação diária e cotações históricas a fim de reduzir chamadas de rede.
  */
-public final class OracleController implements OracleDAO {
+public final class OracleController {
     private static final Logger log = LoggerFactory.getLogger(OracleController.class);
 
-    private final OracleDAO model;
     private final OracleSimpleClient client;
     private final DailyCache<Oracle> todayCache;
     private final Map<LocalDate, Oracle> historicalCache;
 
-    public OracleController(OracleDAO model) {
-        this(model, new OracleSimpleClient());
+    public OracleController() {
+        this(new OracleSimpleClient());
     }
 
-    public OracleController(OracleDAO model, OracleSimpleClient client) {
+    public OracleController(OracleSimpleClient client) {
         super();
-        this.model = model;
-        this.client = client;
+        this.client = client != null ? client : new OracleSimpleClient();
         this.todayCache = new DailyCache<>();
         this.historicalCache = new HashMap<>();
     }
 
     /**
-     * Cotação de hoje (cache, banco ou API).
+     * Cotação de hoje (cache ou OracleSimpleClient).
      *
      * @return a cotação, ou cotação gerada se nenhuma fonte a tiver
      */
@@ -54,29 +50,38 @@ public final class OracleController implements OracleDAO {
         LocalDate today = LocalDate.now();
         final Oracle quote = loadQuote(today);
         if (quote != null) {
-            log.info("Cotação diária localizada para a data {}: R$ {}", today, quote.getPrice());
+            log.info("Cotação diária localizada via OracleSimpleClient para a data {}: R$ {}", today, quote.getPrice());
             todayCache.put(quote);
             return quote;
         }
 
-        // Se nem o banco nem o oráculo tiverem a cotação de hoje, gera uma cotação fallback
+        // Se o oráculo não tiver a cotação de hoje, gera uma cotação fallback simulada
         double simulatedPrice = 1.0 + Math.random() * 9.0;
         Oracle fallbackQuote = OraclePriceFactory.create(today, simulatedPrice);
-        Oracle created = model.create(fallbackQuote);
-        Oracle toCache = created != null ? created : fallbackQuote;
-        todayCache.put(toCache);
-        log.info("Cotação diária gerada para a data {}: R$ {}", today, toCache.getPrice());
-        return toCache;
+        todayCache.put(fallbackQuote);
+        log.info("Cotação diária gerada para a data {}: R$ {}", today, fallbackQuote.getPrice());
+        return fallbackQuote;
     }
 
-    @Override
+    /**
+     * Registra uma cotação no cache local (útil para testes e mock).
+     */
     public Oracle create(Oracle oracle) {
-        log.info("Criando cotação via OracleController: Data={}, Preço={}", oracle.getDate(), oracle.getPrice());
-        return model.create(oracle);
+        if (oracle == null) {
+            return null;
+        }
+        log.info("Registrando cotação no cache do OracleController: Data={}, Preço={}", oracle.getDate(), oracle.getPrice());
+        if (LocalDate.now().equals(oracle.getDate())) {
+            todayCache.put(oracle);
+        }
+        historicalCache.put(oracle.getDate(), oracle);
+        return oracle;
     }
 
-    @Override
     public Oracle findByDate(LocalDate date) {
+        if (date == null) {
+            return null;
+        }
         if (LocalDate.now().equals(date)) {
             return getOrGenerateDailyQuote();
         }
@@ -94,12 +99,8 @@ public final class OracleController implements OracleDAO {
         return quote;
     }
 
-    /** Banco primeiro; se não houver, consulta a API e persiste o resultado. */
+    /** Consulta a API remota via OracleSimpleClient. */
     private Oracle loadQuote(LocalDate date) {
-        final Oracle stored = model.findByDate(date);
-        if (stored != null) {
-            return stored;
-        }
         if (client == null) {
             return null;
         }
@@ -108,9 +109,7 @@ public final class OracleController implements OracleDAO {
             if (rates != null && !rates.isEmpty()) {
                 for (final ExchangeRate rate : rates) {
                     if (date.equals(rate.getDate()) && rate.getValue() != null) {
-                        final Oracle oracle = OraclePriceFactory.create(rate.getDate(), rate.getValue().doubleValue());
-                        final Oracle saved = model.create(oracle);
-                        return saved != null ? saved : oracle;
+                        return OraclePriceFactory.create(rate.getDate(), rate.getValue().doubleValue());
                     }
                 }
             }

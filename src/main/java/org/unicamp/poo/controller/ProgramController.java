@@ -8,14 +8,11 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.unicamp.poo.dao.DatabaseConnection;
-import org.unicamp.poo.dao.OracleDAO;
 import org.unicamp.poo.dao.TransactionDAO;
 import org.unicamp.poo.dao.WalletDAO;
 import org.unicamp.poo.dao.impl.mariadb.MariaDBConnection;
-import org.unicamp.poo.dao.impl.mariadb.OracleMariaDBDAO;
 import org.unicamp.poo.dao.impl.mariadb.TransactionDAOImplMariaDB;
 import org.unicamp.poo.dao.impl.mariadb.WalletDAOImplMariaDB;
-import org.unicamp.poo.dao.impl.memory.OracleMemoryDAO;
 import org.unicamp.poo.dao.impl.memory.TransactionMemoryDAO;
 import org.unicamp.poo.dao.impl.memory.WalletMemoryDAO;
 import org.unicamp.poo.model.enums.DatabaseSelector;
@@ -186,7 +183,9 @@ public class ProgramController {
         this.databaseSelector = selector;
         log.info("Inicializando banco de dados no modo: {} (servidor: {})", selector, serverName);
 
-        OracleDAO oracleDAO;
+        if (oracleController == null) {
+            oracleController = new OracleController(new OracleSimpleClient());
+        }
 
         switch (this.databaseSelector) {
             case MARIADB -> {
@@ -201,21 +200,17 @@ public class ProgramController {
 
                 walletDAO = new WalletDAOImplMariaDB(dbConn.getConnection());
                 transactionDAO = new TransactionDAOImplMariaDB(dbConn.getConnection());
-                oracleDAO = new OracleMariaDBDAO(dbConn.getConnection());
-                oracleController = new OracleController(oracleDAO, new OracleSimpleClient());
 
                 log.info("Executando carga inicial de dados no MariaDB...");
-                DatabaseSeeder.seed(walletDAO, transactionDAO, oracleDAO, messages);
+                DatabaseSeeder.seed(walletDAO, transactionDAO, messages);
             }
             case MEMORY -> {
                 walletDAO = new WalletMemoryDAO();
                 transactionDAO = new TransactionMemoryDAO();
-                oracleDAO = new OracleMemoryDAO();
-                oracleController = new OracleController(oracleDAO, new OracleSimpleClient());
                 System.out.println(messages.get("success.message.database"));
 
                 log.info("Executando carga inicial de dados no banco em memória...");
-                DatabaseSeeder.seed(walletDAO, transactionDAO, oracleDAO, messages);
+                DatabaseSeeder.seed(walletDAO, transactionDAO, messages);
             }
         }
     }

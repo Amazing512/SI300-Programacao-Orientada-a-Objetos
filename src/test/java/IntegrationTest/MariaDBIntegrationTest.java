@@ -16,10 +16,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
-import org.unicamp.poo.dao.impl.mariadb.OracleMariaDBDAO;
 import org.unicamp.poo.dao.impl.mariadb.TransactionDAOImplMariaDB;
 import org.unicamp.poo.dao.impl.mariadb.WalletDAOImplMariaDB;
-import org.unicamp.poo.model.Oracle;
 import org.unicamp.poo.model.Transaction;
 import org.unicamp.poo.model.Wallet;
 import org.unicamp.poo.model.enums.OperationType;
@@ -102,22 +100,6 @@ class MariaDBIntegrationTest {
                         && found.getOperationDate().equals(date)
                         && found.getOperationType() == OperationType.CASH_IN
                         && found.getQuantity() == 3.75));
-    }
-
-    @Test
-    void persistsAndReadsOraclePriceByDate() {
-        OracleMariaDBDAO oracles = new OracleMariaDBDAO(connection);
-        LocalDate date = LocalDate.of(1900, 1, 1)
-                .plusDays(Math.abs(UUID.randomUUID().getLeastSignificantBits() % 100_000));
-        double price = 123.45;
-        Oracle oracle = new Oracle(date, price);
-
-        assertNotNull(oracles.create(oracle));
-
-        Oracle persisted = oracles.findByDate(date);
-        assertNotNull(persisted);
-        assertEquals(date, persisted.getDate());
-        assertEquals(price, persisted.getPrice());
     }
 
     private static String requiredEnvironmentVariable(String name) {

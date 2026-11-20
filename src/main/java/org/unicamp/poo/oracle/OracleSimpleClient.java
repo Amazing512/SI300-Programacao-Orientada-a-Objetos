@@ -19,7 +19,7 @@ import network.ExchangeRate;
 import network.NetworkRequest;
 import network.NetworkResponse;
 
-public final class OracleSimpleClient
+public class OracleSimpleClient
    {
    private static final Logger log = LoggerFactory.getLogger(OracleSimpleClient.class);
 

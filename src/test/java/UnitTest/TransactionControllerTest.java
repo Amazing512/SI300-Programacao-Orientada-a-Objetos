@@ -9,7 +9,6 @@ import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 import org.unicamp.poo.controller.OracleController;
 import org.unicamp.poo.controller.TransactionController;
-import org.unicamp.poo.dao.impl.memory.OracleMemoryDAO;
 import org.unicamp.poo.dao.impl.memory.TransactionMemoryDAO;
 import org.unicamp.poo.dao.impl.memory.WalletMemoryDAO;
 import org.unicamp.poo.model.Oracle;
@@ -101,11 +100,9 @@ class TransactionControllerTest {
     }
 
     private static OracleController oracleController() {
-        OracleMemoryDAO oracles = new OracleMemoryDAO();
-        if (oracles.findByDate(LocalDate.now()) == null) {
-            oracles.create(new Oracle(LocalDate.now(), 8.0));
-        }
-        return new OracleController(oracles);
+        OracleController controller = new OracleController();
+        controller.create(new Oracle(LocalDate.now(), 8.0));
+        return controller;
     }
 
     private static MessageProvider messages() {

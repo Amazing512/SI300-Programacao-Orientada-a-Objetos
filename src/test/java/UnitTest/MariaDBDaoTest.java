@@ -18,10 +18,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
-import org.unicamp.poo.dao.impl.mariadb.OracleMariaDBDAO;
 import org.unicamp.poo.dao.impl.mariadb.TransactionDAOImplMariaDB;
 import org.unicamp.poo.dao.impl.mariadb.WalletDAOImplMariaDB;
-import org.unicamp.poo.model.Oracle;
 import org.unicamp.poo.model.Transaction;
 import org.unicamp.poo.model.Wallet;
 import org.unicamp.poo.model.enums.OperationType;
@@ -118,28 +116,7 @@ class MariaDBDaoTest {
         assertTrue(jdbc.sql.startsWith("INSERT INTO MOVIMENTACAO"));
     }
 
-    @Test
-    void findsOracleByDateAndReturnsNullWhenNotFound() {
-        LocalDate date = LocalDate.of(2026, 10, 3);
-        JdbcFixture jdbc = new JdbcFixture(List.of(Map.of(
-                "Data", Date.valueOf(date), "Cotacao", 6.75)), null, false);
 
-        Oracle oracle = new OracleMariaDBDAO(jdbc.connection).findByDate(date);
-
-        assertEquals(date, oracle.getDate());
-        assertEquals(6.75, oracle.getPrice());
-        assertEquals(Date.valueOf(date), jdbc.parameters.get(1));
-
-        JdbcFixture missing = new JdbcFixture(List.of(), null, false);
-        assertNull(new OracleMariaDBDAO(missing.connection).findByDate(date));
-    }
-
-    @Test
-    void returnsNullWhenOracleQueryFails() {
-        JdbcFixture jdbc = new JdbcFixture(List.of(), null, true);
-
-        assertNull(new OracleMariaDBDAO(jdbc.connection).findByDate(LocalDate.now()));
-    }
 
     private static final class JdbcFixture {
         private final Map<Integer, Object> parameters = new HashMap<>();
