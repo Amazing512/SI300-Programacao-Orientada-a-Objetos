@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.time.LocalDate;
 import java.util.List;
@@ -24,10 +25,16 @@ public final class OracleSimpleClient
 
    private String host;
    private int    port;
+   private int    timeoutMillis;
    private String groupName;
    private String groupPassword;
 
    public OracleSimpleClient()
+      {
+      this(null, 0);
+      }
+
+   public OracleSimpleClient(String host, int port)
       {
       final Properties props = new Properties();
       final Properties credentials = new Properties();
@@ -37,20 +44,26 @@ public final class OracleSimpleClient
          if (input != null)
             {
             props.load(input);
-            host = props.getProperty("serverIP");
-            port = Integer.parseInt(props.getProperty("serverPort"));
             }
+         else
+            {
+            log.error("Arquivo OracleServer.properties não encontrado.");
+            }
+
+         this.host = host == null || host.isBlank() ? props.getProperty("serverIP") : host;
+         this.port = host == null ? parseIntegerProperty(props, "serverPort") : port;
+         timeoutMillis = parseIntegerProperty(props, "timeoutMillis");
 
          groupName = System.getenv("ORACLE_GROUP_NAME");
          groupPassword = System.getenv("ORACLE_GROUP_PASSWORD");
 
-         if ((groupName == null || groupPassword == null) && loadCredentialsFromFile(credentials))
+         if ((isBlank(groupName) || isBlank(groupPassword)) && loadCredentialsFromFile(credentials))
             {
-            if (groupName == null)
+            if (isBlank(groupName))
                {
                groupName = credentials.getProperty("ORACLE_GROUP_NAME");
                }
-            if (groupPassword == null)
+            if (isBlank(groupPassword))
                {
                groupPassword = credentials.getProperty("ORACLE_GROUP_PASSWORD");
                }
@@ -67,13 +80,77 @@ public final class OracleSimpleClient
          }
       }
 
+   private int parseIntegerProperty(Properties props, String propertyName)
+      {
+      try
+         {
+         return Integer.parseInt(props.getProperty(propertyName, "0").trim());
+         }
+      catch (final NumberFormatException exceptionValue)
+         {
+         log.error("Valor inválido para {} nas configurações do Oráculo.", propertyName, exceptionValue);
+         return 0;
+         }
+      }
+
+   private boolean isBlank(String value)
+      {
+      return value == null || value.isBlank();
+      }
+
+   public static void main(String[] args)
+      {
+      try
+         {
+         final OracleSimpleClient client;
+         if (args.length == 2)
+            {
+            client = new OracleSimpleClient(args[0], Integer.parseInt(args[1]));
+            }
+         else if (args.length == 0)
+            {
+            client = new OracleSimpleClient();
+            }
+         else
+            {
+            System.err.println("Uso: OracleSimpleClient [host porta]");
+            System.exit(2);
+            return;
+            }
+
+         final LocalDate lastDate = LocalDate.now();
+         final LocalDate firstDate = lastDate.minusDays(7);
+         final List<ExchangeRate> records = client.getValues(firstDate, lastDate);
+         if (records.isEmpty())
+            {
+            System.out.println("No records found");
+            }
+         else
+            {
+            for (final ExchangeRate record : records)
+               {
+               System.out.printf("%s, %.2f%n", record.getDate(), record.getValue());
+               }
+            }
+         }
+      catch (final Exception exceptionValue)
+         {
+         System.err.println("Client encountered error: " + exceptionValue.getMessage());
+         System.exit(1);
+         }
+      }
+
    public List<ExchangeRate> getValues(LocalDate since, LocalDate to) throws Exception
       {
-      if (host == null || port <= 0)
+      if (isBlank(host) || port <= 0 || port > 65535)
          {
          throw new IllegalStateException("Servidor do Oráculo não configurado (host ou porta inválidos).");
          }
-      if (groupName == null || groupPassword == null)
+      if (timeoutMillis <= 0)
+         {
+         throw new IllegalStateException("Timeout do Oráculo não configurado ou inválido.");
+         }
+      if (isBlank(groupName) || isBlank(groupPassword))
          {
          throw new IllegalStateException("Credenciais do Oráculo não configuradas.");
          }
@@ -81,9 +158,13 @@ public final class OracleSimpleClient
       final NetworkRequest  request  = new NetworkRequest(groupName, groupPassword, since, to);
       final NetworkResponse response = sendRequest(request);
 
-      if (response.errorMessage != null)
+      if (response == null)
          {
-         throw new RuntimeException(response.errorMessage);
+         throw new IllegalStateException("O servidor do Oráculo retornou uma resposta vazia.");
+         }
+      if (response.getErrorMessage() != null)
+         {
+         throw new RuntimeException(response.getErrorMessage());
          }
 
       return (response.getExchangeRates());
@@ -91,11 +172,16 @@ public final class OracleSimpleClient
 
    private NetworkResponse sendRequest(NetworkRequest request) throws Exception
       {
-      try (Socket socket = new Socket(host, port); ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream()); ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream()))
+      try (Socket socket = new Socket())
          {
-         outputStream.writeObject(request);
-         outputStream.flush();
-         return ((NetworkResponse) inputStream.readObject());
+         socket.connect(new InetSocketAddress(host, port), timeoutMillis);
+         socket.setSoTimeout(timeoutMillis);
+         try (ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream()); ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream()))
+            {
+            outputStream.writeObject(request);
+            outputStream.flush();
+            return ((NetworkResponse) inputStream.readObject());
+            }
          }
       }
 

@@ -36,6 +36,10 @@
    mvn "-Doracle.integration=true" "-Dtest=IntegrationTest.OracleApiIntegrationTest" test
    ```
 
+### Cliente simples do Oráculo
+
+O cliente usa o servidor e o timeout definidos em `OracleServer.properties`, e as credenciais em `ORACLE_GROUP_NAME`/`ORACLE_GROUP_PASSWORD` ou no arquivo local `oracle.env`. Para executar manualmente, inicie `org.unicamp.poo.oracle.OracleSimpleClient` pela IDE; opcionalmente, informe `host porta` como argumentos para substituir o servidor configurado. O cliente consulta e imprime as cotações dos últimos sete dias.
+
 ### Executar os dois testes
 
 1. Configure as variáveis de ambiente do MariaDB e do Oráculo conforme os passos acima.
