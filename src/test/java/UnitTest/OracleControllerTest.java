@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
@@ -26,8 +27,8 @@ class OracleControllerTest {
         Oracle existing = new Oracle(today, 6.5);
         controller.create(existing);
 
-        Oracle first = controller.getOrGenerateDailyQuote();
-        Oracle second = controller.getOrGenerateDailyQuote();
+        Oracle first = controller.getDailyQuote();
+        Oracle second = controller.getDailyQuote();
 
         assertSame(existing, first);
         assertSame(first, second);
@@ -35,13 +36,14 @@ class OracleControllerTest {
     }
 
     @Test
-    void generatesQuoteWhenDateDoesNotExist() {
+    void throwsExceptionWhenDailyQuoteNotFound() {
         OracleController controller = new OracleController(new OracleSimpleClient());
 
-        Oracle quote = controller.getOrGenerateDailyQuote();
-
-        assertEquals(LocalDate.now(), quote.getDate());
-        assertTrue(quote.getPrice() >= 1.0 && quote.getPrice() <= 10.0);
+        IllegalStateException exception = assertThrows(
+                IllegalStateException.class,
+                controller::getDailyQuote
+        );
+        assertTrue(exception.getMessage().contains("Cotação não encontrada"));
     }
 
     @Test

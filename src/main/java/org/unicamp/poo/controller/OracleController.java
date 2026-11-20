@@ -39,9 +39,10 @@ public final class OracleController {
     /**
      * Cotação de hoje (cache ou OracleSimpleClient).
      *
-     * @return a cotação, ou cotação gerada se nenhuma fonte a tiver
+     * @return a cotação diária
+     * @throws IllegalStateException se a cotação não for encontrada
      */
-    public Oracle getOrGenerateDailyQuote() {
+    public Oracle getDailyQuote() {
         final Oracle cached = todayCache.get();
         if (cached != null) {
             log.debug("Cotação diária recuperada do cache: R$ {}", cached.getPrice());
@@ -55,12 +56,8 @@ public final class OracleController {
             return quote;
         }
 
-        // Se o oráculo não tiver a cotação de hoje, gera uma cotação fallback simulada
-        double simulatedPrice = 1.0 + Math.random() * 9.0;
-        Oracle fallbackQuote = OraclePriceFactory.create(today, simulatedPrice);
-        todayCache.put(fallbackQuote);
-        log.info("Cotação diária gerada para a data {}: R$ {}", today, fallbackQuote.getPrice());
-        return fallbackQuote;
+        log.error("Cotação não encontrada para a data de hoje: {}", today);
+        throw new IllegalStateException("Cotação não encontrada para a data de hoje: " + today);
     }
 
     /**
@@ -83,7 +80,11 @@ public final class OracleController {
             return null;
         }
         if (LocalDate.now().equals(date)) {
-            return getOrGenerateDailyQuote();
+            try {
+                return getDailyQuote();
+            } catch (IllegalStateException e) {
+                return null;
+            }
         }
         final Oracle cached = historicalCache.get(date);
         if (cached != null) {

@@ -59,8 +59,13 @@ public class ReportController {
     }
 
     private double getTodayPrice() {
-        Oracle todayQuote = oracleController.getOrGenerateDailyQuote();
-        return (todayQuote != null) ? todayQuote.getPrice() : 0.0;
+        try {
+            Oracle todayQuote = oracleController.getDailyQuote();
+            return (todayQuote != null) ? todayQuote.getPrice() : 0.0;
+        } catch (Exception e) {
+            log.warn("Não foi possível obter a cotação de hoje: {}", e.getMessage());
+            return 0.0;
+        }
     }
 
     private record LedgerRow(double price, double coinBalance, double averageCost, double operationResult, double accumulatedResult) {}
@@ -110,11 +115,7 @@ public class ReportController {
         double totalMoneySpent = 0.0;
         double totalMoneyReceived = 0.0;
 
-        double todayPrice = 0.0;
-        Oracle todayQuote = oracleController.getOrGenerateDailyQuote();
-        if (todayQuote != null) {
-            todayPrice = todayQuote.getPrice();
-        }
+        double todayPrice = getTodayPrice();
 
         for (Transaction transaction : transactions) {
             double price;
@@ -221,12 +222,7 @@ public class ReportController {
 
         List<Double> cashValues = new ArrayList<>();
 
-        double todayPrice = 0.0;
-
-        Oracle todayQuote = oracleController.getOrGenerateDailyQuote();
-        if (todayQuote != null) {
-            todayPrice = todayQuote.getPrice();
-        }
+        double todayPrice = getTodayPrice();
 
         for (Transaction transaction : transactions) {
             double price = todayPrice;

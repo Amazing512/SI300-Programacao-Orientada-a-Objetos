@@ -15,6 +15,7 @@ import org.unicamp.poo.model.Oracle;
 import org.unicamp.poo.model.Transaction;
 import org.unicamp.poo.model.Wallet;
 import org.unicamp.poo.model.enums.OperationType;
+import org.unicamp.poo.oracle.OracleSimpleClient;
 import org.unicamp.poo.util.MessageProvider;
 import org.unicamp.poo.view.TransactionView;
 
@@ -97,6 +98,20 @@ class TransactionControllerTest {
 
         assertEquals(1, transactions.findByWalletId(wallet.getId()).size());
         assertTrue(view.error != null);
+    }
+
+    @Test
+    void abortsBuyWhenOracleQuoteNotAvailable() throws Exception {
+        WalletMemoryDAO wallets = new WalletMemoryDAO();
+        Wallet wallet = wallets.create(new Wallet("UnitTest-No-Quote", "Broker"));
+        TransactionMemoryDAO transactions = new TransactionMemoryDAO();
+        TestTransactionView view = new TestTransactionView();
+        OracleController emptyOracleController = new OracleController(new OracleSimpleClient());
+
+        invoke(new TransactionController(transactions, wallets, emptyOracleController, view, messages()), "actionBuyCoin");
+
+        assertEquals(0, transactions.findByWalletId(wallet.getId()).size());
+        assertEquals(messages().get("transaction.oracle.notAvailable"), view.error);
     }
 
     private static OracleController oracleController() {

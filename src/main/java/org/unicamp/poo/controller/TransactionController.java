@@ -55,7 +55,14 @@ public class TransactionController {
     }
 
     private void actionBuyCoin() {
-        Oracle dailyQuote = oracleController.getOrGenerateDailyQuote();
+        Oracle dailyQuote;
+        try {
+            dailyQuote = oracleController.getDailyQuote();
+        } catch (Exception e) {
+            log.warn("Não foi possível obter a cotação do oráculo para a compra: {}", e.getMessage());
+            view.showErrorMessage(messages.get("transaction.oracle.notAvailable"));
+            return;
+        }
         if (dailyQuote == null) {
             log.warn("Não foi possível obter a cotação do oráculo para a compra.");
             view.showErrorMessage(messages.get("transaction.oracle.notAvailable"));
@@ -117,7 +124,14 @@ public class TransactionController {
     }
 
     private void actionSellCoin() {
-        Oracle dailyQuote = oracleController.getOrGenerateDailyQuote();
+        Oracle dailyQuote;
+        try {
+            dailyQuote = oracleController.getDailyQuote();
+        } catch (Exception e) {
+            log.warn("Não foi possível obter a cotação do oráculo para a venda: {}", e.getMessage());
+            view.showErrorMessage(messages.get("transaction.oracle.notAvailable"));
+            return;
+        }
         if (dailyQuote == null) {
             log.warn("Não foi possível obter a cotação do oráculo para a venda.");
             view.showErrorMessage(messages.get("transaction.oracle.notAvailable"));
