@@ -30,7 +30,7 @@ class TransactionControllerTest {
         view.transaction = new Transaction(wallet.getId(), LocalDate.of(2026, 5, 1), OperationType.CASH_IN, 2.5);
         view.rejectConfirmation = false;
 
-        invoke(new TransactionController(transactions, wallets, oracleService(), view, messages()), "actionBuyCoin");
+        invoke(new TransactionController(transactions, wallets, oracleService(view.operationDate), view, messages()), "actionBuyCoin");
 
         assertEquals(1, transactions.findByWalletId(wallet.getId()).size());
         assertEquals(2.5, transactions.findByWalletId(wallet.getId()).get(0).getQuantity());
@@ -46,7 +46,7 @@ class TransactionControllerTest {
         view.transaction = new Transaction(wallet.getId(), LocalDate.now(), OperationType.CASH_IN, 2.0);
         view.rejectConfirmation = true;
 
-        invoke(new TransactionController(transactions, wallets, oracleService(), view, messages()), "actionBuyCoin");
+        invoke(new TransactionController(transactions, wallets, oracleService(view.operationDate), view, messages()), "actionBuyCoin");
 
         assertEquals(0, transactions.findByWalletId(wallet.getId()).size());
         assertTrue(view.error != null);
@@ -58,7 +58,7 @@ class TransactionControllerTest {
         TestTransactionView view = new TestTransactionView();
         view.transaction = new Transaction(999999, LocalDate.now(), OperationType.CASH_IN, 2.0);
 
-        invoke(new TransactionController(transactions, new WalletMemoryDAO(), oracleService(), view, messages()), "actionBuyCoin");
+        invoke(new TransactionController(transactions, new WalletMemoryDAO(), oracleService(view.operationDate), view, messages()), "actionBuyCoin");
 
         assertEquals(0, transactions.findByWalletId(999999).size());
         assertTrue(view.error != null);
@@ -76,7 +76,7 @@ class TransactionControllerTest {
         view.operationDate = LocalDate.of(2026, 5, 2);
         view.rejectConfirmation = false;
 
-        invoke(new TransactionController(transactions, wallets, oracleService(), view, messages()), "actionSellCoin");
+        invoke(new TransactionController(transactions, wallets, oracleService(view.operationDate), view, messages()), "actionSellCoin");
 
         assertEquals(2, transactions.findByWalletId(wallet.getId()).size());
         Transaction sale = transactions.findByWalletId(wallet.getId()).get(1);
@@ -94,7 +94,7 @@ class TransactionControllerTest {
         view.walletId = wallet.getId();
         view.quantity = 3.0;
 
-        invoke(new TransactionController(transactions, wallets, oracleService(), view, messages()), "actionSellCoin");
+        invoke(new TransactionController(transactions, wallets, oracleService(view.operationDate), view, messages()), "actionSellCoin");
 
         assertEquals(1, transactions.findByWalletId(wallet.getId()).size());
         assertTrue(view.error != null);
@@ -114,9 +114,28 @@ class TransactionControllerTest {
         assertEquals(messages().get("transaction.oracle.notAvailable"), view.error);
     }
 
-    private static OracleService oracleService() {
+    @Test
+    void consultsQuoteForSelectedDate() throws Exception {
+        TestTransactionView view = new TestTransactionView();
+        view.operationDate = LocalDate.of(2026, 5, 3);
+        OracleService service = oracleService(view.operationDate);
+
+        invoke(new TransactionController(
+                new TransactionMemoryDAO(),
+                new WalletMemoryDAO(),
+                service,
+                view,
+                messages()), "actionGetDailyQuote");
+
+        assertEquals(view.operationDate, view.displayedQuote.getDate());
+    }
+
+    private static OracleService oracleService(LocalDate... dates) {
         OracleService service = new OracleService();
         service.create(new Oracle(LocalDate.now(), 8.0));
+        for (LocalDate date : dates) {
+            service.create(new Oracle(date, 8.0));
+        }
         return service;
     }
 
@@ -138,6 +157,7 @@ class TransactionControllerTest {
         private LocalDate operationDate = LocalDate.now();
         private String error;
         private String success;
+        private Oracle displayedQuote;
 
         TestTransactionView() { super(null); }
 
@@ -146,7 +166,7 @@ class TransactionControllerTest {
         @Override public int readWalletId() { return walletId; }
         @Override public Double readQuantity() { return quantity; }
         @Override public LocalDate readOperationDate() { return operationDate; }
-        @Override public void displayDailyQuote(Oracle quote) { }
+        @Override public void displayDailyQuote(Oracle quote) { displayedQuote = quote; }
         @Override public void displayWalletBalance(double balance) { }
         @Override public void showErrorMessage(String message) { error = message; }
         @Override public void showSuccessMessage(String message) { success = message; }

@@ -51,8 +51,7 @@ public class TransactionView {
             quantity = ConsoleScanner.readDouble(messages.get("transaction.view.prompt.positiveQuantity"), messages.get("generic.confirmInvalid"));
         }
 
-        LocalDate operationDate = readOperationDate();
-        return TransactionFactory.create(id, operationDate, operationType, quantity);
+        return TransactionFactory.create(id, LocalDate.now(), operationType, quantity);
     }
 
     /**

@@ -79,9 +79,10 @@ public class TransactionController {
      * Executa o fluxo de compra de moedas (CASH_IN), obtendo cotação diária e solicitando confirmação.
      */
     private void actionBuyCoin() {
+        LocalDate operationDate = view.readOperationDate();
         Oracle dailyQuote;
         try {
-            dailyQuote = oracleService.getDailyQuote();
+            dailyQuote = oracleService.findByDate(operationDate);
         } catch (Exception e) {
             log.warn("Não foi possível obter a cotação do oráculo para a compra: {}", e.getMessage());
             view.showErrorMessage(messages.get("transaction.oracle.notAvailable"));
@@ -94,7 +95,14 @@ public class TransactionController {
         }
         view.displayDailyQuote(dailyQuote);
 
-        Transaction newTransaction = view.readTransactionData(OperationType.CASH_IN);
+        Transaction transactionData = view.readTransactionData(OperationType.CASH_IN);
+        Transaction newTransaction = transactionData == null
+                ? null
+                : TransactionFactory.create(
+                        transactionData.getWalletId(),
+                        operationDate,
+                        OperationType.CASH_IN,
+                        transactionData.getQuantity());
 
         if (newTransaction != null){
             MDC.put("walletId", String.valueOf(newTransaction.getWalletId()));
@@ -151,9 +159,10 @@ public class TransactionController {
      * Executa o fluxo de venda de moedas (CASH_OUT), validando se há saldo suficiente na carteira.
      */
     private void actionSellCoin() {
+        LocalDate operationDate = view.readOperationDate();
         Oracle dailyQuote;
         try {
-            dailyQuote = oracleService.getDailyQuote();
+            dailyQuote = oracleService.findByDate(operationDate);
         } catch (Exception e) {
             log.warn("Não foi possível obter a cotação do oráculo para a venda: {}", e.getMessage());
             view.showErrorMessage(messages.get("transaction.oracle.notAvailable"));
@@ -193,7 +202,6 @@ public class TransactionController {
                 return;
             }
 
-            LocalDate operationDate = view.readOperationDate();
             Transaction newTransaction = TransactionFactory.createSell(walletId, operationDate, quantity);
 
             double totalValue = newTransaction.getQuantity() * dailyQuote.getPrice();
@@ -227,12 +235,36 @@ public class TransactionController {
         }
     }
 
+    /**
+     * Consulta e exibe a cotação do oráculo para uma data informada pelo usuário.
+     */
+    private void actionGetDailyQuote() {
+        LocalDate date = view.readOperationDate();
+        Oracle quote;
+        try {
+            quote = oracleService.findByDate(date);
+        } catch (Exception e) {
+            log.warn("Não foi possível obter a cotação do oráculo para a data {}: {}", date, e.getMessage());
+            view.showErrorMessage(messages.get("transaction.oracle.notAvailable"));
+            return;
+        }
+
+        if (quote == null) {
+            log.warn("Não foi possível obter a cotação do oráculo para a data {}.", date);
+            view.showErrorMessage(messages.get("transaction.oracle.notAvailable"));
+            return;
+        }
+
+        view.displayDailyQuote(quote);
+    }
+
     private List<String> getMenuOptions()
     {
         final List<String> options = new ArrayList<>();
         options.add(messages.get("transactionMenu.return"));
         options.add(messages.get("transactionMenu.buyCoin"));
         options.add(messages.get("transactionMenu.sellCoin"));
+        options.add(messages.get("transactionMenu.dailyQuote"));
         return (options);
     }
 
@@ -260,6 +292,12 @@ public class TransactionController {
                 case 2 -> {
                     ConsoleScanner.clearScreen();
                     actionSellCoin();
+                    ConsoleScanner.pressEnterToContinue(messages.get("generic.pressEnter"));
+                    ConsoleScanner.clearScreen();
+                }
+                case 3 -> {
+                    ConsoleScanner.clearScreen();
+                    actionGetDailyQuote();
                     ConsoleScanner.pressEnterToContinue(messages.get("generic.pressEnter"));
                     ConsoleScanner.clearScreen();
                 }
