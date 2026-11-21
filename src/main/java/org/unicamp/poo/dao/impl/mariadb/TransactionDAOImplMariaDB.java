@@ -14,16 +14,32 @@ import org.unicamp.poo.dao.TransactionDAO;
 import org.unicamp.poo.model.Transaction;
 import org.unicamp.poo.model.enums.OperationType;
 
+/**
+ * Implementação de {@link TransactionDAO} para persistência de movimentações financeiras
+ * em banco de dados relacional MariaDB via JDBC.
+ * Realiza inserções e consultas SQL diretamente na tabela {@code MOVIMENTACAO}.
+ */
 public final class TransactionDAOImplMariaDB implements TransactionDAO {
     private static final Logger log = LoggerFactory.getLogger(TransactionDAOImplMariaDB.class);
 
     private final Connection connection;
 
+    /**
+     * Constrói o DAO de transações com a conexão JDBC fornecida.
+     *
+     * @param connection a conexão JDBC ativa com o MariaDB
+     */
     public TransactionDAOImplMariaDB(Connection connection)
     {
         this.connection = connection;
     }
 
+    /**
+     * Insere uma nova transação na tabela de movimentações e preenche o identificador gerado.
+     *
+     * @param transaction a transação a ser persistida
+     * @return a transação atualizada com seu ID gerado, ou {@code null} em caso de falha de SQL
+     */
     @Override
     public Transaction create(Transaction transaction) {
         String sql = "INSERT INTO MOVIMENTACAO (IdCarteira, Data, TipoOperacao, Quantidade) VALUES (?, ?, ?, ?)";
@@ -53,6 +69,12 @@ public final class TransactionDAOImplMariaDB implements TransactionDAO {
         }
     }
 
+    /**
+     * Busca todas as movimentações financeiras pertencentes à carteira especificada.
+     *
+     * @param walletId o identificador da carteira
+     * @return a lista de movimentações encontradas na tabela {@code MOVIMENTACAO}
+     */
     @Override
     public List<Transaction> findByWalletId(int walletId) {
         log.debug("Buscando transações da carteira ID {} no MariaDB", walletId);

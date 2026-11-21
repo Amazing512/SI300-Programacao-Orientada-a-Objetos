@@ -7,15 +7,34 @@ import org.unicamp.poo.util.ConsoleColors;
 import org.unicamp.poo.util.ConsoleScanner;
 import org.unicamp.poo.util.MessageProvider;
 
+/**
+ * Classe responsável pela apresentação formatada
+ * de menus de opções e validação da opção numérica escolhida pelo usuário.
+ */
 public final class Menu {
     private final Scanner scanner;
     private final MessageProvider messages;
 
+    /**
+     * Constrói uma nova instância de Menu vinculada ao scanner de entrada e ao provedor de mensagens.
+     *
+     * @param scanner  o scanner para leitura das entradas de console
+     * @param messages o provedor de mensagens internacionalizadas
+     */
     public Menu(Scanner scanner, MessageProvider messages) {
         this.scanner = scanner;
         this.messages = messages;
     }
 
+    /**
+     * Exibe o menu com título e lista de opções, aguardando a seleção de uma opção válida.
+     * Repete a solicitação e exibe mensagem de erro caso o valor digitado não seja um número no intervalo válido.
+     *
+     * @param title   o texto do cabeçalho ou título do menu
+     * @param options a lista de opções textuais a serem apresentadas
+     * @param prompt  o texto de orientação/solicitação exibido abaixo das opções
+     * @return o índice inteiro correspondente à opção selecionada
+     */
     public int getChoice(String title, List<String> options, String prompt)
     {
         boolean waiting = true;

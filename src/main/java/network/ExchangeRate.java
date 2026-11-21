@@ -22,13 +22,30 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+/**
+ * Objeto de Transferência de Dados (DTO) que representa a cotação da moeda FTCoin
+ * em uma determinada data.
+ */
 public final class ExchangeRate implements Serializable
    {
    private static final long serialVersionUID = 1L;
 
+   /**
+    * Data de referência da cotação da moeda.
+    */
    LocalDate                 date;
+
+   /**
+    * Valor monetário da cotação na data especificada.
+    */
    BigDecimal                value;
 
+   /**
+    * Constrói uma nova cotação com data e valor.
+    *
+    * @param date  a data da cotação
+    * @param value o valor monetário da cotação
+    */
    public ExchangeRate(LocalDate date, BigDecimal value)
       {
       super();
@@ -36,11 +53,21 @@ public final class ExchangeRate implements Serializable
       this.value = value;
       }
 
+   /**
+    * Obtém a data da cotação.
+    *
+    * @return a data da cotação
+    */
    public final LocalDate getDate()
       {
       return date;
       }
 
+   /**
+    * Obtém o valor da cotação da moeda.
+    *
+    * @return o valor da cotação
+    */
    public final BigDecimal getValue()
       {
       return value;

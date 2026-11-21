@@ -22,6 +22,11 @@ import org.unicamp.poo.util.MessageProvider;
 import org.unicamp.poo.view.Menu;
 import org.unicamp.poo.view.TransactionView;
 
+/**
+ * controller encarregado das operações de compra (aporte) e venda (resgate) de moedas virtuais.
+ * Coordena as chamadas ao serviço do Oráculo para cotação em tempo real, validação de regras de saldo
+ * e persistência das transações no banco de dados.
+ */
 public class TransactionController {
     private static final Logger log = LoggerFactory.getLogger(TransactionController.class);
 
@@ -31,6 +36,15 @@ public class TransactionController {
     final TransactionView view;
     final MessageProvider messages;
 
+    /**
+     * Constrói o controller de transações com as dependências necessárias.
+     *
+     * @param model         o DAO de transações
+     * @param walletModel   o DAO de carteiras
+     * @param oracleService o serviço de cotações do Oráculo
+     * @param view          a interface com o usuário para operações de transação
+     * @param messages      o provedor de mensagens internacionalizadas
+     */
     public TransactionController(TransactionDAO model, WalletDAO walletModel, OracleService oracleService, TransactionView view, MessageProvider messages) {
         super();
         this.model = model;
@@ -40,6 +54,12 @@ public class TransactionController {
         this.messages = messages;
     }
 
+    /**
+     * Calcula o saldo atual em moedas da carteira a partir da soma dos aportes e subtração dos resgates.
+     *
+     * @param walletId o identificador da carteira
+     * @return o saldo acumulado de moedas
+     */
     private double calculateWalletBalance (int walletId){
         List<Transaction> transactions = model.findByWalletId(walletId);
         double balance = 0.0;
@@ -55,6 +75,9 @@ public class TransactionController {
         return balance;
     }
 
+    /**
+     * Executa o fluxo de compra de moedas (CASH_IN), obtendo cotação diária e solicitando confirmação.
+     */
     private void actionBuyCoin() {
         Oracle dailyQuote;
         try {
@@ -124,6 +147,9 @@ public class TransactionController {
         }
     }
 
+    /**
+     * Executa o fluxo de venda de moedas (CASH_OUT), validando se há saldo suficiente na carteira.
+     */
     private void actionSellCoin() {
         Oracle dailyQuote;
         try {
@@ -210,6 +236,9 @@ public class TransactionController {
         return (options);
     }
 
+    /**
+     * Inicia o menu de transações da carteira, permitindo ao usuário comprar ou vender moedas em loop.
+     */
     public void start()
     {
         final List<String> options = getMenuOptions();

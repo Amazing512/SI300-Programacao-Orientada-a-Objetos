@@ -19,24 +19,58 @@ import static org.unicamp.poo.util.ConsoleColors.YELLOW;
 import org.unicamp.poo.util.ConsoleScanner;
 import org.unicamp.poo.util.MessageProvider;
 
+/**
+ * Classe responsável pela formatação e renderização dos relatórios no console.
+ * 
+ * Gera demonstrativos de posição financeira consolidada, saldo atual, histórico de movimentações,
+ * listagem ordenada de carteiras e apuração contábil de ganho/perda de capital, com suporte a impressão gráfica.
+ */
 public class ReportView {
 
     private final MessageProvider messages;
 
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
+    /**
+     * Constrói a visão de relatórios associada ao provedor de mensagens para internacionalização.
+     *
+     * @param messages o provedor de mensagens da aplicação
+     */
     public ReportView(MessageProvider messages) {
         this.messages = messages;
     }
 
+    /**
+     * Solicita e lê o identificador da carteira para geração de relatórios com mensagem padrão.
+     *
+     * @return o identificador numérico da carteira
+     */
     public int readWalletIdReport(){
         return readWalletIdReport(messages.get("report.wallet.id.prompt"));
     }
 
+    /**
+     * Solicita e lê o identificador da carteira para geração de relatórios com mensagem personalizada.
+     *
+     * @param prompt a mensagem de solicitação exibida ao usuário
+     * @return o identificador numérico da carteira
+     */
     public int readWalletIdReport(String prompt){
         return ConsoleScanner.readInt(prompt, messages.get("generic.confirmInvalid"));
     }
 
+    /**
+     * Exibe o relatório financeiro consolidado de uma carteira e oferece a opção de impressão.
+     *
+     * @param walletId               o identificador da carteira
+     * @param totalCoinsBought       o volume total de moedas compradas
+     * @param totalCoinsSold         o volume total de moedas vendidas
+     * @param coinBalance            o saldo final de moedas
+     * @param totalMoneySpent        o total de dinheiro investido nas compras
+     * @param totalMoneyReceived     o total de dinheiro obtido nas vendas
+     * @param currentHoldingsValue   o valor atual de mercado da custódia de moedas
+     * @param totalFinancialGainLoss o resultado financeiro líquido acumulado
+     */
     public void showFinancialReport(
         int walletId,
         double totalCoinsBought,
@@ -83,6 +117,11 @@ public class ReportView {
         System.out.println("----------------------------------");
     }
 
+    /**
+     * Exibe o relatório de carteiras ordenadas por ID no console e oferece opção para impressão.
+     *
+     * @param wallets a lista de carteiras a ser exibida
+     */
     public void showWalletsOrderedByIdReport(List<Wallet> wallets) {
         renderWalletsOrderedByIdReport(wallets);
         offerPrint(messages.get("report.wallets.byId.title").trim(), false, () -> renderWalletsOrderedByIdReport(wallets));
@@ -103,6 +142,11 @@ public class ReportView {
         System.out.println("---------------------------------");
     }
 
+    /**
+     * Exibe o relatório de carteiras ordenadas pelo titular no console e oferece opção para impressão.
+     *
+     * @param wallets a lista de carteiras ordenada por titular
+     */
     public void showWalletsOrderedByHolderReport(List<Wallet> wallets) {
         renderWalletsOrderedByHolderReport(wallets);
         offerPrint(messages.get("report.wallets.byHolder.title").trim(), false, () -> renderWalletsOrderedByHolderReport(wallets));
@@ -123,6 +167,12 @@ public class ReportView {
         System.out.println("---------------------------------");
     }
 
+    /**
+     * Exibe o saldo atual de uma carteira específica e oferece a opção de impressão.
+     *
+     * @param wallet  a carteira consultada
+     * @param balance o saldo de moedas calculado
+     */
     public void showWalletCurrentBalanceReport(Wallet wallet, double balance) {
         renderWalletCurrentBalanceReport(wallet, balance);
         offerPrint(messages.get("report.wallet.currentBalance.title").trim(), false, () -> renderWalletCurrentBalanceReport(wallet, balance));
@@ -139,6 +189,13 @@ public class ReportView {
         System.out.println("---------------------------------");
     }
 
+    /**
+     * Exibe o histórico de transações de uma carteira e seus valores convertidos em reais, oferecendo opção para impressão.
+     *
+     * @param wallet       a carteira consultada
+     * @param transactions a lista de transações registradas
+     * @param cashValues   a lista dos valores financeiros correspondentes a cada transação
+     */
     public void showWalletHistoryReport(Wallet wallet, List<Transaction> transactions, List<Double> cashValues) {
         renderWalletHistoryReport(wallet, transactions, cashValues);
         offerPrint(messages.get("report.wallet.history.title").trim(), false, () -> renderWalletHistoryReport(wallet, transactions, cashValues));
@@ -178,6 +235,17 @@ public class ReportView {
         System.out.println("---------------------------------");
     }
 
+    /**
+     * Exibe o demonstrativo contábil de apuração de ganho ou perda de capital (livro-razão) e oferece opção de impressão.
+     *
+     * @param wallet             a carteira analisada
+     * @param transactions       as transações ordenadas cronologicamente
+     * @param prices             as cotações unitárias nas datas das operações
+     * @param coinBalances       o saldo de moedas após cada operação
+     * @param averageCosts       o custo médio ponderado unitário após cada operação
+     * @param operationResults   o resultado financeiro obtido em cada operação de venda
+     * @param accumulatedResults o resultado financeiro consolidado acumulado
+     */
     public void showWalletGainLossReport(
         Wallet wallet,
         List<Transaction> transactions,
@@ -322,6 +390,11 @@ public class ReportView {
         return lines;
     }
 
+    /**
+     * Exibe uma mensagem de erro em cor vermelha no console.
+     *
+     * @param message o texto da mensagem de erro
+     */
     public void showErrorMessage(String message) {
         System.out.println(RED + message + RESET);
     }

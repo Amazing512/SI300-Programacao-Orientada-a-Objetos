@@ -14,6 +14,11 @@ import org.unicamp.poo.util.MessageProvider;
 import org.unicamp.poo.view.Menu;
 import org.unicamp.poo.view.WalletView;
 
+/**
+ * controller responsável pelas operações de CRUD de carteiras (Wallet).
+ * Faz a mediação entre a interface de usuário ({@link WalletView}), as regras de negócio
+ * e a camada de persistência ({@link WalletDAO}).
+ */
 public final class WalletController {
     private static final Logger log = LoggerFactory.getLogger(WalletController.class);
 
@@ -22,6 +27,13 @@ public final class WalletController {
 
     private final MessageProvider messages;
 
+    /**
+     * Constrói o controller de carteiras com suas respectivas dependências.
+     *
+     * @param model    o DAO para persistência de carteiras
+     * @param view     a visão responsável pela interação com o usuário
+     * @param messages o provedor de mensagens internacionalizadas
+     */
     public WalletController(WalletDAO model, WalletView view, MessageProvider messages) {
         super();
         this.model = model;
@@ -29,6 +41,9 @@ public final class WalletController {
         this.messages = messages;
     }
 
+    /**
+     * Conduz o fluxo de cadastro de uma nova carteira através da view.
+     */
     private void actionAddWallet() {
         Wallet newWallet = view.readWalletData();
 
@@ -48,6 +63,9 @@ public final class WalletController {
         }
     }
 
+    /**
+     * Conduz o fluxo de consulta de uma carteira pelo ID.
+     */
     private void actionSearchWallet() {
         int id = view.readWalletId();
         log.debug("Buscando carteira por ID: {}", id);
@@ -65,6 +83,9 @@ public final class WalletController {
 
     }
 
+    /**
+     * Conduz o fluxo de edição de dados de uma carteira existente.
+     */
     private void actionEditWallet() {
 
         int id = view.readWalletId();
@@ -91,6 +112,9 @@ public final class WalletController {
         }
     }
 
+    /**
+     * Conduz o fluxo de exclusão de uma carteira com confirmação prévia.
+     */
     private void actionRemoveWallet() {
         int id = view.readWalletId();
         
@@ -124,6 +148,9 @@ public final class WalletController {
         return (options);
     }
 
+    /**
+     * Inicia o menu de operações de carteira, processando as escolhas do usuário em loop.
+     */
     public void start()
     {
         final List<String> options = getMenuOptions();

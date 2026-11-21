@@ -13,12 +13,24 @@ import org.unicamp.poo.model.TransactionFactory;
 import org.unicamp.poo.model.Wallet;
 import org.unicamp.poo.model.WalletFactory;
 
+/**
+ * Utilitário responsável pela carga inicial de dados (seeding) da aplicação.
+ * Insere carteiras e movimentações fictícias para demonstração e testes caso a base esteja vazia.
+ */
 public final class DatabaseSeeder {
     private static final Logger log = LoggerFactory.getLogger(DatabaseSeeder.class);
 
     private DatabaseSeeder() {
     }
 
+    /**
+     * Executa a inserção de dados de exemplo (carteiras e transações históricas)
+     * caso o banco de dados ainda não possua nenhum registro de carteira.
+     *
+     * @param walletDAO      o DAO de acesso às carteiras
+     * @param transactionDAO o DAO de acesso às transações
+     * @param messages       o provedor de mensagens para exibição de avisos no console
+     */
     public static void seed(WalletDAO walletDAO, TransactionDAO transactionDAO, MessageProvider messages) {
         if (!walletDAO.findAll().isEmpty()) {
             log.debug("DatabaseSeeder: base de dados já possui registros. Seeding skippado.");

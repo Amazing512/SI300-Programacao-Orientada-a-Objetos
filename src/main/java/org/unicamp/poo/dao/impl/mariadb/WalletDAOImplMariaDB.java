@@ -9,6 +9,10 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Implementação de {@link WalletDAO} para gerenciamento de carteiras no banco de dados MariaDB.
+ * Realiza as operações de criação, leitura, atualização e exclusão na tabela {@code CARTEIRA}.
+ */
 public final class WalletDAOImplMariaDB implements WalletDAO {
     private static final Logger log = LoggerFactory.getLogger(WalletDAOImplMariaDB.class);
 
@@ -19,10 +23,21 @@ public final class WalletDAOImplMariaDB implements WalletDAO {
     private static final String HOLDER_COLUMN = "Titular";
     private static final String BROKER_COLUMN = "Corretora";
 
+    /**
+     * Constrói a instância do DAO de carteiras utilizando a conexão JDBC fornecida.
+     *
+     * @param connection a conexão JDBC ativa com o MariaDB
+     */
     public WalletDAOImplMariaDB(Connection connection) {
         this.connection = connection;
     }
 
+    /**
+     * Insere uma nova carteira na tabela de carteiras e preenche seu ID gerado.
+     *
+     * @param wallet a carteira a ser persistida
+     * @return a carteira criada com seu ID gerado, ou null em caso de falha SQL
+     */
     @Override
     public Wallet create(Wallet wallet) {
         String sql = "INSERT INTO " + TABLE_NAME +
@@ -53,6 +68,12 @@ public final class WalletDAOImplMariaDB implements WalletDAO {
         }
     }
 
+    /**
+     * Localiza uma carteira por seu identificador único na tabela {@code CARTEIRA}.
+     *
+     * @param id o ID da carteira buscada
+     * @return a carteira correspondente ou null se não for encontrada
+     */
     @Override
     public Wallet findById(int id) {
         log.debug("Buscando carteira por ID {} no MariaDB", id);
@@ -80,6 +101,11 @@ public final class WalletDAOImplMariaDB implements WalletDAO {
         return null;
     }
 
+    /**
+     * Retorna todas as carteiras cadastradas na base MariaDB.
+     *
+     * @return lista de carteiras cadastradas
+     */
     @Override
     public List<Wallet> findAll() {
         log.debug("Buscando todas as carteiras no MariaDB");
@@ -105,6 +131,11 @@ public final class WalletDAOImplMariaDB implements WalletDAO {
         return wallets;
     }
 
+    /**
+     * Retorna todas as carteiras cadastradas ordenadas pelo nome do titular.
+     *
+     * @return lista de carteiras ordenadas pelo titular
+     */
     @Override
     public List<Wallet> findAllOrderByHolder() {
         log.debug("Buscando carteiras ordenadas por titular no MariaDB");
@@ -131,6 +162,11 @@ public final class WalletDAOImplMariaDB implements WalletDAO {
         return wallets;
     }
 
+    /**
+     * Atualiza o titular e a corretora de uma carteira existente na tabela {@code CARTEIRA}.
+     *
+     * @param wallet a carteira contendo as informações atualizadas
+     */
     @Override
     public void update(Wallet wallet) {
         String sql = "UPDATE " + TABLE_NAME +
@@ -153,6 +189,11 @@ public final class WalletDAOImplMariaDB implements WalletDAO {
         }
     }
 
+    /**
+     * Exclui uma carteira da tabela {@code CARTEIRA} pelo seu identificador.
+     *
+     * @param id o ID da carteira a ser removida
+     */
     @Override
     public void delete(int id) {
         String sql = "DELETE FROM " + TABLE_NAME +

@@ -13,6 +13,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.unicamp.poo.dao.DatabaseConnection;
 
+/**
+ * Implementação Singleton de {@link DatabaseConnection} responsável pelo gerenciamento
+ * de conexões JDBC com o banco de dados MariaDB.
+ * Carrega as definições do servidor a partir de arquivo {@code .properties} e as credenciais
+ * a partir de variáveis de ambiente ou do arquivo local {@code mariadb.env}.
+ */
 public final class MariaDBConnection implements DatabaseConnection {
     private static final Logger log = LoggerFactory.getLogger(MariaDBConnection.class);
 
@@ -67,6 +73,12 @@ public final class MariaDBConnection implements DatabaseConnection {
         }
     }
 
+    /**
+     * Obtém a instância Singleton de conexão com o banco de dados MariaDB para o servidor indicado.
+     *
+     * @param serverName o nome do arquivo de propriedades de configuração do servidor
+     * @return a instância única de {@link MariaDBConnection}
+     */
     public static synchronized MariaDBConnection getInstance(String serverName)
     {
         if (instance == null)
@@ -76,6 +88,11 @@ public final class MariaDBConnection implements DatabaseConnection {
         return instance;
     }
 
+    /**
+     * Obtém a instância Singleton de conexão com o MariaDB utilizando o servidor padrão ("WindServer").
+     *
+     * @return a instância única de {@link MariaDBConnection}
+     */
     public static synchronized MariaDBConnection getInstance()
     {
         if (instance == null)
@@ -85,6 +102,10 @@ public final class MariaDBConnection implements DatabaseConnection {
         return instance;
     }
 
+    /**
+     * Encerra a conexão ativa e redefine a instância Singleton para {@code null}.
+     * Recomendado para limpeza em testes automatizados e reinicialização de conexões.
+     */
     public static synchronized void resetInstance()
     {
         if (instance != null)
@@ -94,6 +115,9 @@ public final class MariaDBConnection implements DatabaseConnection {
         }
     }
 
+    /**
+     * Encerra a conexão ativa com o MariaDB.
+     */
     @Override
     public void closeConnection()
     {
@@ -115,12 +139,20 @@ public final class MariaDBConnection implements DatabaseConnection {
         }
     }
 
+    /**
+     * Retorna a conexão JDBC ativa com o MariaDB.
+     *
+     * @return a conexão ativa ou {@code null} se a conexão não foi iniciada ou falhou
+     */
     @Override
     public Connection getConnection()
     {
         return (connection);
     }
 
+    /**
+     * Inicializa e abre a conexão com o banco de dados MariaDB utilizando os parâmetros configurados.
+     */
     @Override
     public void openConnection()
     {

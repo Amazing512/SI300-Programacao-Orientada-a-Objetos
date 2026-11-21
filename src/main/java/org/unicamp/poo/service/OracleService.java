@@ -16,7 +16,6 @@ import network.ExchangeRate;
 
 /**
  * Serviço de domínio responsável pelo gerenciamento de cotações da moeda virtual através do OracleSimpleClient.
- * Mantém cache em memória para a cotação diária e cotações históricas para otimizar chamadas de rede.
  */
 public class OracleService {
     private static final Logger log = LoggerFactory.getLogger(OracleService.class);
@@ -25,10 +24,18 @@ public class OracleService {
     private final DailyCache<Oracle> todayCache;
     private final Map<LocalDate, Oracle> historicalCache;
 
+    /**
+     * Construtor padrão que inicializa o serviço com um novo {@link OracleSimpleClient}.
+     */
     public OracleService() {
         this(new OracleSimpleClient());
     }
 
+    /**
+     * Construtor parametrizado que permite injetar uma instância customizada de {@link OracleSimpleClient}.
+     *
+     * @param client o cliente do Oráculo a ser utilizado para as requisições de rede
+     */
     public OracleService(OracleSimpleClient client) {
         super();
         this.client = client != null ? client : new OracleSimpleClient();
@@ -61,7 +68,10 @@ public class OracleService {
     }
 
     /**
-     * Registra uma cotação no cache local (útil para testes e mock).
+     * Registra uma cotação no cache local.
+     *
+     * @param oracle a cotação a ser registrada no cache
+     * @return a cotação registrada ou null se o objeto for nulo
      */
     public Oracle create(Oracle oracle) {
         if (oracle == null) {
@@ -77,6 +87,9 @@ public class OracleService {
 
     /**
      * Consulta cotação para uma data específica.
+     *
+     * @param date a data da cotação a ser consultada
+     * @return a cotação correspondente ou null caso não seja encontrada
      */
     public Oracle findByDate(LocalDate date) {
         if (date == null) {

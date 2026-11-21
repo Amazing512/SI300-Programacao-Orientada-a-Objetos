@@ -20,6 +20,11 @@ import org.unicamp.poo.util.MessageProvider;
 import org.unicamp.poo.view.Menu;
 import org.unicamp.poo.view.ReportView;
 
+/**
+ * controller responsável pela geração, cálculo e apresentação dos relatórios financeiros da aplicação.
+ * Processa informações de posição consolidada, saldo atual, histórico de transações, listagens ordenadas
+ * de carteiras e o demonstrativo contábil de ganho ou perda de capital com base no custo médio ponderado.
+ */
 public class ReportController {
     private static final Logger log = LoggerFactory.getLogger(ReportController.class);
 
@@ -29,6 +34,15 @@ public class ReportController {
     private final ReportView view;
     private final MessageProvider messages;
 
+    /**
+     * Constrói o controller de relatórios injetando os DAOs, serviços e camada de visão.
+     *
+     * @param walletDAO      o DAO de acesso às carteiras
+     * @param transactionDAO o DAO de acesso às transações
+     * @param oracleService  o serviço de consulta ao Oráculo de cotações
+     * @param view           a visão responsável pela impressão e renderização dos relatórios
+     * @param messages       o provedor de mensagens internacionalizadas
+     */
     public ReportController(
         WalletDAO walletDAO,
         TransactionDAO transactionDAO,
@@ -44,6 +58,12 @@ public class ReportController {
         this.messages = messages;
     }
 
+    /**
+     * Calcula o saldo em moedas de uma carteira específica somando aportes e subtraindo resgates.
+     *
+     * @param walletId o identificador da carteira
+     * @return o saldo total de moedas
+     */
     private double calculateWalletBalance (int walletId){
         List<Transaction> transactions = transactionDAO.findByWalletId(walletId);
         double balance = 0.0;
@@ -59,6 +79,11 @@ public class ReportController {
         return balance;
     }
 
+    /**
+     * Obtém a cotação do dia de hoje a partir do Oráculo, tratando falhas e retornando 0.0 se indisponível.
+     *
+     * @return o preço cotado de hoje ou 0.0
+     */
     private double getTodayPrice() {
         try {
             Oracle todayQuote = oracleService.getDailyQuote();
@@ -71,6 +96,13 @@ public class ReportController {
 
     private record LedgerRow(double price, double coinBalance, double averageCost, double operationResult, double accumulatedResult) {}
 
+    /**
+     * Monta o livro-razão contábil para as movimentações ordenadas cronologicamente,
+     * apurando o preço praticado, saldo de moedas, custo médio e resultado de cada operação.
+     *
+     * @param sortedTransactions a lista de transações ordenadas cronologicamente
+     * @return a lista de linhas contábeis calculadas
+     */
     private List<LedgerRow> buildWalletLedger(List<Transaction> sortedTransactions) {
         double todayPrice = getTodayPrice();
         double coinBalance = 0.0;
@@ -99,6 +131,10 @@ public class ReportController {
         return ledger;
     }
 
+    /**
+     * Solicita o ID da carteira, calcula a posição consolidada (moedas compradas/vendidas,
+     * saldo, valor investido, valor arrecadado, valor de custódia e resultado líquido) e exibe o relatório financeiro.
+     */
     public void showFinancialReport(){
         int walletId = view.readWalletIdReport();
         log.info("Solicitada geração de relatório financeiro para carteira ID {}", walletId);
@@ -160,6 +196,9 @@ public class ReportController {
         );
     }
 
+    /**
+     * Recupera todas as carteiras e as exibe ordenadas crescentemente pelo ID.
+     */
     private void showWalletsOrderedById() {
         log.info("Gerando relatório de carteiras ordenadas por ID");
         List<Wallet> wallets = walletDAO.findAll();
@@ -174,6 +213,9 @@ public class ReportController {
         view.showWalletsOrderedByIdReport(wallets);
     }
 
+    /**
+     * Recupera todas as carteiras e as exibe em ordem alfabética pelo nome do titular.
+     */
     private void showWalletsOrderedByHolder() {
         log.info("Gerando relatório de carteiras ordenadas por titular");
         List<Wallet> wallets = walletDAO.findAllOrderByHolder();
@@ -187,6 +229,9 @@ public class ReportController {
         view.showWalletsOrderedByHolderReport(wallets);
     }
 
+    /**
+     * Consulta e exibe o saldo acumulado de moedas para uma carteira selecionada.
+     */
     private void showWalletCurrentBalance() {
         int walletId = view.readWalletIdReport(messages.get("report.wallet.balance.prompt"));
         log.info("Consultando saldo atual da carteira ID {}", walletId);
@@ -203,6 +248,9 @@ public class ReportController {
         view.showWalletCurrentBalanceReport(wallet, balance);
     }
 
+    /**
+     * Consulta o histórico de movimentações da carteira e exibe com os valores financeiros calculados.
+     */
     private void showWalletHistory() {
         int walletId = view.readWalletIdReport(messages.get("report.wallet.history.prompt"));
         log.info("Consultando histórico de transações da carteira ID {}", walletId);
@@ -238,6 +286,10 @@ public class ReportController {
         view.showWalletHistoryReport(wallet, transactions, cashValues);
     }
 
+    /**
+     * Apura o ganho ou perda de capital de cada operação pelo método do custo médio ponderado
+     * e exibe o demonstrativo detalhado da carteira.
+     */
     private void showWalletGainOrLoss() {
         int walletId = view.readWalletIdReport(messages.get("report.wallet.history.prompt"));
         log.info("Calculando ganho/perda de capital para carteira ID {}", walletId);
@@ -290,6 +342,9 @@ public class ReportController {
         return options;
     }
 
+    /**
+     * Inicia o menu de relatórios financeiros, gerenciando a navegação e execução das opções do usuário.
+     */
     public void start() {
         final List<String> options = getMenuOptions();
         final Menu reportMenu = new Menu(ConsoleScanner.getInstance(), messages);

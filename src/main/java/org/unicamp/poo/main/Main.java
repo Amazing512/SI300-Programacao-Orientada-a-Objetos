@@ -7,6 +7,11 @@ import org.unicamp.poo.model.enums.DatabaseSelector;
 import org.unicamp.poo.util.Info;
 import org.unicamp.poo.util.MessageProvider;
 
+/**
+ * Ponto de entrada principal da aplicação FT Coin.
+ * Inicializa a configuração regional padrão (pt-BR), exibe informações de abertura
+ * e dispara o controller mestre da aplicação ({@link ProgramController}).
+ */
 public final class Main {
     private static final Logger log = LoggerFactory.getLogger(Main.class);
 
@@ -14,6 +19,17 @@ public final class Main {
     private final static String          country  = "BR";
     private final static MessageProvider messageProvider = new MessageProvider("messages", lang, country);
 
+    /**
+     * Construtor privado para evitar instanciação da classe executável.
+     */
+    private Main() {
+    }
+
+    /**
+     * Ponto de entrada do programa.
+     *
+     * @param args argumentos de linha de comando
+     */
     static void main(String[] args) {
         try {
             final String serverName = "WindServer";

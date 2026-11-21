@@ -11,6 +11,10 @@ import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.util.List;
 
+/**
+ * Implementação de {@link Printable} encarregada da paginação, quebra de linhas e desenho
+ * gráfico de relatórios textuais enviados para impressão pelo sistema operacional.
+ */
 public class ReportPrinter implements Printable {
 
     private static final float MAX_FONT_SIZE = 10f;
@@ -20,12 +24,25 @@ public class ReportPrinter implements Printable {
     private final List<String> lines;
     private final boolean landscape;
 
+    /**
+     * Constrói o manipulador de impressão com o nome do trabalho, as linhas de relatório e a orientação de página.
+     *
+     * @param jobName   o identificador do trabalho de impressão
+     * @param lines     a lista de linhas textuais a serem impressas
+     * @param landscape {@code true} para impressão em modo paisagem, {@code false} para modo retrato
+     */
     public ReportPrinter(String jobName, List<String> lines, boolean landscape) {
         this.jobName = jobName;
         this.lines = lines;
         this.landscape = landscape;
     }
 
+    /**
+     * Exibe o diálogo nativo de impressão e, se confirmado, despacha o trabalho para a impressora.
+     *
+     * @return {@code true} se o trabalho foi impresso, ou {@code false} se o usuário cancelou o diálogo
+     * @throws PrinterException caso ocorra falha de comunicação com o subsistema de impressão
+     */
     public boolean print() throws PrinterException {
         PrinterJob job = PrinterJob.getPrinterJob();
         job.setJobName(jobName);
@@ -43,6 +60,14 @@ public class ReportPrinter implements Printable {
         return true;
     }
 
+    /**
+     * Desenha o conteúdo de texto da página especificada no contexto gráfico fornecido.
+     *
+     * @param graphics   o contexto gráfico 2D onde o desenho é realizado
+     * @param pageFormat a configuração de geometria e formato da página
+     * @param pageIndex  o índice baseado em zero da página solicitada
+     * @return {@link #PAGE_EXISTS} se a página existe e foi desenhada; {@link #NO_SUCH_PAGE} se o índice estiver além do limite
+     */
     @Override
     public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) {
         Graphics2D g2 = (Graphics2D) graphics;

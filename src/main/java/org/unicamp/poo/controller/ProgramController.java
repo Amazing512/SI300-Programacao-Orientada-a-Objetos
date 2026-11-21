@@ -29,6 +29,12 @@ import org.unicamp.poo.view.ReportView;
 import org.unicamp.poo.view.TransactionView;
 import org.unicamp.poo.view.WalletView;
 
+/**
+ * controller principal da aplicação FT Coin.
+ * Coordena o fluxo do menu principal, o ciclo de vida do banco de dados (Memória ou MariaDB),
+ * a troca dinâmica de idiomas e a delegação de tarefas aos controllers específicos de carteira,
+ * transações e relatórios.
+ */
 public class ProgramController {
     private static final Logger log = LoggerFactory.getLogger(ProgramController.class);
 
@@ -40,27 +46,45 @@ public class ProgramController {
     private TransactionDAO transactionDAO;
     private OracleService oracleService;
 
+    /**
+     * Constrói o controller principal da aplicação.
+     *
+     * @param databaseSelector o banco de persistência
+     * @param messages         o provedor de mensagens internacionalizadas
+     */
     public ProgramController(DatabaseSelector databaseSelector, MessageProvider messages) {
         super();
         this.databaseSelector = databaseSelector;
         this.messages = messages;
     }
 
+    /**
+     * Aciona o submenu de gerenciamento de carteiras.
+     */
     void actionWallet() {
         final WalletController walletController = new WalletController(walletDAO, new WalletView(messages), messages);
         walletController.start();
     }
 
+    /**
+     * Aciona o submenu de movimentações financeiras (compra e venda).
+     */
     void actionTransaction() {
         final TransactionController transactionController = new TransactionController(transactionDAO, walletDAO, oracleService, new TransactionView(messages), messages);
         transactionController.start();
     }
 
+    /**
+     * Aciona o submenu de emissão de relatórios.
+     */
     void actionReports() {
         final ReportController reportController = new ReportController(walletDAO, transactionDAO, oracleService, new ReportView(messages), messages);
         reportController.start();
     }
 
+    /**
+     * Exibe o menu de troca de idiomas (Português, Inglês ou Espanhol) e atualiza o MessageProvider.
+     */
     void actionLanguage(){
         boolean loop = true;
 
@@ -93,6 +117,9 @@ public class ProgramController {
         }
     }
 
+    /**
+     * Exibe o menu de seleção do mecanismo de banco de dados (Memória ou MariaDB).
+     */
     void actionDatabase(){
         boolean loop = true;
 
@@ -118,6 +145,9 @@ public class ProgramController {
         }
     }
 
+    /**
+     * Exibe o menu de ajuda com instruções e com créditos da equipe.
+     */
     void actionHelp() {
         final Menu helpMenu = new Menu(ConsoleScanner.getInstance(), messages);
         boolean loop = true;
@@ -237,6 +267,12 @@ public class ProgramController {
         return options;
     }
 
+    /**
+     * Inicia o ciclo de vida da aplicação com o servidor especificado, mostrando
+     * o menu principal em loop até que o usuário solicite o encerramento.
+     *
+     * @param serverName o nome das configurações do servidor de banco de dados
+     */
     public void start(String serverName)
     {
         final Menu userMenu = new Menu(ConsoleScanner.getInstance(), messages);

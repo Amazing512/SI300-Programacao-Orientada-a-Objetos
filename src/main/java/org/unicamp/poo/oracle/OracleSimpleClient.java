@@ -19,6 +19,9 @@ import network.ExchangeRate;
 import network.NetworkRequest;
 import network.NetworkResponse;
 
+/**
+ * Cliente de comunicação via sockets com o servidor do Oráculo de cotações da FTCoin.
+ */
 public class OracleSimpleClient
    {
    private static final Logger log = LoggerFactory.getLogger(OracleSimpleClient.class);
@@ -29,11 +32,21 @@ public class OracleSimpleClient
    private String groupName;
    private String groupPassword;
 
+   /**
+    * Construtor padrão que inicializa o cliente carregando as configurações do arquivo
+    * {@code OracleServer.properties} e credenciais de variáveis de ambiente ou {@code oracle.env}.
+    */
    public OracleSimpleClient()
       {
       this(null, 0);
       }
 
+   /**
+    * Constrói o cliente especificando o endereço de host e a porta de conexão do servidor.
+    *
+    * @param host o endereço de IP ou hostname do servidor Oráculo
+    * @param port a porta de escuta do serviço remoto
+    */
    public OracleSimpleClient(String host, int port)
       {
       final Properties props = new Properties();
@@ -98,6 +111,11 @@ public class OracleSimpleClient
       return value == null || value.isBlank();
       }
 
+   /**
+    * Executa uma consulta de teste diretamente via linha de comando.
+    *
+    * @param args argumentos de execução, podendo ser vazios ou conter [host porta]
+    */
    public static void main(String[] args)
       {
       try
@@ -140,6 +158,14 @@ public class OracleSimpleClient
          }
       }
 
+   /**
+    * Consulta o servidor remoto do Oráculo para obter a lista de cotações em um período.
+    *
+    * @param since a data inicial da consulta
+    * @param to    a data final da consulta
+    * @return a lista de {@link ExchangeRate} retornadas pelo Oráculo
+    * @throws Exception se ocorrer erro de validação de parâmetros, comunicação via socket ou erro retornado pelo servidor
+    */
    public List<ExchangeRate> getValues(LocalDate since, LocalDate to) throws Exception
       {
       if (isBlank(host) || port <= 0 || port > 65535)
@@ -204,21 +230,41 @@ public class OracleSimpleClient
          }
       }
 
+   /**
+    * Obtém o host configurado para conexão ao Oráculo.
+    *
+    * @return o hostname ou IP do servidor
+    */
    public String getHost()
       {
       return host;
       }
 
+   /**
+    * Obtém a porta TCP configurada do Oráculo.
+    *
+    * @return o número da porta
+    */
    public int getPort()
       {
       return port;
       }
 
+   /**
+    * Obtém o nome do grupo utilizado para autenticação.
+    *
+    * @return o nome do grupo
+    */
    public String getGroupName()
       {
       return groupName;
       }
 
+   /**
+    * Obtém a senha do grupo utilizada para autenticação.
+    *
+    * @return a senha do grupo
+    */
    public String getGroupPassword()
       {
       return groupPassword;
