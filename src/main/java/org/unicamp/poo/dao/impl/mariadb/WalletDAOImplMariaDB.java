@@ -195,28 +195,58 @@ public final class WalletDAOImplMariaDB implements WalletDAO {
     }
 
     /**
-     * Exclui uma carteira da tabela {@code CARTEIRA} pelo seu identificador.
+     * Exclui as movimentações e a carteira pelo identificador da carteira.
+     * A operação é executada em uma transação para evitar remover as movimentações
+     * caso a carteira não possa ser excluída.
      *
      * @param id o ID da carteira a ser removida
      */
     @Override
     public boolean delete(int id) {
-        String sql = "DELETE FROM " + TABLE_NAME +
-                     " WHERE " + ID_COLUMN + " = ?";
+        String deleteTransactionsSql = "DELETE FROM MOVIMENTACAO WHERE IdCarteira = ?";
+        String deleteWalletSql = "DELETE FROM " + TABLE_NAME +
+                                 " WHERE " + ID_COLUMN + " = ?";
 
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        boolean originalAutoCommit = true;
+        try {
+            originalAutoCommit = connection.getAutoCommit();
+            connection.setAutoCommit(false);
 
-            stmt.setInt(1, id);
+            try (PreparedStatement deleteTransactions = connection.prepareStatement(deleteTransactionsSql);
+                 PreparedStatement deleteWallet = connection.prepareStatement(deleteWalletSql)) {
 
-            int affectedRows = stmt.executeUpdate();
-            if (affectedRows > 0) {
-                log.info("Carteira excluída com sucesso no MariaDB: ID={}", id);
-                return true;
+                deleteTransactions.setInt(1, id);
+                deleteTransactions.executeUpdate();
+
+                deleteWallet.setInt(1, id);
+                int affectedRows = deleteWallet.executeUpdate();
+
+                if (affectedRows > 0) {
+                    connection.commit();
+                    log.info("Movimentações e carteira excluídas com sucesso no MariaDB: Carteira ID={}", id);
+                    return true;
+                }
+
+                connection.rollback();
+                log.warn("Nenhuma carteira foi excluída no MariaDB: ID={}", id);
             }
-
-            log.warn("Nenhuma carteira foi excluída no MariaDB: ID={}", id);
         } catch (SQLException e) {
+            try {
+                connection.rollback();
+            } catch (SQLException rollbackException) {
+                log.error("Erro ao desfazer exclusão da carteira ID {} no MariaDB: {}",
+                        id, rollbackException.getMessage(), rollbackException);
+            }
             log.error("Erro ao excluir carteira ID {} no MariaDB: {}", id, e.getMessage(), e);
+        } finally {
+            try {
+                if (connection.getAutoCommit() != originalAutoCommit) {
+                    connection.setAutoCommit(originalAutoCommit);
+                }
+            } catch (SQLException e) {
+                log.error("Erro ao restaurar autoCommit da conexão após excluir carteira ID {}: {}",
+                        id, e.getMessage(), e);
+            }
         }
         return false;
     }

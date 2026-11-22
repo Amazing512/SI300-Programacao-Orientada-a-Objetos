@@ -12,6 +12,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +38,16 @@ class MariaDBDaoTest {
         assertEquals("Alice", jdbc.parameters.get(1));
         assertEquals("Broker", jdbc.parameters.get(2));
         assertTrue(jdbc.sql.startsWith("INSERT INTO CARTEIRA"));
+    }
+
+    @Test
+    void deletesWalletTransactionsBeforeWallet() {
+        JdbcFixture jdbc = new JdbcFixture(List.of(), null, false);
+
+        assertTrue(new WalletDAOImplMariaDB(jdbc.connection).delete(7));
+        assertEquals("DELETE FROM MOVIMENTACAO WHERE IdCarteira = ?", jdbc.sqlStatements.get(0));
+        assertEquals("DELETE FROM CARTEIRA WHERE IdCarteira = ?", jdbc.sqlStatements.get(1));
+        assertEquals(7, jdbc.parameters.get(1));
     }
 
     @Test
@@ -119,6 +130,7 @@ class MariaDBDaoTest {
 
     private static final class JdbcFixture {
         private final Map<Integer, Object> parameters = new HashMap<>();
+        private final List<String> sqlStatements = new ArrayList<>();
         private String sql = "";
         private final Connection connection;
 
@@ -150,6 +162,7 @@ class MariaDBDaoTest {
                         throw new SQLException("database unavailable");
                     }
                     sql = (String) arguments[0];
+                    sqlStatements.add(sql);
                     return statement;
                 }
                 return defaultValue(method.getReturnType());
