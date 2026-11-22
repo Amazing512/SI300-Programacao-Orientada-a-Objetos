@@ -96,10 +96,15 @@ public final class WalletController {
             Wallet updatedWallet = view.readWalletUpdates(editableWallet);
 
             if (updatedWallet != null) {
-                model.update(updatedWallet);
-                log.info("Carteira ID {} atualizada via WalletController: titular='{}', corretora='{}'",
-                        updatedWallet.getId(), updatedWallet.getHolder(), updatedWallet.getBroker());
-                view.showSuccessMessage(messages.get("wallet.edit.success"));
+                if (model.update(updatedWallet)) {
+                    log.info("Carteira ID {} atualizada via WalletController: titular='{}', corretora='{}'",
+                            updatedWallet.getId(), updatedWallet.getHolder(), updatedWallet.getBroker());
+                    view.showSuccessMessage(messages.get("wallet.edit.success"));
+                }
+                else {
+                    log.warn("Erro ao atualizar carteira ID {} via WalletController.", updatedWallet.getId());
+                    view.showErrorMessage(messages.get("wallet.edit.error"));
+                }
             }
             else{
                 log.debug("Edição da carteira ID {} cancelada pelo usuário.", id);
@@ -122,9 +127,14 @@ public final class WalletController {
 
         if (removableWallet != null){
             if (view.confirmDeletion()) {
-                model.delete(id);
-                log.info("Carteira ID {} excluída via WalletController.", id);
-                view.showSuccessMessage(messages.get("wallet.remove.success"));
+                if (model.delete(id)) {
+                    log.info("Carteira ID {} excluída via WalletController.", id);
+                    view.showSuccessMessage(messages.get("wallet.remove.success"));
+                }
+                else {
+                    log.warn("Erro ao excluir carteira ID {} via WalletController.", id);
+                    view.showErrorMessage(messages.get("wallet.remove.error"));
+                }
             }
             else {
                 log.debug("Exclusão da carteira ID {} cancelada pelo usuário.", id);

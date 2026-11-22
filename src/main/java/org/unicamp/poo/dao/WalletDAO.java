@@ -45,13 +45,15 @@ public sealed interface WalletDAO permits org.unicamp.poo.dao.impl.mariadb.Walle
      * Atualiza as informações (titular e corretora) de uma carteira existente.
      *
      * @param wallet a carteira com os dados modificados
+     * @return {@code true} se ao menos uma carteira foi atualizada
      */
-    void update(Wallet wallet);
+    boolean update(Wallet wallet);
 
     /**
      * Remove a carteira associada ao identificador informado.
      *
      * @param id o identificador da carteira a ser excluída
+     * @return {@code true} se ao menos uma carteira foi excluída
      */
-    void delete(int id);
+    boolean delete(int id);
 }

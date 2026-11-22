@@ -168,7 +168,7 @@ public final class WalletDAOImplMariaDB implements WalletDAO {
      * @param wallet a carteira contendo as informações atualizadas
      */
     @Override
-    public void update(Wallet wallet) {
+    public boolean update(Wallet wallet) {
         String sql = "UPDATE " + TABLE_NAME +
                      " SET " + HOLDER_COLUMN + " = ?, " +
                      BROKER_COLUMN + " = ? " +
@@ -180,13 +180,18 @@ public final class WalletDAOImplMariaDB implements WalletDAO {
             stmt.setString(2, wallet.getBroker());
             stmt.setInt(3, wallet.getId());
 
-            stmt.executeUpdate();
-            log.info("Carteira atualizada no MariaDB: ID={}, titular='{}', corretora='{}'",
-                    wallet.getId(), wallet.getHolder(), wallet.getBroker());
+            int affectedRows = stmt.executeUpdate();
+            if (affectedRows > 0) {
+                log.info("Carteira atualizada no MariaDB: ID={}, titular='{}', corretora='{}'",
+                        wallet.getId(), wallet.getHolder(), wallet.getBroker());
+                return true;
+            }
 
+            log.warn("Nenhuma carteira foi atualizada no MariaDB: ID={}", wallet.getId());
         } catch (SQLException e) {
             log.error("Erro ao atualizar carteira ID {} no MariaDB: {}", wallet.getId(), e.getMessage(), e);
         }
+        return false;
     }
 
     /**
@@ -195,7 +200,7 @@ public final class WalletDAOImplMariaDB implements WalletDAO {
      * @param id o ID da carteira a ser removida
      */
     @Override
-    public void delete(int id) {
+    public boolean delete(int id) {
         String sql = "DELETE FROM " + TABLE_NAME +
                      " WHERE " + ID_COLUMN + " = ?";
 
@@ -203,11 +208,16 @@ public final class WalletDAOImplMariaDB implements WalletDAO {
 
             stmt.setInt(1, id);
 
-            stmt.executeUpdate();
-            log.info("Carteira excluída com sucesso no MariaDB: ID={}", id);
+            int affectedRows = stmt.executeUpdate();
+            if (affectedRows > 0) {
+                log.info("Carteira excluída com sucesso no MariaDB: ID={}", id);
+                return true;
+            }
 
+            log.warn("Nenhuma carteira foi excluída no MariaDB: ID={}", id);
         } catch (SQLException e) {
             log.error("Erro ao excluir carteira ID {} no MariaDB: {}", id, e.getMessage(), e);
         }
+        return false;
     }
 }

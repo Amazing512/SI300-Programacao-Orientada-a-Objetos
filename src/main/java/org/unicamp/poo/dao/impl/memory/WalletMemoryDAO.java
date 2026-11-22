@@ -81,15 +81,16 @@ public final class WalletMemoryDAO implements WalletDAO {
      * @param updatedWallet a carteira contendo as informações atualizadas
      */
     @Override
-    public void update(Wallet updatedWallet) {
+    public boolean update(Wallet updatedWallet) {
         for (int walletIndex = 0; walletIndex < wallets.size(); walletIndex++) {
             Wallet currentWallet = wallets.get(walletIndex);
 
             if (currentWallet.getId().equals(updatedWallet.getId())) {
                 wallets.set(walletIndex, updatedWallet);
-                return;
+                return true;
             }
         }
+        return false;
     }
 
     /**
@@ -98,7 +99,7 @@ public final class WalletMemoryDAO implements WalletDAO {
      * @param id o identificador da carteira a ser removida
      */
     @Override
-    public void delete(int id) {
-        wallets.removeIf(wallet -> wallet.getId() == id);
+    public boolean delete(int id) {
+        return wallets.removeIf(wallet -> wallet.getId() == id);
     }
 }

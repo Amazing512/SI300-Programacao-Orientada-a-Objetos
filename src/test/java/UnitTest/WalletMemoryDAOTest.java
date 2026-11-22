@@ -55,10 +55,12 @@ class WalletMemoryDAOTest {
         Wallet original = dao.create(new Wallet("UnitTest-Original", "Broker"));
         Wallet replacement = new Wallet(original.getId(), "UnitTest-Replacement", "New Broker");
 
-        dao.update(replacement);
+        assertEquals(true, dao.update(replacement));
         assertEquals(replacement, dao.findById(original.getId()));
 
-        dao.delete(original.getId());
+        assertEquals(true, dao.delete(original.getId()));
         assertNull(dao.findById(original.getId()));
+        assertEquals(false, dao.delete(original.getId()));
+        assertEquals(false, dao.update(new Wallet(original.getId(), "UnitTest-Missing", "Broker")));
     }
 }
