@@ -18,6 +18,8 @@ import org.unicamp.poo.oracle.OracleSimpleClient;
 import org.unicamp.poo.service.OracleService;
 import org.unicamp.poo.util.MessageProvider;
 import org.unicamp.poo.view.TransactionView;
+import java.util.List;
+import network.ExchangeRate;
 
 class TransactionControllerTest {
 
@@ -106,7 +108,7 @@ class TransactionControllerTest {
         Wallet wallet = wallets.create(new Wallet("UnitTest-No-Quote", "Broker"));
         TransactionMemoryDAO transactions = new TransactionMemoryDAO();
         TestTransactionView view = new TestTransactionView();
-        OracleService emptyOracleService = new OracleService(new OracleSimpleClient());
+        OracleService emptyOracleService = new OracleService(emptyClient());
 
         invoke(new TransactionController(transactions, wallets, emptyOracleService, view, messages()), "actionBuyCoin");
 
@@ -137,6 +139,15 @@ class TransactionControllerTest {
             service.create(new Oracle(date, 8.0));
         }
         return service;
+    }
+
+    private static OracleSimpleClient emptyClient() {
+        return new OracleSimpleClient() {
+            @Override
+            public List<ExchangeRate> getValues(LocalDate since, LocalDate to) {
+                return List.of();
+            }
+        };
     }
 
     private static MessageProvider messages() {

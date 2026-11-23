@@ -37,7 +37,7 @@ class OracleServiceTest {
 
     @Test
     void throwsExceptionWhenDailyQuoteNotFound() {
-        OracleService service = new OracleService(new OracleSimpleClient());
+        OracleService service = new OracleService(emptyClient());
 
         IllegalStateException exception = assertThrows(
                 IllegalStateException.class,
@@ -48,7 +48,7 @@ class OracleServiceTest {
 
     @Test
     void findsQuoteByDateAndReturnsNullWhenMissing() {
-        OracleService service = new OracleService(new OracleSimpleClient());
+        OracleService service = new OracleService(emptyClient());
         LocalDate date = LocalDate.of(2026, 3, 15);
         Oracle expected = new Oracle(date, 4.0);
         service.create(expected);
@@ -77,4 +77,14 @@ class OracleServiceTest {
         // Segundo acesso deve vir do cache
         assertSame(loaded, service.findByDate(targetDate));
     }
+
+    private static OracleSimpleClient emptyClient() {
+        return new OracleSimpleClient() {
+            @Override
+            public List<ExchangeRate> getValues(LocalDate since, LocalDate to) {
+                return List.of();
+            }
+        };
+    }
+
 }
